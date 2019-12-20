@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="image">
+      <UniqueIdentifier>{269de2dc-f86c-4304-a5a8-61b25a94ea2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="layers">
+      <UniqueIdentifier>{ef049326-5a1d-4f04-b04f-af4c7c72b5b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="interface">
+      <UniqueIdentifier>{92c1d758-ce0c-4e9c-af3f-f460da28cb22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="audio">
+      <UniqueIdentifier>{cb314450-2ced-49bc-b802-8489cea3d4c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="export">
+      <UniqueIdentifier>{d16bdcee-c53f-404c-8160-4e39ff9abfe2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ImageProcess.h">
+      <Filter>image</Filter>
+    </ClInclude>
+    <ClInclude Include="OeipCommon.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseLayer.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoDevice.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoManager.h">
+      <Filter>interface</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioFile.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioRecord.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Oeip.h">
+      <Filter>export</Filter>
+    </ClInclude>
+    <ClInclude Include="OeipManager.h">
+      <Filter>export</Filter>
+    </ClInclude>
+    <ClInclude Include="OeipExport.h">
+      <Filter>export</Filter>
+    </ClInclude>
+    <ClInclude Include="OeipDefine.h">
+      <Filter>export</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ImageProcess.cpp">
+      <Filter>image</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseLayer.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="OeipCommon.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoDevice.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoManager.cpp">
+      <Filter>interface</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioFile.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioRecord.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="OeipManager.cpp">
+      <Filter>export</Filter>
+    </ClCompile>
+    <ClCompile Include="OeipExport.cpp">
+      <Filter>export</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="..\README.md" />
+  </ItemGroup>
+</Project>

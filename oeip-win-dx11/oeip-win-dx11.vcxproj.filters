@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="layers">
+      <UniqueIdentifier>{1f7a0240-b1cf-42a9-b481-5206b15ddd85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{e5a09334-8186-4523-a319-e7f0fa41472f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cs">
+      <UniqueIdentifier>{ade82854-0b35-42ee-9abb-b7ff4b3337db}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="InputLayerDx11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputLayerDx11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="Dx11ComputeShader.cpp">
+      <Filter>cs</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcessDx11.cpp">
+      <Filter>cs</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerDx11.cpp">
+      <Filter>cs</Filter>
+    </ClCompile>
+    <ClCompile Include="YUV2RGBALayerDX11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="InputLayerDx11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputLayerDx11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.hlsl">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Dx11ComputeShader.h">
+      <Filter>cs</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageProcessDx11.h">
+      <Filter>cs</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerDx11.h">
+      <Filter>cs</Filter>
+    </ClInclude>
+    <ClInclude Include="YUV2RGBALayerDX11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Input.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Output.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Test.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="YUV2RGBA.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Resize.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
