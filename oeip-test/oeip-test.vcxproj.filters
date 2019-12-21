@@ -23,5 +23,8 @@
     <ClInclude Include="testcamer.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="templatetest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

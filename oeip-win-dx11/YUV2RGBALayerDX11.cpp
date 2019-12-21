@@ -37,9 +37,12 @@ bool YUV2RGBALayerDX11::initHlsl()
 
 void YUV2RGBALayerDX11::onInitLayer()
 {
-	if (layerParamet.yuvType == OEIP_YUVFMT_YUV420SP) {
+	if (layerParamet.yuvType == OEIP_YUVFMT_YUV420SP || layerParamet.yuvType == OEIP_YUVFMT_YUV420P || layerParamet.yuvType == OEIP_YUVFMT_YUY2P) {
 		threadSizeX = selfConnects[0].width;
 		threadSizeY = selfConnects[0].height * 2 / 3;
+		if (layerParamet.yuvType == OEIP_YUVFMT_YUY2P) {
+			threadSizeY = selfConnects[0].height / 2;
+		}
 		outConnects[0].width = threadSizeX;
 		outConnects[0].height = threadSizeY;
 	}

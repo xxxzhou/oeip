@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+
 #define OEIP_EMPTYSTR ""
 
 #ifndef SAFE_RELEASE
@@ -53,7 +54,8 @@ OEIPDLL_EXPORT std::string getLayerName(OeipLayerType layerType);
 
 OEIPDLL_EXPORT uint32_t divUp(int32_t x, int32_t y);
 
-template <class T> void safeRelease(T*& ppT)
+template <class T>
+void safeRelease(T*& ppT)
 {
 	if (ppT != nullptr) {
 		(ppT)->Release();
@@ -61,7 +63,8 @@ template <class T> void safeRelease(T*& ppT)
 	}
 }
 
-template <class T> void safeReleaseAll(T*& ppT)
+template <class T>
+void safeReleaseAll(T*& ppT)
 {
 	if (ppT != nullptr) {
 		long e = (ppT)->Release();
@@ -72,7 +75,8 @@ template <class T> void safeReleaseAll(T*& ppT)
 	}
 }
 
-template <class T> void safeDelete(T*& ppT)
+template <class T>
+void safeDelete(T*& ppT)
 {
 	if (ppT != nullptr) {
 		delete ppT;
@@ -88,3 +92,49 @@ void clearList(std::vector<T*> list)
 	}
 	list.clear();
 }
+
+template<int32_t index, typename... Types>
+struct LayerParamet;
+
+template<int32_t index, typename First, typename... Types>
+struct LayerParamet<index, First, Types...>
+{
+	using ParametType = typename LayerParamet<index - 1, Types...>::ParametType;
+};
+
+template<typename T, typename... Types>
+struct LayerParamet<0, T, Types...>
+{
+	using ParametType = T;
+};
+
+template<typename T, typename... Types>
+struct LayerParamet<-1, T, Types...>
+{
+	using ParametType = int32_t;
+};
+
+//前向声明
+template < typename T, typename... List >
+struct IndexOf;
+
+//一般形式
+template < typename T, typename Head, typename... Rest >
+struct IndexOf<T, Head, Rest...>
+{
+	static const int32_t value = IndexOf<T, Rest...>::value + 1;
+};
+
+//递归终止一 查找到相等(T=T向前++)
+template < typename T, typename... Rest >
+struct IndexOf<T, T, Rest...>
+{
+	static const int32_t value = 0;
+};
+
+//递归终止二 没找到
+template < typename T >
+struct IndexOf<T>
+{
+	static const int32_t value = -1;
+};

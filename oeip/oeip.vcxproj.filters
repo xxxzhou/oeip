@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="image">
-      <UniqueIdentifier>{269de2dc-f86c-4304-a5a8-61b25a94ea2f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="layers">
       <UniqueIdentifier>{ef049326-5a1d-4f04-b04f-af4c7c72b5b1}</UniqueIdentifier>
     </Filter>
@@ -28,11 +25,11 @@
     <Filter Include="export">
       <UniqueIdentifier>{d16bdcee-c53f-404c-8160-4e39ff9abfe2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="fixpipe">
+      <UniqueIdentifier>{dd4d2901-e789-4397-8ebc-2909badab9ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ImageProcess.h">
-      <Filter>image</Filter>
-    </ClInclude>
     <ClInclude Include="OeipCommon.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -66,11 +63,14 @@
     <ClInclude Include="OeipDefine.h">
       <Filter>export</Filter>
     </ClInclude>
+    <ClInclude Include="ImageProcess.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoPipe.h">
+      <Filter>fixpipe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ImageProcess.cpp">
-      <Filter>image</Filter>
-    </ClCompile>
     <ClCompile Include="BaseLayer.cpp">
       <Filter>layers</Filter>
     </ClCompile>
@@ -97,6 +97,12 @@
     </ClCompile>
     <ClCompile Include="OeipExport.cpp">
       <Filter>export</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcess.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoPipe.cpp">
+      <Filter>fixpipe</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

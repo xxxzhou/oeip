@@ -129,6 +129,7 @@
     <ClInclude Include="PluginManager.h" />
     <ClInclude Include="VideoDevice.h" />
     <ClInclude Include="VideoManager.h" />
+    <ClInclude Include="VideoPipe.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioFile.cpp" />
@@ -141,6 +142,7 @@
     <ClCompile Include="PluginManager.cpp" />
     <ClCompile Include="VideoDevice.cpp" />
     <ClCompile Include="VideoManager.cpp" />
+    <ClCompile Include="VideoPipe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

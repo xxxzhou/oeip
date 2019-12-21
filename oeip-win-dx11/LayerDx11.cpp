@@ -23,10 +23,6 @@ bool LayerDx11::onInitBuffer()
 			bInit &= outTextures[i]->initResource(dx11->device);
 		}
 	}
-	constBuffer->setBufferSize(sizeof(InputConstant));
-	constBuffer->initResource(dx11->device);
-	constBuffer->cpuData = (uint8_t*)&inputConstant;
-	updateCBuffer();
 	if (layerType != OEIP_INPUT_LAYER) {
 		for (int32_t i = 0; i < inCount; i++) {
 			int32_t layerIndex = forwardLayerIndexs[i];
@@ -41,7 +37,17 @@ bool LayerDx11::onInitBuffer()
 			outUAVs[i] = outTextures[i]->uavView;
 		}
 	}
+	onInitCBuffer();
+	updateCBuffer();
 	return bInit;
+}
+
+bool LayerDx11::onInitCBuffer()
+{
+	constBuffer->setBufferSize(sizeof(InputConstant));
+	constBuffer->initResource(dx11->device);
+	constBuffer->cpuData = (uint8_t*)&inputConstant;	
+	return true;
 }
 
 bool LayerDx11::updateCBuffer()
@@ -54,7 +60,6 @@ bool LayerDx11::updateCBuffer()
 	constBuffer->updateResource(dx11->ctx);
 	return true;
 }
-
 
 void LayerDx11::setImageProcess(ImageProcess* ipdx11)
 {

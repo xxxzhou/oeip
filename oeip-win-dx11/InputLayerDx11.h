@@ -7,13 +7,11 @@ class InputLayerDx11 :public InputLayer, public LayerDx11
 public:
 	InputLayerDx11();
 	~InputLayerDx11() {};
-public:
-	OeipLayerType layerType = OEIP_INPUT_LAYER;
 private:
 	std::vector<std::unique_ptr<Dx11SharedTex>> shardTexs;
 	std::vector<std::unique_ptr<Dx11Buffer>> inBuffers;
 protected:
-	virtual void onParametChange(InputLayerParamet oldT) override;
+	virtual void onParametChange(InputParamet oldT) override;
 	virtual void onInitLayer() override;
 	virtual bool initHlsl() override;
 	virtual bool onInitBuffer() override;

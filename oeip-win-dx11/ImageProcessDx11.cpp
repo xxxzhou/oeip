@@ -44,7 +44,6 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType)
 		break;
 	}
 	if (layer) {
-		layer->layerType = layerType;
 		layer->setImageProcess(this);
 	}
 	return layer;
@@ -53,6 +52,8 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType)
 void ImageProcessDx11::onRunLayers()
 {
 	for (auto layer : layers) {
+		if (layer->bDisable || layer->bDisableList)
+			continue;
 		layer->runLayer();
 	}
 }

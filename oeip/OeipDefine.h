@@ -77,3 +77,5 @@
 
 #define OEIP_CV_ELEM_SIZE(type) (OEIP_CV_MAT_CN(type)*OEIP_CV_ELEM_SIZE1(type))
 #pragma endregion
+
+#define OEIP_TOSTRING(x) #x

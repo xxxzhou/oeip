@@ -19,8 +19,8 @@ protected:
 	int32_t runInit = 0;
 	std::vector<std::shared_ptr<BaseLayer>> layers;
 	onProcessHandle onProcessEvent;
-	bool bInitLayer = false;
-	bool bInitBuffer = false;
+	bool bInitLayers = false;
+	bool bInitBuffers = false;
 	//bool bRunFirst = false;
 protected:
 	//链接各层
@@ -33,14 +33,17 @@ public:
 	//updateLayer里根据参数决定是否需要重新初始化
 	void resetLayers() {
 		std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-		bInitLayer = false;
+		bInitLayers = false;
 	};
-
-	int32_t addLayer(const std::string& name, OeipLayerType layerType);
+	int32_t addLayer(const std::string& name, OeipLayerType layerType, const void* paramet = nullptr);
+	void connectLayer(int32_t layerIndex, const std::string& forwardName, int32_t inputIndex = 0, int32_t selfIndex = 0);
 	template<typename T>
-	int32_t addLayer(const std::string& name, OeipLayerType layerType, const T& t);
-	template<typename T>
-	bool updateLayer(int32_t index, const T& t);
+	bool updateLayer(int32_t layerIndex, const T& t);
+	bool updateLayer(int32_t layerIndex, const void* paramet);
+	void setEnableLayer(int32_t layerIndex, bool bEnable);
+	bool getEnableLayer(int32_t layerIndex);
+	void setEnableLayerList(int32_t layerIndex, bool bEnable);
+	bool getEnableLayerList(int32_t layerIndex);
 public:
 	int32_t findLayer(const std::string& name);
 	void getLayerOutConnect(int32_t layerIndex, LayerConnect& outConnect, int32_t outIndex);
@@ -58,15 +61,6 @@ public:
 };
 
 template<typename T>
-inline int32_t ImageProcess::addLayer(const std::string& name, OeipLayerType layerType, const T& t)
-{
-	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	int32_t index = addLayer(name, layerType);
-	updateLayer(index, t);
-	return index;
-};
-
-template<typename T>
 inline bool ImageProcess::updateLayer(int32_t index, const T& t)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
@@ -81,5 +75,4 @@ inline bool ImageProcess::updateLayer(int32_t index, const T& t)
 	layer->updateParamet(t);
 	return true;
 };
-
-OEIPDLL_EXPORT void registerFactory(ObjectFactory<ImageProcess>* factory, int32_t type, std::string name);
+template OEIPDLL_EXPORT void registerFactory<ImageProcess>(ObjectFactory<ImageProcess>* factory, int32_t type, std::string name);

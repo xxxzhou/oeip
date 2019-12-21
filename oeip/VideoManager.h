@@ -8,9 +8,9 @@ public:
 	VideoManager();
 	virtual ~VideoManager();
 protected:
-	std::vector<VideoDevice*> videoList; 
+	std::vector<VideoDevice*> videoList;
 public:
 	virtual std::vector<VideoDevice*> getDeviceList() = 0;
 };
-
-OEIPDLL_EXPORT void registerFactory(ObjectFactory<VideoManager>* factory, int32_t type, std::string name);
+//实例化供导出
+template OEIPDLL_EXPORT void registerFactory<VideoManager>(ObjectFactory<VideoManager>* factory, int32_t type, std::string name);

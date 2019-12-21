@@ -20,6 +20,8 @@ public:
 	virtual ~CommonLayer() {};
 public:
 	OeipLayerType layerType = OEIP_NONE_LAYER;
+public:
+	static const int layerTypeIndex = -1;
 };
 
 template<typename T>
@@ -27,28 +29,31 @@ class BaseLayerTemplate : public virtual CommonLayer
 {
 public:
 	typedef T UpdateStruct;
-
 	T layerParamet;
 public:
-	BaseLayerTemplate() {};
+	static const int32_t layerTypeIndex = IndexOf<T, AllLayerParamet>::value;
+public:
+	BaseLayerTemplate() {
+		layerType = OeipLayerType(layerTypeIndex);		
+	};
 	virtual ~BaseLayerTemplate() {};
 public:
-	//一定引发onParametChange,是否重置buffer看onParametChange的决定
+	//一定引发onParametChange,是否需要重置当前管线看onParametChange的决定
 	void updateParamet(const T& t) {
 		T oldParamet = layerParamet;
 		layerParamet = t;
 		onParametChange(oldParamet);
 	};
+	void updateParamet(const void* paramet);
 protected:
 	//当更新当层Layer层的参数时发生,根据需要决定变更那些buffer,一般在bBufferInit=true后有意义
 	virtual void onParametChange(T oldT) {};
 };
 
-#define TOSTRING(x) #x
 #define OEIP_CS_SIZE_X 32
 #define OEIP_CS_SIZE_Y 8
-#define OEIP_CS_SIZE_XSTR TOSTRING(32)
-#define OEIP_CS_SIZE_YSTR TOSTRING(8)
+#define OEIP_CS_SIZE_XSTR OEIP_TOSTRING(32)
+#define OEIP_CS_SIZE_YSTR OEIP_TOSTRING(8)
 
 class OEIPDLL_EXPORT BaseLayer :public virtual CommonLayer
 {
@@ -63,11 +68,11 @@ public:
 	std::vector<std::string> forwardNames;
 	//对应每层的输出索引
 	std::vector<int32_t> forwardOutIndexs;
-protected:
 	//当前层是否关闭
 	bool bDisable = false;
 	//当前层及链接在后面的层全部关闭运算
 	bool bDisableList = false;
+protected:
 	//当前层buffer有没初始化
 	bool bBufferInit = false;
 	int32_t threadSizeX;
@@ -91,7 +96,7 @@ protected:
 	//和每层输入有关的初始化
 	virtual void onInitLayer(int32_t index) {};
 	//相应的GPU显存申请
-	virtual bool onInitBuffer() { return true; }	
+	virtual bool onInitBuffer() { return true; }
 	virtual void onRunLayer() {};
 public:
 	virtual void setImageProcess(class ImageProcess* process) {
@@ -104,6 +109,7 @@ public:
 	virtual bool initLayer();
 	bool initBuffer();
 	void runLayer();
+	void updateParamet(const void* paramet);
 public:
 	int32_t getForwardIndex(int32_t inputIndex) {
 		return forwardLayerIndexs[inputIndex];
@@ -135,13 +141,11 @@ public:
 	virtual void outputGpuTex(void* device, void* texture, int32_t outputIndex) = 0;
 };
 
-class OEIPDLL_EXPORT InputLayer : public BaseLayerTemplate<InputLayerParamet>, public BaseInputLayer
+class OEIPDLL_EXPORT InputLayer : public BaseLayerTemplate<InputParamet>, public BaseInputLayer
 {
 public:
 	InputLayer() {};
 	virtual ~InputLayer() {};
-public:
-	OeipLayerType layerType = OEIP_INPUT_LAYER;
 };
 
 class OEIPDLL_EXPORT OutputLayer : public BaseLayerTemplate<OutputParamet>, public BaseOutputLayer
@@ -149,10 +153,14 @@ class OEIPDLL_EXPORT OutputLayer : public BaseLayerTemplate<OutputParamet>, publ
 public:
 	OutputLayer() {};
 	virtual ~OutputLayer() {};
-public:
-	OeipLayerType layerType = OEIP_OUTPUT_LAYER;
 };
 
+template<typename T>
+inline void BaseLayerTemplate<T>::updateParamet(const void* paramet)
+{
+	T* tparamet = (T*)paramet;
+	updateParamet(*tparamet);
+}
+
 typedef BaseLayerTemplate<YUV2RGBAParamet> YUV2RGBALayer;
-
-
+typedef BaseLayerTemplate<MapChannelParamet> MapChannelLayer;

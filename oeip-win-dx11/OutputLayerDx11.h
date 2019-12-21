@@ -6,8 +6,6 @@ class OutputLayerDx11 :public OutputLayer, public LayerDx11
 public:
 	OutputLayerDx11();
 	~OutputLayerDx11() {};
-public:
-	OeipLayerType layerType = OEIP_OUTPUT_LAYER;
 private:
 	std::vector<std::unique_ptr<Dx11SharedTex>> shardTexs;
 	std::vector<std::unique_ptr<Dx11Buffer>> outBuffers;

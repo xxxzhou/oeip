@@ -13,7 +13,7 @@ InputLayerDx11::InputLayerDx11()
 	computeShader->setCS(105, modeName, rctype);
 }
 
-void InputLayerDx11::onParametChange(InputLayerParamet oldT)
+void InputLayerDx11::onParametChange(InputParamet oldT)
 {
 	if (!bBufferInit)
 		return;

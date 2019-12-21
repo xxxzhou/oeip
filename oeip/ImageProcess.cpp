@@ -1,41 +1,55 @@
 #include "ImageProcess.h"
 
+#define OEIP_CHECKPIPEINDEXVOID \
+	if (layerIndex<0 || layerIndex > layers.size())\
+		return ;\
+	auto layer = layers[layerIndex];
+#define OEIP_CHECKPIPEINDEXBOOL \
+	if (layerIndex<0 || layerIndex > layers.size())\
+		return false;\
+	auto layer = layers[layerIndex];
+
+
 bool ImageProcess::initLayers()
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	bInitLayer = false;
-	bInitBuffer = false;
+	bInitLayers = false;
+	bInitBuffers = false;
 	for (auto layer : layers) {
+		if (layer->bDisable || layer->bDisableList)
+			continue;
 		if (!layer->initLayer()) {
-			bInitLayer = false;
+			bInitLayers = false;
 			return false;
 		}
 	}
-	bInitLayer = onInitLayers();
-	if (bInitLayer) {
+	bInitLayers = onInitLayers();
+	if (bInitLayers) {
 		for (auto layer : layers) {
+			if (layer->bDisable || layer->bDisableList)
+				continue;
 			if (!layer->initBuffer()) {
-				bInitBuffer = false;
+				bInitBuffers = false;
 				return false;
 			}
 		}
-		bInitBuffer = true;
+		bInitBuffers = true;
 	}
-	return bInitLayer && bInitBuffer;
+	return bInitLayers && bInitBuffers;
 }
 
 void ImageProcess::runLayers()
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	if (!bInitLayer) {
+	if (!bInitLayers) {
 		initLayers();
 	}
-	if (bInitLayer && bInitBuffer) {
+	if (bInitLayers && bInitBuffers) {
 		onRunLayers();
 	}
 }
 
-int32_t ImageProcess::addLayer(const std::string& name, OeipLayerType layerType)
+int32_t ImageProcess::addLayer(const std::string& name, OeipLayerType layerType, const void* paramet)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	for (auto clayer : layers) {
@@ -52,14 +66,25 @@ int32_t ImageProcess::addLayer(const std::string& name, OeipLayerType layerType)
 	}
 	layer->layerName = name;
 	layer->layerIndex = layers.size();
+	if (paramet) {
+		layer->updateParamet(paramet);
+	}
 	layers.push_back(layer);
 	return layer->layerIndex;
+}
+
+void ImageProcess::connectLayer(int32_t layerIndex, const std::string & forwardName, int32_t inputIndex, int32_t selfIndex)
+{
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXVOID
+	layer->forwardNames[selfIndex] = forwardName;
+	layer->forwardOutIndexs[selfIndex] = inputIndex;
 }
 
 void ImageProcess::updateInput(int32_t layerIndex, uint8_t* data, int32_t intputIndex)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	auto layer = layers[layerIndex];
+	OEIP_CHECKPIPEINDEXVOID
 	BaseInputLayer* inputLayer = dynamic_cast<BaseInputLayer*>(layer.get());
 	if (inputLayer)
 		inputLayer->inputCpuData(data, intputIndex);
@@ -76,55 +101,89 @@ void ImageProcess::outputData(int32_t layerIndex, uint8_t* data, int32_t width, 
 void ImageProcess::setOutputGpuTex(int32_t layerIndex, void* device, void* tex, int32_t outputIndex)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	auto layer = layers[layerIndex];
+	OEIP_CHECKPIPEINDEXVOID
 	BaseOutputLayer* outputLayer = dynamic_cast<BaseOutputLayer*>(layer.get());
 	if (outputLayer)
 		outputLayer->outputGpuTex(device, tex, outputIndex);
 }
 
+bool ImageProcess::updateLayer(int32_t layerIndex, const void* paramet)
+{
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXBOOL
+	layer->updateParamet(paramet);
+	return true;
+}
+
+void ImageProcess::setEnableLayer(int32_t layerIndex, bool bEnable)
+{
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXVOID
+	layer->bDisable = !bEnable;
+	bInitLayers = false;
+}
+
+bool ImageProcess::getEnableLayer(int32_t layerIndex)
+{
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXBOOL
+	return !layer->bDisable;
+}
+
+void ImageProcess::setEnableLayerList(int32_t layerIndex, bool bEnable)
+{
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXVOID
+	layer->bDisableList = !bEnable;
+	bInitLayers = false;
+}
+
+bool ImageProcess::getEnableLayerList(int32_t layerIndex)
+{
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXBOOL
+	return !layer->bDisableList;
+}
+
 int32_t ImageProcess::findLayer(const std::string& name)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	int32_t index = -1;
+	int32_t index = 0;
 	for (auto layer : layers) {
-		index += 1;
 		if (layer->layerName.compare(name)) {
 			return index;
 		}
+		index += 1;
 	}
-	//if (index < 0) {
-	//	std::string message = "not find layer:" + name;
-	//	logMessage(OEIP_ERROR, message.c_str());
-	//	return index;
-	//}
+	if (index >= layers.size())
+		return -1;
 	return index;
 }
 
 void ImageProcess::getLayerOutConnect(int32_t layerIndex, LayerConnect& outConnect, int32_t outIndex)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	layers[layerIndex]->getOutputSize(outConnect, outIndex);
+	OEIP_CHECKPIPEINDEXVOID
+	layer->getOutputSize(outConnect, outIndex);
 }
 
 void ImageProcess::getLayerInConnect(int32_t layerIndex, LayerConnect& inConnect, int32_t inIndex)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	layers[layerIndex]->getInputSize(inConnect, inIndex);
+	OEIP_CHECKPIPEINDEXVOID
+	layer->getInputSize(inConnect, inIndex);
 }
 
 void ImageProcess::setInput(int32_t layerIndex, int32_t width, int32_t height, int32_t dataType, int32_t intputIndex)
 {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXVOID
 	LayerConnect lc = {};
-	layers[layerIndex]->getInputSize(lc, intputIndex);
+	layer->getInputSize(lc, intputIndex);
 	if (lc.width != width || lc.height != height || lc.dataType != lc.dataType) {
-		layers[layerIndex]->setInputSize(width, height, dataType, intputIndex);
-		layers[layerIndex]->setOutputSize(width, height, dataType, intputIndex);
-		bInitLayer = false;
+		layer->setInputSize(width, height, dataType, intputIndex);
+		layer->setOutputSize(width, height, dataType, intputIndex);
+		bInitLayers = false;
 	}
 }
 
-void registerFactory(ObjectFactory<ImageProcess>* factory, int32_t type, std::string name)
-{
-	PluginManager<ImageProcess>::getInstance().registerFactory(factory, type, name);
-}

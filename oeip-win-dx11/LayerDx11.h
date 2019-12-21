@@ -51,8 +51,10 @@ protected:
 	virtual void onInitLayer(int32_t index) override {};
 	//当上下文设定大小后,开始创建对应纹理与buffer
 	virtual bool onInitBuffer() override;
-	virtual void onRunLayer() override;
+	virtual bool onInitCBuffer();
 	virtual bool updateCBuffer();
+	virtual void onRunLayer() override;
+
 };
 
 

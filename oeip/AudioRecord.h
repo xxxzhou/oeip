@@ -15,6 +15,7 @@ public:
 	virtual void close() {};
 };
 
-OEIPDLL_EXPORT void registerFactory(ObjectFactory<AudioRecord>* factory, int32_t type, std::string name);
+template OEIPDLL_EXPORT void registerFactory<AudioRecord>(ObjectFactory<AudioRecord>* factory, int32_t type, std::string name);
+
 
 

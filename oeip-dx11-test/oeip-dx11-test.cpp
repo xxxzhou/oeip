@@ -5,7 +5,7 @@
 #include "oeip-dx11-test.h"
 #include <windows.h>
 #include <d3d11.h>
-#include <d3dx11.h>
+//#include <d3dx11.h>
 #include "resource.h"
 
 #include "../oeip/OeipExport.h"
@@ -94,11 +94,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		setFormat(devicdIndex, formatIndex);
 		openDevice(devicdIndex);
 
-		InputLayerParamet ip = {};
+		InputParamet ip = {};
 		YUV2RGBAParamet yuip = {};
 		yuip.yuvType = getVideoYUV(formats[formatIndex].videoType);
-		updatePipeParamet(pipeId, 0, ip);
-		updatePipeParamet(pipeId, 1, yuip);
+		updatePipeParamet(pipeId, 0, &ip);
+		updatePipeParamet(pipeId, 1, &yuip);
 		if (yuip.yuvType == OEIP_VIDEO_NV12)
 			setPipeInput(pipeId, inputLayerIndex, width, height * 3 / 2, OEIP_CV_8UC1);
 		else

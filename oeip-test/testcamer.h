@@ -61,22 +61,22 @@ namespace OeipCamera
 		setFormat(devicdIndex, formatIndex);
 		openDevice(devicdIndex);
 
-		InputLayerParamet ip = {};
+		InputParamet ip = {};
 		yuip.yuvType = getVideoYUV(formats[formatIndex].videoType);
-		updatePipeParamet(pipeId, 0, ip);
-		updatePipeParamet(pipeId, 1, yuip);
+		updatePipeParamet(pipeId, 0, (void*)&ip);
+		updatePipeParamet(pipeId, 1, &yuip);
 		if (yuip.yuvType == OEIP_VIDEO_NV12)
 			setPipeInput(pipeId, inputLayerIndex, width, height * 3 / 2, OEIP_CV_8UC1);
 		else
 			setPipeInput(pipeId, inputLayerIndex, width / 2, height, OEIP_CV_8UC4);
 		show = new cv::Mat(height, width, CV_8UC4);
 		//const char* window_name = "vvvvvvvv";
-		while (int key = cv::waitKey(1)) {			
+		while (int key = cv::waitKey(1)) {
 			cv::imshow("a", *show);
 			switch (key)
 			{
 			case 'q':
-				updatePipeParamet(pipeId, 0, ip);
+				updatePipeParamet(pipeId, 0, &ip);
 				break;
 			default:
 				break;

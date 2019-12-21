@@ -4,10 +4,10 @@
 //__cdecl 默认C/C++语言调用规则 调用者来清栈 UE4
 //__stdcall 默认C#调用规则 被调用的函数自己清栈 Unity
 
-template<typename T>
-bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const T& t);
-template OEIPDLL_EXPORT bool updatePipeParamet<InputLayerParamet>(int32_t pipeId, int32_t layerIndex, const InputLayerParamet& paramet);
-template OEIPDLL_EXPORT bool updatePipeParamet<YUV2RGBAParamet>(int32_t pipeId, int32_t layerIndex, const YUV2RGBAParamet& paramet);
+//template<typename T>
+//bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const T& t);
+//template OEIPDLL_EXPORT bool updatePipeParamet<InputParamet>(int32_t pipeId, int32_t layerIndex, const InputParamet& paramet);
+//template OEIPDLL_EXPORT bool updatePipeParamet<YUV2RGBAParamet>(int32_t pipeId, int32_t layerIndex, const YUV2RGBAParamet& paramet);
 
 extern "C"
 {
@@ -34,7 +34,7 @@ extern "C"
 	//捕获视频设备设置对应格式
 	OEIPDLL_EXPORT void setFormat(int32_t deviceIndex, int32_t formatIndex);
 	//运行设备
-	OEIPDLL_EXPORT bool openDevice(int deviceIndex);
+	OEIPDLL_EXPORT bool openDevice(int32_t deviceIndex);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型,用于C/C#使用
 	OEIPDLL_EXPORT void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型。用于C++使用。
@@ -48,6 +48,14 @@ extern "C"
 #pragma region gpgpu pipe
 	//初始化一个GPU计算管线
 	OEIPDLL_EXPORT int32_t initPipe(OeipGpgpuType gpgpuType);
+	//管线添加一层,paramet表示管线对应的参数结构,请传递对应结构
+	OEIPDLL_EXPORT int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet = nullptr);
+	//设定连接层级
+	OEIPDLL_EXPORT void connectLayer(int32_t pipeId, int32_t layerIndex, const char* forwardName, int32_t inputIndex = 0, int32_t selfIndex = 0);
+	//设定当前层是否可用
+	OEIPDLL_EXPORT void setEnableLayer(int32_t pipeId, int32_t layerIndex, bool bEnable);
+	//设定当前层及关联这层的分支全部不可用
+	OEIPDLL_EXPORT void setEnableLayerList(int32_t pipeId, int32_t layerIndex, bool bEnable);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型,用于C/C#使用
 	OEIPDLL_EXPORT void setPipeDataAction(int32_t pipeId, onProcessAction onProcessData);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型。用于C++使用。
@@ -62,10 +70,8 @@ extern "C"
 	OEIPDLL_EXPORT void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);
 	//把当前管线的输出结果直接放入另一个DX11上下文的纹理中
 	OEIPDLL_EXPORT void setPipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t outputIndex = 0);
-
-
-	//OEIPDLL_EXPORT void updatePipeParamet(int32_t pipeId, int32_t layerIndex, InputLayerParamet paramet);
-	//OEIPDLL_EXPORT void updatePipeParamet(int32_t pipeId, int32_t layerIndex, YUV2RGBALayerParamet paramet);
+	//更新当前层的参数，需要注意paramet是当前层的参数结构，不同会引发想不到的问题
+	OEIPDLL_EXPORT bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const void* paramet);
 #pragma endregion
 }
 

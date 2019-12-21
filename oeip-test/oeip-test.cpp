@@ -3,10 +3,14 @@
 
 #include <iostream>
 #include "testcamer.h"
+#include "templatetest.h"
 #include <mutex>
 
 int main()
 {	
+	Templatetest::TemplateLayer<1> t1;
+	double x = 1;
+	t1.update(&x);
 	OeipCamera::testCamera();
 	std::cout << "Hello World!\n";
 }

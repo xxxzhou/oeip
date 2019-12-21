@@ -55,6 +55,8 @@ enum OeipLayerType : int32_t
 	OEIP_MAX_LAYER,
 };
 
+#define AllLayerParamet void, InputParamet, YUV2RGBAParamet, MapChannelParamet, void, OutputParamet, void
+
 enum OeipGpgpuType : int32_t
 {
 	OEIP_GPGPU_OTHER,
@@ -93,7 +95,7 @@ enum VideoDeviceType : int32_t
 
 //C#/C++里bool都只有一字节，但是可能因为不同对齐方式导致差异，故与C#交互的结构bool全使用int32
 //默认从CPU输入,如果要支持GPU输入,bGpu=true
-struct InputLayerParamet
+struct InputParamet
 {
 	int32_t bCpu = true;
 	int32_t bGpu = false;
@@ -108,6 +110,15 @@ struct OutputParamet
 struct YUV2RGBAParamet
 {
 	OeipYUVFMT yuvType = OEIP_YUVFMT_YUV420SP;
+};
+
+//ARGB<->BGRA<->RGBA<->RRRR
+struct MapChannelParamet
+{
+	uint32_t red = 0;
+	uint32_t green = 1;
+	uint32_t blue = 2;
+	uint32_t alpha = 4;
 };
 
 struct ResizeParamet

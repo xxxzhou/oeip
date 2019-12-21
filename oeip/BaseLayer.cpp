@@ -25,12 +25,31 @@ bool BaseLayer::initLayer()
 	std::string layerMeg = "check " + layerName + " in:" + std::to_string(layerIndex) + " " + getLayerName(layerType) + inputMeg;
 	for (uint32_t i = 0; i < inCount; i++) {
 		LayerConnect lc = selfConnects[i];
+		if (layerType <= 0) {
+			std::string message = layerMeg + "layer type invalid.";
+			logMessage(OEIP_ERROR, message.c_str());
+			return false;
+		}
 		if (layerType != OEIP_INPUT_LAYER) {
 			if (forwardNames[i].empty()) {
 				forwardLayerIndexs[i] = layerIndex - 1;
 			}
 			else {
 				forwardLayerIndexs[i] = imageProcess->findLayer(forwardNames[i]);
+			}
+			//bEnableList会关闭所有连接到当前层的后续层
+			bool bEnableList = imageProcess->getEnableLayerList(forwardLayerIndexs[i]);
+			if (!bEnableList) {
+				this->bDisableList = true;
+				continue;
+			}
+			bool bEnable = imageProcess->getEnableLayer(forwardLayerIndexs[i]);
+			while (!bEnable) {
+				//自动向上一层
+				forwardLayerIndexs[i] -= 1;
+				if (forwardLayerIndexs[i] < 0)
+					break;
+				bEnable = imageProcess->getEnableLayer(forwardLayerIndexs[i]);
 			}
 			if (forwardLayerIndexs[i] < 0) {
 				std::string message = layerMeg + "out of range.";
@@ -88,6 +107,25 @@ void BaseLayer::runLayer()
 	if (!bBufferInit)
 		return;
 	onRunLayer();
+}
+
+void BaseLayer::updateParamet(const void* paramet)
+{
+	if (layerType == OEIP_INPUT_LAYER) {
+		using ParametType = LayerParamet<OEIP_INPUT_LAYER, AllLayerParamet>::ParametType;
+		auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);
+		xlayer->updateParamet(paramet);
+	}
+	else if (layerType == OEIP_YUV2RGBA_LAYER) {
+		using ParametType = LayerParamet<OEIP_YUV2RGBA_LAYER, AllLayerParamet>::ParametType;
+		auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);
+		xlayer->updateParamet(paramet);
+	}
+	else if (layerType == OEIP_OUTPUT_LAYER) {
+		using ParametType = LayerParamet<OEIP_OUTPUT_LAYER, AllLayerParamet>::ParametType;
+		auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);
+		xlayer->updateParamet(paramet);
+	}
 }
 
 void BaseLayer::setInputSize(int32_t width, int32_t height, int32_t dataType, int32_t intputIndex)

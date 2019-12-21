@@ -54,11 +54,6 @@ int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType)
 	if (vp == nullptr)
 		return -1;
 	imagePipeList.push_back(vp);
-
-	vp->addLayer("input", OEIP_INPUT_LAYER);
-	vp->addLayer("nv2rgba", OEIP_YUV2RGBA_LAYER);
-	vp->addLayer("output", OEIP_OUTPUT_LAYER);
-
 	return imagePipeList.size() - 1;
 }
 

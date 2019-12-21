@@ -136,3 +136,9 @@ public:
 	}
 };
 
+
+template<typename T>
+void registerFactory(ObjectFactory<T>* factory, int32_t type, std::string name)
+{
+	PluginManager<T>::getInstance().registerFactory(factory, type, name);
+}

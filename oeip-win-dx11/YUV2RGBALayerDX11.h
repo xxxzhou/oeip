@@ -6,8 +6,6 @@ class YUV2RGBALayerDX11 : public YUV2RGBALayer, public LayerDx11
 public:
 	YUV2RGBALayerDX11();
 	~YUV2RGBALayerDX11() {};
-public:
-	OeipLayerType layerType = OEIP_YUV2RGBA_LAYER;
 private:
 	void initConnect();
 protected:
