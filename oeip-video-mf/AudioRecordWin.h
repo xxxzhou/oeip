@@ -14,7 +14,7 @@ public:
 	AudioRecordWin();
 	virtual ~AudioRecordWin(); 
 private:
-	AudioFile * audioFile;
+	AudioFile *audioFile;
 	onAudioRecordHandle onAudioRecordFunc;
 	bool bStart = false;
 	IAudioClient* client = nullptr;

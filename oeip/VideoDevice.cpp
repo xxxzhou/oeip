@@ -3,16 +3,13 @@
 #include <fstream>
 #include <regex>
 
-VideoDevice::VideoDevice()
-{
+VideoDevice::VideoDevice() {
 }
 
-VideoDevice::~VideoDevice()
-{
+VideoDevice::~VideoDevice() {
 }
 
-bool VideoDevice::setFormat(uint32_t index)
-{
+bool VideoDevice::setFormat(uint32_t index) {
 	if (index < 0 || index >= videoFormats.size())
 		index = 0;
 	bool open = bOpen();
@@ -27,8 +24,7 @@ bool VideoDevice::setFormat(uint32_t index)
 	return true;
 }
 
-void VideoDevice::getFormat(uint32_t index, VideoFormat& format)
-{
+void VideoDevice::getFormat(uint32_t index, VideoFormat& format) {
 	if (index >= videoFormats.size()) {
 		logMessage(OEIP_WARN, "video capture getformat incorrect index");
 		index = 0;
@@ -36,8 +32,7 @@ void VideoDevice::getFormat(uint32_t index, VideoFormat& format)
 	format = videoFormats[index];
 }
 
-bool VideoDevice::saveCameraParameters(std::wstring path)
-{
+bool VideoDevice::saveCameraParameters(std::wstring path) {
 	if (path.empty()) {
 		return false;
 	}
@@ -65,8 +60,7 @@ bool VideoDevice::saveCameraParameters(std::wstring path)
 	}
 }
 
-bool VideoDevice::loadCameraParameters(std::wstring path)
-{
+bool VideoDevice::loadCameraParameters(std::wstring path) {
 	std::wstring fileName = getDeviceID();
 	std::wregex reg(L"[^a-zA-Z0-9]+");
 	std::wstring fname = regex_replace(fileName, reg, L"");
@@ -93,15 +87,13 @@ bool VideoDevice::loadCameraParameters(std::wstring path)
 	}
 }
 
-void VideoDevice::onDeviceHandle(OeipDeviceEventType eventType, int32_t data)
-{
+void VideoDevice::onDeviceHandle(OeipDeviceEventType eventType, int32_t data) {
 	if (onDeviceEvent) {
 		onDeviceEvent(eventType, data);
 	}
 }
 
-void VideoDevice::onDataHandle(unsigned long lenght, uint8_t* data)
-{
+void VideoDevice::onDataHandle(unsigned long lenght, uint8_t* data) {
 	if (onProcessData) {
 		//OeipImageType imageType = getImageType(videoFormat.videoType);
 		//int32_t elementCount = (int32_t)imageType;

@@ -1,32 +1,27 @@
 #include "Dx11Resource.h"
 
-Dx11Resource::~Dx11Resource()
-{
+Dx11Resource::~Dx11Resource() {
 	releaseResource();
 }
 
-void Dx11Resource::Reset()
-{
+void Dx11Resource::Reset() {
 	if (bBufferInit) {
 		releaseResource();
 		bBufferInit = false;
 	}
 }
 
-bool Dx11Resource::initResource(ID3D11Device* deviceDx11)
-{
+bool Dx11Resource::initResource(ID3D11Device* deviceDx11) {
 	Reset();
 	return createResource(deviceDx11);
 }
 
-void Dx11CSResource::setCpuWrite(bool bCpuWrite)
-{
+void Dx11CSResource::setCpuWrite(bool bCpuWrite) {
 	Reset();
 	this->bCpuWrite = bCpuWrite;
 }
 
-void Dx11CSResource::setShared(bool bShared)
-{
+void Dx11CSResource::setShared(bool bShared) {
 	Reset();
 	this->bShared = bShared;
 	if (this->bShared) {
@@ -34,40 +29,34 @@ void Dx11CSResource::setShared(bool bShared)
 	}
 }
 
-void Dx11CSResource::setNoView(bool bNoView)
-{
+void Dx11CSResource::setNoView(bool bNoView) {
 	Reset();
 	this->bNoView = bNoView;
 }
 
-void Dx11CSResource::setOnlyUAV(bool bOnlyUAV)
-{
+void Dx11CSResource::setOnlyUAV(bool bOnlyUAV) {
 	Reset();
 	this->bOnlyUAV = bOnlyUAV;
 }
 
-void Dx11CSResource::releaseResource()
-{
+void Dx11CSResource::releaseResource() {
 	srvView.Release();
 	uavView.Release();
 }
 
 
-Dx11Texture::~Dx11Texture()
-{
+Dx11Texture::~Dx11Texture() {
 
 }
 
-void Dx11Texture::setTextureSize(int32_t width, int32_t height, DXGI_FORMAT format)
-{
+void Dx11Texture::setTextureSize(int32_t width, int32_t height, DXGI_FORMAT format) {
 	Reset();
 	this->width = width;
 	this->height = height;
 	this->format = format;
 }
 
-bool Dx11Texture::createResource(ID3D11Device* deviceDx11)
-{
+bool Dx11Texture::createResource(ID3D11Device* deviceDx11) {
 	D3D11_TEXTURE2D_DESC textureDesc = { };
 	textureDesc.Width = width;
 	textureDesc.Height = height;
@@ -108,8 +97,7 @@ bool Dx11Texture::createResource(ID3D11Device* deviceDx11)
 	return bBufferInit;
 }
 
-bool Dx11Texture::updateResource(ID3D11DeviceContext* ctxDx11)
-{
+bool Dx11Texture::updateResource(ID3D11DeviceContext* ctxDx11) {
 	if (!cpuData || !bBufferInit)
 		return false;
 	int dataType = width * height * sizeDxFormatElement(format);
@@ -121,26 +109,22 @@ bool Dx11Texture::updateResource(ID3D11DeviceContext* ctxDx11)
 	return bUpdate;
 }
 
-void Dx11Texture::releaseResource()
-{
+void Dx11Texture::releaseResource() {
 	Dx11CSResource::releaseResource();
 	texture.Release();
 }
 
-Dx11Buffer::~Dx11Buffer()
-{
+Dx11Buffer::~Dx11Buffer() {
 }
 
-void Dx11Buffer::setBufferSize(int32_t elementSize, int32_t dataType, bool rawBuffer)
-{
+void Dx11Buffer::setBufferSize(int32_t elementSize, int32_t dataType, bool rawBuffer) {
 	Reset();
 	this->dataType = dataType;
 	this->elementSize = elementSize;
 	this->bRawBuffer = rawBuffer;
 }
 
-bool Dx11Buffer::createResource(ID3D11Device* deviceDx11)
-{
+bool Dx11Buffer::createResource(ID3D11Device* deviceDx11) {
 	D3D11_BUFFER_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
 	desc.ByteWidth = elementSize * dataType;
@@ -182,8 +166,7 @@ bool Dx11Buffer::createResource(ID3D11Device* deviceDx11)
 	return bBufferInit;
 }
 
-bool Dx11Buffer::updateResource(ID3D11DeviceContext* ctxDx11)
-{
+bool Dx11Buffer::updateResource(ID3D11DeviceContext* ctxDx11) {
 	if (!cpuData || !bBufferInit)
 		return false;
 	int elementByteCount = elementSize * dataType;
@@ -191,23 +174,19 @@ bool Dx11Buffer::updateResource(ID3D11DeviceContext* ctxDx11)
 	return bUpdate;
 }
 
-void Dx11Buffer::releaseResource()
-{
+void Dx11Buffer::releaseResource() {
 	Dx11CSResource::releaseResource();
 	buffer.Release();
 }
 
-Dx11Constant::~Dx11Constant()
-{
+Dx11Constant::~Dx11Constant() {
 }
 
-void Dx11Constant::setBufferSize(int32_t dataType)
-{
+void Dx11Constant::setBufferSize(int32_t dataType) {
 	byteDataSize = dataType;
 }
 
-bool Dx11Constant::createResource(ID3D11Device* deviceDx11)
-{
+bool Dx11Constant::createResource(ID3D11Device* deviceDx11) {
 	//Constant默认不需要重建功能
 	if (buffer != nullptr)
 		return true;
@@ -233,26 +212,22 @@ bool Dx11Constant::createResource(ID3D11Device* deviceDx11)
 	return SUCCEEDED(hr);
 }
 
-bool Dx11Constant::updateResource(ID3D11DeviceContext* ctxDx11)
-{
+bool Dx11Constant::updateResource(ID3D11DeviceContext* ctxDx11) {
 	if (!cpuData)
 		return false;
 	ctxDx11->UpdateSubresource(buffer, 0, nullptr, cpuData, 0, 0);
 	return true;
 }
 
-void Dx11Constant::releaseResource()
-{
+void Dx11Constant::releaseResource() {
 	buffer.Release();
 }
 
-Dx11SharedTex::~Dx11SharedTex()
-{
+Dx11SharedTex::~Dx11SharedTex() {
 	release();
 }
 
-bool Dx11SharedTex::restart(ID3D11Device* deviceDx11, int32_t width, int32_t height, DXGI_FORMAT format)
-{
+bool Dx11SharedTex::restart(ID3D11Device* deviceDx11, int32_t width, int32_t height, DXGI_FORMAT format) {
 	texture = std::make_unique<Dx11Texture>();
 	texture->setShared(true);
 	texture->setTextureSize(width, height, format);
@@ -269,21 +244,18 @@ void Dx11SharedTex::release() {
 }
 
 #pragma region ShaderInclude
-ShaderInclude::ShaderInclude(std::string modelName, std::string rctype, int32_t rcId)
-{
+ShaderInclude::ShaderInclude(std::string modelName, std::string rctype, int32_t rcId) {
 	this->rcId = rcId;
 	readResouce(modelName.c_str(), rcId, rctype.c_str(), strRes, length);
 }
 
-HRESULT __stdcall ShaderInclude::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
-{
+HRESULT __stdcall ShaderInclude::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) {
 	*ppData = (const void*)strRes.c_str();
 	*pBytes = length;
 	return true;
 }
 
-HRESULT __stdcall ShaderInclude::Close(LPCVOID pData)
-{
+HRESULT __stdcall ShaderInclude::Close(LPCVOID pData) {
 	return true;
 }
 

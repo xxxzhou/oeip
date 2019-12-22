@@ -1,13 +1,11 @@
 #include "Dx11ComputeShader.h"
 #include "d3dcommon.h"
 
-void Dx11ComputeShader::setCS(int32_t rcId, std::string modelName, std::string rcType)
-{
+void Dx11ComputeShader::setCS(int32_t rcId, std::string modelName, std::string rcType) {
 	readResouce(modelName.c_str(), rcId, rcType.c_str(), rcData, size);
 }
 
-bool Dx11ComputeShader::initResource(ID3D11Device* deviceDx11, const D3D_SHADER_MACRO* defines, ID3DInclude* include, std::string mainFunc)
-{
+bool Dx11ComputeShader::initResource(ID3D11Device* deviceDx11, const D3D_SHADER_MACRO* defines, ID3DInclude* include, std::string mainFunc) {
 	if (rcData.empty())
 		return false;
 	computeShader.Release();
@@ -34,8 +32,7 @@ bool Dx11ComputeShader::initResource(ID3D11Device* deviceDx11, const D3D_SHADER_
 	return SUCCEEDED(hr);
 }
 
-void Dx11ComputeShader::runCS(ID3D11DeviceContext* dxCtx, const UInt3& groupSize, std::vector<ID3D11ShaderResourceView*> srvs, std::vector<ID3D11UnorderedAccessView*> urvs, std::vector<ID3D11Buffer*> cbuffer, bool bClear)
-{
+void Dx11ComputeShader::runCS(ID3D11DeviceContext* dxCtx, const UInt3& groupSize, std::vector<ID3D11ShaderResourceView*> srvs, std::vector<ID3D11UnorderedAccessView*> urvs, std::vector<ID3D11Buffer*> cbuffer, bool bClear) {
 	dxCtx->CSSetShader(computeShader, nullptr, 0);
 	if (cbuffer.size() > 0)
 		dxCtx->CSSetConstantBuffers(0, cbuffer.size(), cbuffer.data());
@@ -61,8 +58,7 @@ void Dx11ComputeShader::runCS(ID3D11DeviceContext* dxCtx, const UInt3& groupSize
 	}
 }
 
-void Dx11ComputeShader::runCS(ID3D11DeviceContext* dxCtx, const UInt3& groupSize, ID3D11ShaderResourceView* srv, ID3D11UnorderedAccessView* urv, ID3D11Buffer* cbuffer, bool bClear)
-{	
+void Dx11ComputeShader::runCS(ID3D11DeviceContext* dxCtx, const UInt3& groupSize, ID3D11ShaderResourceView* srv, ID3D11UnorderedAccessView* urv, ID3D11Buffer* cbuffer, bool bClear) {
 	dxCtx->CSSetShader(computeShader, nullptr, 0);
 	if (cbuffer)
 		dxCtx->CSSetConstantBuffers(0, 1, &cbuffer);

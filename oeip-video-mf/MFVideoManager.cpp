@@ -3,14 +3,13 @@
 #include "VideoCaptureDevice.h"
 #include "AudioRecordWin.h"
 
-MFVideoManager::MFVideoManager()
-{
+MFVideoManager::MFVideoManager() {
 	CComPtr<IMFAttributes> pAttributes = nullptr;
 	auto hr = MFCreateAttributes(&pAttributes, 1);
-	if (SUCCEEDED(hr))	{
+	if (SUCCEEDED(hr)) {
 		hr = pAttributes->SetGUID(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE, MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_GUID);
 	}
-	if (SUCCEEDED(hr))	{
+	if (SUCCEEDED(hr)) {
 		IMFActivate** ppDevices = nullptr;
 		UINT32 count = -1;
 		hr = MFEnumDeviceSources(pAttributes, &ppDevices, &count);
@@ -37,25 +36,21 @@ MFVideoManager::MFVideoManager()
 }
 
 
-MFVideoManager::~MFVideoManager()
-{
+MFVideoManager::~MFVideoManager() {
 	HRESULT hr = MFShutdown();
 	CoUninitialize();
 }
 
-std::vector<VideoDevice*> MFVideoManager::getDeviceList()
-{
+std::vector<VideoDevice*> MFVideoManager::getDeviceList() {
 	return videoList;
 }
 
-VideoManager* MFVideoManagerFactory::create(int type)
-{
+VideoManager* MFVideoManagerFactory::create(int type) {
 	MFVideoManager* mf = new MFVideoManager();
 	return mf;
 }
 
-bool bCanLoad()
-{
+bool bCanLoad() {
 	auto hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	hr &= MFStartup(MF_VERSION);
 	hr &= CoInitialize(NULL);
@@ -69,8 +64,7 @@ bool bCanLoad()
 	}
 }
 
-void registerFactory()
-{
+void registerFactory() {
 	registerFactory(new MFVideoManagerFactory(), VideoDeviceType::OEIP_MF, "video mf");
 	registerFactory(new MFAudioRecordFactory(), VideoDeviceType::OEIP_MF, "audio record mf");
 }

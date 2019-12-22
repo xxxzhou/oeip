@@ -5,9 +5,10 @@
 #include "testcamer.h"
 #include "templatetest.h"
 #include <mutex>
+#include "../oeip-win/DxHelper.h"
 
 int main()
-{	
+{
 	Templatetest::TemplateLayer<1> t1;
 	double x = 1;
 	t1.update(&x);

@@ -9,10 +9,8 @@
 
 static logEventHandle logHandle = nullptr;
 
-void logMessage(int level, const char* message)
-{
-	if (logHandle != nullptr)
-	{
+void logMessage(int level, const char* message) {
+	if (logHandle != nullptr) {
 		//GBK->UTF8 后面全改为带bom的utf8
 		//std::string str = message;
 		//const char* GBK_LOCALE_NAME = ".936";
@@ -20,13 +18,12 @@ void logMessage(int level, const char* message)
 		//wstring tmp_wstr = cv1.from_bytes(str);
 		//wstring_convert<codecvt_utf8<wchar_t>> cv2;
 		//string utf8_str = cv2.to_bytes(tmp_wstr);
-
 		//logHandle(level, utf8_str._Myptr());
+
 		//中文 ExecutionEngineException: String conversion error: Illegal byte sequence encounted in the input.
 		logHandle(level, message);
 	}
-	else if (message)
-	{
+	else if (message) {
 		auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		struct tm t;   //tm结构指针
 		localtime_s(&t, &now);   //获取当地日期和时间
@@ -36,13 +33,11 @@ void logMessage(int level, const char* message)
 	}
 }
 
-void setLogEvent(logEventHandle logEvent)
-{
+void setLogEvent(logEventHandle logEvent) {
 	logHandle = logEvent;
 }
 
-std::wstring string2wstring(std::string str)
-{
+std::wstring string2wstring(std::string str) {
 	std::wstring result;
 	//获取缓冲区大小，并申请空间，缓冲区大小按字符计算  
 	int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
@@ -57,8 +52,7 @@ std::wstring string2wstring(std::string str)
 }
 
 //将wstring转换成string  
-std::string wstring2string(std::wstring wstr)
-{
+std::string wstring2string(std::wstring wstr) {
 	std::string result;
 	//获取缓冲区大小，并申请空间，缓冲区大小事按字节计算的  
 	int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
@@ -72,8 +66,7 @@ std::string wstring2string(std::wstring wstr)
 	return result;
 }
 
-bool readResouce(std::string modelName, int32_t rcId, std::string rctype, std::string& resouce, uint32_t& dataType)
-{
+bool readResouce(std::string modelName, int32_t rcId, std::string rctype, std::string& resouce, uint32_t& dataType) {
 	HMODULE hinstance = ::GetModuleHandleA(modelName.c_str());
 	HRSRC hRsrc = FindResourceA(hinstance, MAKEINTRESOURCEA(rcId), rctype.c_str());
 
@@ -97,8 +90,7 @@ bool readResouce(std::string modelName, int32_t rcId, std::string rctype, std::s
 	dataType = resouce.size();
 }
 
-void splitString(const std::string& str, std::vector<std::string>& strarray, const std::string& split)
-{
+void splitString(const std::string& str, std::vector<std::string>& strarray, const std::string& split) {
 	std::string::size_type pos1, pos2;
 	pos2 = str.find(split);
 	pos1 = 0;
@@ -111,29 +103,24 @@ void splitString(const std::string& str, std::vector<std::string>& strarray, con
 		strarray.push_back(str.substr(pos1));
 }
 
-void copywcharstr(wchar_t* dest, const wchar_t* source, int maxlength)
-{
+void copywcharstr(wchar_t* dest, const wchar_t* source, int maxlength) {
 	int length = sizeof(wchar_t) * (wcslen(source) + 1);
 	memcpy(dest, source, min(length, maxlength));
 }
 
-void copycharstr(char* dest, const char* source, int maxlength)
-{
+void copycharstr(char* dest, const char* source, int maxlength) {
 	int length = sizeof(char) * (strlen(source) + 1);
 	memcpy(dest, source, min(length, maxlength));
 }
 
-bool loadFile(std::wstring path, std::vector<uint8_t>& data, int length)
-{
+bool loadFile(std::wstring path, std::vector<uint8_t>& data, int length) {
 	bool bIn = std::tr2::sys::exists(path);
-	if (!bIn)
-	{
+	if (!bIn) {
 		std::string message = "path not exist:" + wstring2string(path);
 		logMessage(OEIP_WARN, message.c_str());
 		return false;
 	}
-	try
-	{
+	try {
 		//文件数据输入到内存
 		auto fileMask = (std::ios::binary | std::ios::in);
 		std::ifstream fileStream;
@@ -142,18 +129,15 @@ bool loadFile(std::wstring path, std::vector<uint8_t>& data, int length)
 		fileStream.close();
 		return true;
 	}
-	catch (const std::exception&)
-	{
+	catch (const std::exception&) {
 		std::string message = "load file path:" + wstring2string(path) + " fail.";
 		logMessage(OEIP_ERROR, message.c_str());
 		return false;
 	}
 }
 
-bool saveFile(std::wstring path, void* data, int length)
-{
-	try
-	{
+bool saveFile(std::wstring path, void* data, int length) {
+	try {
 		//内存数据写入到文件
 		auto fileMask = (std::ios::binary | std::ios::out);
 		std::ofstream fileStream(path, fileMask);
@@ -161,24 +145,21 @@ bool saveFile(std::wstring path, void* data, int length)
 		fileStream.close();
 		return true;
 	}
-	catch (const std::exception&)
-	{
+	catch (const std::exception&) {
 		std::string message = "save file path:" + wstring2string(path) + " fail.";
 		logMessage(OEIP_ERROR, message.c_str());
 		return false;
 	}
 }
 
-int64_t getNowTimestamp()
-{
+int64_t getNowTimestamp() {
 	std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
 	auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
 	time_t timestamp = tmp.count();
 	return timestamp;
 }
 
-int32_t getDataType(OeipVideoType videoType)
-{
+int32_t getDataType(OeipVideoType videoType) {
 	int32_t imageType = -1;
 	switch (videoType)
 	{
@@ -217,11 +198,9 @@ int32_t getDataType(OeipVideoType videoType)
 	return imageType;
 }
 
-std::string getLayerName(OeipLayerType layerType)
-{
+std::string getLayerName(OeipLayerType layerType) {
 	std::string name = "no name layer";
-	switch (layerType)
-	{
+	switch (layerType) {
 	case OEIP_NONE_LAYER:
 		break;
 	case OEIP_INPUT_LAYER:
@@ -245,7 +224,6 @@ std::string getLayerName(OeipLayerType layerType)
 	return name;
 }
 
-uint32_t divUp(int32_t x, int32_t y)
-{
+uint32_t divUp(int32_t x, int32_t y) {
 	return (x + y - 1) / y;
 }

@@ -5,8 +5,7 @@
 #include "Strsafe.h"
 
 
-unsigned int* GetParametr(GUID guid, MediaType& out)
-{
+unsigned int* GetParametr(GUID guid, MediaType& out) {
 	if (guid == MF_MT_YUV_MATRIX)
 		return &(out.yuvMatrix);
 	if (guid == MF_MT_VIDEO_LIGHTING)
@@ -32,8 +31,7 @@ unsigned int* GetParametr(GUID guid, MediaType& out)
 	return NULL;
 }
 
-HRESULT LogAttributeValueByIndexNew(IMFAttributes* pAttr, DWORD index, MediaType& out)
-{
+HRESULT LogAttributeValueByIndexNew(IMFAttributes* pAttr, DWORD index, MediaType& out) {
 	WCHAR* pGuidName = NULL;
 	WCHAR* pGuidValName = NULL;
 
@@ -110,8 +108,7 @@ done:
 	return hr;
 }
 
-HRESULT GetGUIDNameNew(const GUID& guid, WCHAR** ppwsz)
-{
+HRESULT GetGUIDNameNew(const GUID& guid, WCHAR** ppwsz) {
 	HRESULT hr = S_OK;
 	WCHAR* pName = NULL;
 	LPCWSTR pcwsz = GetGUIDNameConstNew(guid);
@@ -145,18 +142,15 @@ done:
 	return hr;
 }
 
-void LogUINT32AsUINT64New(const PROPVARIANT& var, UINT32& uHigh, UINT32& uLow)
-{
+void LogUINT32AsUINT64New(const PROPVARIANT& var, UINT32& uHigh, UINT32& uLow) {
 	Unpack2UINT32AsUINT64(var.uhVal.QuadPart, &uHigh, &uLow);
 }
 
-float OffsetToFloatNew(const MFOffset& offset)
-{
+float OffsetToFloatNew(const MFOffset& offset) {
 	return offset.value + (static_cast<float>(offset.fract) / 65536.0f);
 }
 
-HRESULT LogVideoAreaNew(const PROPVARIANT& var)
-{
+HRESULT LogVideoAreaNew(const PROPVARIANT& var) {
 	//if (var.caub.cElems < sizeof(MFVideoArea))	{
 	//	return S_OK;
 	//}
@@ -164,8 +158,7 @@ HRESULT LogVideoAreaNew(const PROPVARIANT& var)
 	return S_OK;
 }
 
-HRESULT SpecialCaseAttributeValueNew(GUID guid, const PROPVARIANT& var, MediaType& out)
-{
+HRESULT SpecialCaseAttributeValueNew(GUID guid, const PROPVARIANT& var, MediaType& out) {
 	if (guid == MF_MT_FRAME_SIZE) {
 		UINT32 uHigh = 0, uLow = 0;
 		LogUINT32AsUINT64New(var, uHigh, uLow);
@@ -207,8 +200,7 @@ HRESULT SpecialCaseAttributeValueNew(GUID guid, const PROPVARIANT& var, MediaTyp
 #define IF_EQUAL_RETURN(param, val) if(val == param) return L#val
 #endif
 
-LPCWSTR GetGUIDNameConstNew(const GUID& guid)
-{
+LPCWSTR GetGUIDNameConstNew(const GUID& guid) {
 	IF_EQUAL_RETURN(guid, MF_MT_MAJOR_TYPE);
 	IF_EQUAL_RETURN(guid, MF_MT_SUBTYPE);
 	IF_EQUAL_RETURN(guid, MF_MT_ALL_SAMPLES_INDEPENDENT);
@@ -356,12 +348,10 @@ LPCWSTR GetGUIDNameConstNew(const GUID& guid)
 	return NULL;
 }
 
-FormatReader::FormatReader(void)
-{
+FormatReader::FormatReader(void) {
 }
 
-bool FormatReader::Read(IMFMediaType* pType, MediaType& mediaType)
-{
+bool FormatReader::Read(IMFMediaType* pType, MediaType& mediaType) {
 	UINT32 count = 0;
 	HRESULT hr = S_OK;
 	hr = pType->LockStore();
@@ -383,7 +373,6 @@ bool FormatReader::Read(IMFMediaType* pType, MediaType& mediaType)
 	return true;
 }
 
-FormatReader::~FormatReader(void)
-{
+FormatReader::~FormatReader(void) {
 }
 

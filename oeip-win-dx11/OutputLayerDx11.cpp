@@ -1,8 +1,7 @@
 #include "OutputLayerDx11.h"
 
 
-OutputLayerDx11::OutputLayerDx11()
-{
+OutputLayerDx11::OutputLayerDx11() {
 	shardTexs.resize(inCount);
 	outBuffers.resize(inCount);
 	outTexs.resize(inCount);
@@ -15,8 +14,7 @@ OutputLayerDx11::OutputLayerDx11()
 	computeShader->setCS(107, modeName, rctype);
 }
 
-bool OutputLayerDx11::onInitBuffer()
-{
+bool OutputLayerDx11::onInitBuffer() {
 	for (int32_t i = 0; i < inCount; i++) {
 		if (layerParamet.bCpu) {
 			if (selfConnects[i].dataType == OEIP_CV_8UC4) {
@@ -42,20 +40,17 @@ bool OutputLayerDx11::onInitBuffer()
 	return LayerDx11::onInitBuffer();
 }
 
-void OutputLayerDx11::onParametChange(OutputParamet oldParamet)
-{
+void OutputLayerDx11::onParametChange(OutputParamet oldParamet) {
 	if (!bBufferInit)
 		return;
 	dx11->resetLayers();
 }
 
-bool OutputLayerDx11::initHlsl()
-{
+bool OutputLayerDx11::initHlsl() {
 	return computeShader->initResource(dx11->device, nullptr, dx11->includeShader);
 }
 
-void OutputLayerDx11::outputGpuTex(void* device, void* texture, int32_t outputIndex)
-{
+void OutputLayerDx11::outputGpuTex(void* device, void* texture, int32_t outputIndex) {
 	ID3D11Device* dxdevice = (ID3D11Device*)device;
 	ID3D11Texture2D* dxtexture = (ID3D11Texture2D*)texture;
 	if (!layerParamet.bGpu || dxdevice == nullptr || dxtexture == nullptr)
@@ -67,8 +62,7 @@ void OutputLayerDx11::outputGpuTex(void* device, void* texture, int32_t outputIn
 	}
 }
 
-void OutputLayerDx11::onRunLayer()
-{
+void OutputLayerDx11::onRunLayer() {
 	for (int32_t i = 0; i < outCount; i++) {
 		if (layerParamet.bCpu) {
 			computeShader->runCS(dx11->ctx, groupSize, inSRVs[i], outBuffers[i]->uavView, constBuffer->buffer);

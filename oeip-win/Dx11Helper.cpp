@@ -1,8 +1,7 @@
 #include "Dx11Helper.h"
 #include <math.h>
 
-bool createDevice11(ID3D11Device** deviceDx11, ID3D11DeviceContext** ctxDx11)
-{
+bool createDevice11(ID3D11Device** deviceDx11, ID3D11DeviceContext** ctxDx11) {
 	*deviceDx11 = nullptr;
 	*ctxDx11 = nullptr;
 
@@ -44,8 +43,7 @@ bool createDevice11(ID3D11Device** deviceDx11, ID3D11DeviceContext** ctxDx11)
 	return SUCCEEDED(hr);
 }
 
-bool updateDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce, uint8_t* data, uint32_t size)
-{
+bool updateDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce, uint8_t* data, uint32_t size) {
 	D3D11_MAPPED_SUBRESOURCE mappedResource = { 0 };
 	HRESULT result = ctxDx11->Map(resouce, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	//RowPitch 需要注意，如果数据要返回给CPU,经试验,必需是32的倍数
@@ -57,8 +55,7 @@ bool updateDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce, u
 	return SUCCEEDED(result);
 }
 
-bool downloadDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce, uint8_t** data, uint32_t& byteWidth)
-{
+bool downloadDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce, uint8_t** data, uint32_t& byteWidth) {
 	D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 	HRESULT result = ctxDx11->Map(resouce, 0, D3D11_MAP_READ, 0, &mappedResource);
 	if (SUCCEEDED(result)) {
@@ -72,8 +69,7 @@ bool downloadDx11Resource(ID3D11DeviceContext* ctxDx11, ID3D11Resource* resouce,
 	return SUCCEEDED(result);
 }
 
-bool createGUITextureBuffer(ID3D11Device* deviceDx11, int width, int height, ID3D11Texture2D** ppBufOut)
-{
+bool createGUITextureBuffer(ID3D11Device* deviceDx11, int width, int height, ID3D11Texture2D** ppBufOut) {
 	*ppBufOut = nullptr;
 	D3D11_TEXTURE2D_DESC textureDesc = { 0 };
 	textureDesc.Width = width;
@@ -94,8 +90,7 @@ bool createGUITextureBuffer(ID3D11Device* deviceDx11, int width, int height, ID3
 	return SUCCEEDED(result);
 }
 
-void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11Buffer** descBuffer)
-{
+void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11Buffer** descBuffer) {
 	D3D11_BUFFER_DESC desc = { };
 	pBuffer->GetDesc(&desc);
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -113,8 +108,7 @@ void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11Buf
 	}
 }
 
-void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11Texture2D** descBuffer)
-{
+void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11Texture2D** descBuffer) {
 	D3D11_TEXTURE2D_DESC desc = { };
 	pBuffer->GetDesc(&desc);
 	desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
@@ -132,8 +126,7 @@ void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11
 	}
 }
 
-bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11ShaderResourceView** ppSRVOut)
-{
+bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11ShaderResourceView** ppSRVOut) {
 	D3D11_BUFFER_DESC descBuf;
 	ZeroMemory(&descBuf, sizeof(descBuf));
 	pBuffer->GetDesc(&descBuf);
@@ -165,8 +158,7 @@ bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11Shad
 	return SUCCEEDED(result);
 }
 
-bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11UnorderedAccessView** ppUAVOut)
-{
+bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11UnorderedAccessView** ppUAVOut) {
 	D3D11_BUFFER_DESC descBuf;
 	ZeroMemory(&descBuf, sizeof(descBuf));
 	pBuffer->GetDesc(&descBuf);
@@ -197,8 +189,7 @@ bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11Unor
 	return SUCCEEDED(result);
 }
 
-bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11ShaderResourceView** ppSRVOut)
-{
+bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11ShaderResourceView** ppSRVOut) {
 	D3D11_TEXTURE2D_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
 	pBuffer->GetDesc(&desc);
@@ -216,8 +207,7 @@ bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11S
 	return SUCCEEDED(result);
 }
 
-bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11UnorderedAccessView** ppUAVOut)
-{
+bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11UnorderedAccessView** ppUAVOut) {
 	D3D11_TEXTURE2D_DESC desc;
 	ZeroMemory(&desc, sizeof(desc));
 	pBuffer->GetDesc(&desc);
@@ -235,8 +225,7 @@ bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11U
 	return SUCCEEDED(result);
 }
 
-HANDLE getDx11SharedHandle(ID3D11Resource* source)
-{
+HANDLE getDx11SharedHandle(ID3D11Resource* source) {
 	HANDLE handle = nullptr;
 	// QI IDXGIResource interface to synchronized shared surface.
 	IDXGIResource* dxGIResource = nullptr;
@@ -252,8 +241,7 @@ HANDLE getDx11SharedHandle(ID3D11Resource* source)
 	return handle;
 }
 
-void copySharedToTexture(ID3D11Device* d3ddevice, HANDLE& sharedHandle, ID3D11Texture2D* texture)
-{
+void copySharedToTexture(ID3D11Device* d3ddevice, HANDLE& sharedHandle, ID3D11Texture2D* texture) {
 	if (!d3ddevice)
 		return;
 	CComPtr<ID3D11DeviceContext> d3dcontext = nullptr;
@@ -282,8 +270,7 @@ void copySharedToTexture(ID3D11Device* d3ddevice, HANDLE& sharedHandle, ID3D11Te
 	}
 }
 
-void copyTextureToShared(ID3D11Device* d3ddevice, HANDLE& sharedHandle, ID3D11Texture2D* texture)
-{
+void copyTextureToShared(ID3D11Device* d3ddevice, HANDLE& sharedHandle, ID3D11Texture2D* texture) {
 	if (!d3ddevice)
 		return;
 	CComPtr<ID3D11DeviceContext> d3dcontext = nullptr;

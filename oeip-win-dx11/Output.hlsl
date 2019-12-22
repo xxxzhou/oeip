@@ -14,12 +14,12 @@ RWStructuredBuffer<uint> dataOut : register(u0);
 
 //https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-per-component-math
 [numthreads(SIZE_X, SIZE_Y, 1)]
-void main(uint3 DTid : SV_DispatchThreadID)// uint GI : SV_GroupIndex)
-{
+void main(uint3 DTid : SV_DispatchThreadID) {// uint GI : SV_GroupIndex)
+
 	if (DTid.x >= width || DTid.y >= height)
 		return;
 	uint index = u22u1(DTid.xy, width);
 	float4 rgba = texIn[DTid.xy];
 	uint4 data = uint4(rgba * 255);
-	dataOut[index] = uint8Zip(data);	
-}                                  
+	dataOut[index] = uint8Zip(data);
+}

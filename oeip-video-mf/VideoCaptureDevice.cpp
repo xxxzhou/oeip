@@ -12,8 +12,7 @@
 using namespace std;
 using namespace std::placeholders;
 
-VideoCaptureDevice::VideoCaptureDevice()
-{
+VideoCaptureDevice::VideoCaptureDevice() {
 	type = VideoDeviceType::OEIP_MF;
 	streamIndex = MF_SOURCE_READER_FIRST_VIDEO_STREAM;
 	//把数据交给VideoProcess处理
@@ -21,13 +20,11 @@ VideoCaptureDevice::VideoCaptureDevice()
 	readerCallback->setBufferRevice(processData);
 }
 
-VideoCaptureDevice::~VideoCaptureDevice()
-{
+VideoCaptureDevice::~VideoCaptureDevice() {
 	readerCallback->setBufferRevice(nullptr);
 }
 
-bool VideoCaptureDevice::init(IMFActivate* pActivate, unsigned int num)
-{
+bool VideoCaptureDevice::init(IMFActivate* pActivate, unsigned int num) {
 	bool bResult = MFCaptureDevice::init(pActivate, num);
 	if (bResult) {
 		resetFormats();
@@ -39,14 +36,12 @@ bool VideoCaptureDevice::init(IMFActivate* pActivate, unsigned int num)
 	return bResult;
 }
 
-void VideoCaptureDevice::setDeviceHandle(onEventHandle eventHandle)
-{
+void VideoCaptureDevice::setDeviceHandle(onEventHandle eventHandle) {
 	VideoDevice::setDeviceHandle(eventHandle);
 	readerCallback->setDeviceEvent(onDeviceEvent);
 }
 
-bool VideoCaptureDevice::resetFormats()
-{
+bool VideoCaptureDevice::resetFormats() {
 	bool bExcute = false;
 	videoFormats.clear();
 
@@ -81,8 +76,7 @@ bool VideoCaptureDevice::resetFormats()
 	return bExcute;
 }
 
-bool VideoCaptureDevice::openDevice()
-{
+bool VideoCaptureDevice::openDevice() {
 	//先关闭当前正在读的数据流
 	bool result = MFCaptureDevice::Open();
 	if (!result) {
@@ -131,8 +125,7 @@ bool VideoCaptureDevice::openDevice()
 	return SUCCEEDED(hr);
 }
 
-bool VideoCaptureDevice::closeDevice()
-{
+bool VideoCaptureDevice::closeDevice() {
 	bool result = true;
 	if (bOpen()) {
 		result = readerCallback->setPlay(false);
@@ -143,13 +136,11 @@ bool VideoCaptureDevice::closeDevice()
 	return result;
 }
 
-bool VideoCaptureDevice::bOpen()
-{
+bool VideoCaptureDevice::bOpen() {
 	return readerCallback->IsOpen();
 }
 
-const OeipVideoType VideoCaptureDevice::getVideoType(const wchar_t* videoName)
-{
+const OeipVideoType VideoCaptureDevice::getVideoType(const wchar_t* videoName) {
 	static vector<wstring> videoTypeList = { L"MFVideoFormat_NV12" ,L"MFVideoFormat_YUY2" ,L"MFVideoFormat_YVYU",L"MFVideoFormat_UYVY" ,L"MFVideoFormat_MJPG" ,L"MFVideoFormat_RGB24" ,L"MFVideoFormat_ARGB32" };
 	int vindex = -1;
 	for (int i = 0; i < videoTypeList.size(); i++) {
@@ -162,8 +153,7 @@ const OeipVideoType VideoCaptureDevice::getVideoType(const wchar_t* videoName)
 	return videoType;
 }
 
-void VideoCaptureDevice::addVideoType(const MediaType& mediaType, int index)
-{
+void VideoCaptureDevice::addVideoType(const MediaType& mediaType, int index) {
 	VideoFormat videoFormat;
 	videoFormat.index = index;
 	videoFormat.width = mediaType.width;
@@ -174,8 +164,7 @@ void VideoCaptureDevice::addVideoType(const MediaType& mediaType, int index)
 		videoFormats.push_back(videoFormat);
 }
 
-CamParametrs VideoCaptureDevice::getParametrs()
-{
+CamParametrs VideoCaptureDevice::getParametrs() {
 	CamParametrs out = {};
 	unsigned int shift = sizeof(Parametr);
 	Parametr* pParametr = (Parametr*)(&out);
@@ -215,8 +204,7 @@ CamParametrs VideoCaptureDevice::getParametrs()
 	return out;
 }
 
-void VideoCaptureDevice::setParametrs(CamParametrs parametrs)
-{
+void VideoCaptureDevice::setParametrs(CamParametrs parametrs) {
 	unsigned int shift = sizeof(Parametr);
 	Parametr* pParametr = (Parametr*)(&parametrs);
 	CamParametrs curPar = getParametrs();

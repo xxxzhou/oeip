@@ -17,7 +17,7 @@ protected:
 	virtual bool onInitBuffer() override;
 	virtual void onRunLayer() override;
 public:
-	// 通过 InputLayer 继承
+	//通过 InputLayer 继承
 	//GPU 数据输入肯定在引擎device上的渲染线程中,和当前ImageProcessDx11的GPU数据处理不在同一线程,texture暂时只支持RGBA32类型
 	virtual void inputGpuTex(void* device, void* texture, int32_t inputIndex) override;
 	virtual void inputCpuData(uint8_t* byteData, int32_t inputIndex) override;

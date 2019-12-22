@@ -1,8 +1,7 @@
 #include "InputLayerDx11.h"
 
 
-InputLayerDx11::InputLayerDx11()
-{
+InputLayerDx11::InputLayerDx11() {
 	shardTexs.resize(inCount);
 	inBuffers.resize(inCount);
 	for (int32_t i = 0; i < inCount; i++) {
@@ -13,15 +12,13 @@ InputLayerDx11::InputLayerDx11()
 	computeShader->setCS(105, modeName, rctype);
 }
 
-void InputLayerDx11::onParametChange(InputParamet oldT)
-{
+void InputLayerDx11::onParametChange(InputParamet oldT) {
 	if (!bBufferInit)
 		return;
 	dx11->resetLayers();
 }
 
-void InputLayerDx11::onInitLayer()
-{
+void InputLayerDx11::onInitLayer() {
 	//因StructureByteStride只能为4的倍数,相应buffer要重新设计,图片的宽度不为4的倍数后面想办法处理
 	if (selfConnects[0].dataType == OEIP_CV_8UC1) {
 		threadSizeX = divUp(threadSizeX, 4);
@@ -35,8 +32,7 @@ void InputLayerDx11::onInitLayer()
 	LayerDx11::onInitLayer();
 }
 
-bool InputLayerDx11::onInitBuffer()
-{
+bool InputLayerDx11::onInitBuffer() {
 	for (int32_t i = 0; i < inCount; i++) {
 		DXGI_FORMAT dxFormat = getDxFormat(selfConnects[i].dataType);
 		if (layerParamet.bCpu) {
@@ -60,15 +56,13 @@ bool InputLayerDx11::onInitBuffer()
 	return LayerDx11::onInitBuffer();
 }
 
-bool InputLayerDx11::initHlsl()
-{
+bool InputLayerDx11::initHlsl() {
 	std::string yuvTypestr = std::to_string(selfConnects[0].dataType);
 	D3D_SHADER_MACRO defines[] = { "OEIP_DATA_TYPE",yuvTypestr.c_str(),"SIZE_X", "240", "SIZE_Y","1",nullptr,nullptr };
 	return computeShader->initResource(dx11->device, defines, dx11->includeShader);
 }
 
-void InputLayerDx11::onRunLayer()
-{
+void InputLayerDx11::onRunLayer() {
 	for (int32_t i = 0; i < inCount; i++) {
 		if (layerParamet.bCpu) {
 			computeShader->runCS(dx11->ctx, groupSize, inBuffers[i]->srvView, outTextures[i]->uavView, constBuffer->buffer);
@@ -88,14 +82,12 @@ void InputLayerDx11::onRunLayer()
 	}
 }
 
-void InputLayerDx11::inputCpuData(uint8_t* byteData, int32_t inputIndex)
-{
+void InputLayerDx11::inputCpuData(uint8_t* byteData, int32_t inputIndex) {
 	inBuffers[inputIndex]->cpuData = byteData;
 	inBuffers[inputIndex]->updateResource(dx11->ctx);
 }
 
-void InputLayerDx11::inputGpuTex(void* device, void* texture, int32_t inputIndex)
-{
+void InputLayerDx11::inputGpuTex(void* device, void* texture, int32_t inputIndex) {
 	ID3D11Device* dxdevice = (ID3D11Device*)device;
 	ID3D11Texture2D* dxtexture = (ID3D11Texture2D*)texture;
 	if (!layerParamet.bGpu || dxdevice == nullptr || dxtexture == nullptr)

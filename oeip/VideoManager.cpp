@@ -2,11 +2,9 @@
 
 
 
-VideoManager::VideoManager()
-{
+VideoManager::VideoManager() {
 }
 
 
-VideoManager::~VideoManager()  
-{
+VideoManager::~VideoManager() {
 }

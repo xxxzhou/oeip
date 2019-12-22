@@ -133,6 +133,8 @@
     <ClCompile Include="LayerDx11.cpp" />
     <ClCompile Include="MapChannelLayerDx11.cpp" />
     <ClCompile Include="OutputLayerDx11.cpp" />
+    <ClCompile Include="ResizeLayerDx11.cpp" />
+    <ClCompile Include="RGBA2YUVLayerDX11.cpp" />
     <ClCompile Include="YUV2RGBALayerDX11.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,7 +144,9 @@
     <ClInclude Include="LayerDx11.h" />
     <ClInclude Include="MapChannelLayerDx11.h" />
     <ClInclude Include="OutputLayerDx11.h" />
+    <ClInclude Include="ResizeLayerDx11.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="RGBA2YUVLayerDX11.h" />
     <ClInclude Include="YUV2RGBALayerDX11.h" />
   </ItemGroup>
   <ItemGroup>
@@ -195,13 +199,23 @@
     </FxCompile>
     <FxCompile Include="Resize.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="RGBA2YUV.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Test.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>

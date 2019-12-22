@@ -34,7 +34,7 @@ public:
 	static const int32_t layerTypeIndex = IndexOf<T, AllLayerParamet>::value;
 public:
 	BaseLayerTemplate() {
-		layerType = OeipLayerType(layerTypeIndex);		
+		layerType = OeipLayerType(layerTypeIndex);
 	};
 	virtual ~BaseLayerTemplate() {};
 public:
@@ -154,13 +154,27 @@ public:
 	OutputLayer() {};
 	virtual ~OutputLayer() {};
 };
+typedef BaseLayerTemplate<YUV2RGBAParamet> YUV2RGBALayer;
+typedef BaseLayerTemplate<MapChannelParamet> MapChannelLayer;
+typedef BaseLayerTemplate<ResizeParamet> ResizeLayer;
+typedef BaseLayerTemplate<RGBA2YUVParamet> RGBA2YUVLayer;
 
 template<typename T>
-inline void BaseLayerTemplate<T>::updateParamet(const void* paramet)
-{
+inline void BaseLayerTemplate<T>::updateParamet(const void* paramet){
 	T* tparamet = (T*)paramet;
 	updateParamet(*tparamet);
 }
 
-typedef BaseLayerTemplate<YUV2RGBAParamet> YUV2RGBALayer;
-typedef BaseLayerTemplate<MapChannelParamet> MapChannelLayer;
+#define OEIP_UPDATEPARAMET(layerType) \
+	using ParametType = LayerParamet<layerType, AllLayerParamet>::ParametType;\
+	auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);\
+	xlayer->updateParamet(paramet);
+
+template<OeipLayerType layerType>
+void updateParametTemplate(BaseLayer* layer, const void* paramet)
+{
+	using ParametType = LayerParamet<layerType, AllLayerParamet>::ParametType;
+	auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(layer);
+	xlayer->updateParamet(paramet);
+}
+

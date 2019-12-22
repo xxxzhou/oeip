@@ -13,6 +13,7 @@
 #include <fstream>
 
 #include <../oeip/BaseLayer.h>
+#include <../oeip/VideoPipe.h>
 
 using namespace std;
 using namespace cv;
@@ -24,16 +25,16 @@ namespace OeipCamera
 	cv::Mat* show = nullptr;
 	int32_t devicdIndex = 0;
 	int32_t formatIndex = 0;
-	int32_t pipeId = 0;
 	int32_t inputLayerIndex = 0;
 	int32_t width = 1920;
 	int32_t height = 1080;
-	YUV2RGBAParamet yuip = {};
+	OeipVideoType videoType = OEIP_VIDEO_OTHER;
+	VideoPipe* vpipe = nullptr;
+
 
 	void dataRecive(uint8_t* data, int32_t width, int32_t height) {
 		//std::cout << width << height << std::endl;
-		updatePipeInput(pipeId, inputLayerIndex, data);
-		runPipe(pipeId);
+		vpipe->runVideoPipe(0, data);
 	}
 
 	void onPipeData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex) {
@@ -44,8 +45,8 @@ namespace OeipCamera
 	void testCamera() {
 		initOeip();
 
-		pipeId = initPipe(OEIP_DX11);
-		setPipeDataAction(pipeId, onPipeData);
+		vpipe = new VideoPipe();
+		setPipeDataAction(vpipe->getPipeId(), onPipeData);
 
 		int32_t deviceCount = getDeviceCount();
 		std::vector<OeipDeviceInfo> devices;
@@ -61,14 +62,8 @@ namespace OeipCamera
 		setFormat(devicdIndex, formatIndex);
 		openDevice(devicdIndex);
 
-		InputParamet ip = {};
-		yuip.yuvType = getVideoYUV(formats[formatIndex].videoType);
-		updatePipeParamet(pipeId, 0, (void*)&ip);
-		updatePipeParamet(pipeId, 1, &yuip);
-		if (yuip.yuvType == OEIP_VIDEO_NV12)
-			setPipeInput(pipeId, inputLayerIndex, width, height * 3 / 2, OEIP_CV_8UC1);
-		else
-			setPipeInput(pipeId, inputLayerIndex, width / 2, height, OEIP_CV_8UC4);
+		videoType = formats[formatIndex].videoType;
+		vpipe->setVideoFormat(videoType, width, height);
 		show = new cv::Mat(height, width, CV_8UC4);
 		//const char* window_name = "vvvvvvvv";
 		while (int key = cv::waitKey(1)) {
@@ -76,7 +71,7 @@ namespace OeipCamera
 			switch (key)
 			{
 			case 'q':
-				updatePipeParamet(pipeId, 0, &ip);
+
 				break;
 			default:
 				break;

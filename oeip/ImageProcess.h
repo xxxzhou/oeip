@@ -61,8 +61,7 @@ public:
 };
 
 template<typename T>
-inline bool ImageProcess::updateLayer(int32_t index, const T& t)
-{
+inline bool ImageProcess::updateLayer(int32_t index, const T& t) {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	if (index<0 || index > layers.size())
 		return false;

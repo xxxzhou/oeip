@@ -2,33 +2,27 @@
 #include <shlwapi.h>
 #include "MediaStruct.h"
 
-ReaderCallback::ReaderCallback()
-{
+ReaderCallback::ReaderCallback() {
 }
 
-ReaderCallback::~ReaderCallback()
-{
+ReaderCallback::~ReaderCallback() {
 }
 
-void ReaderCallback::setSourceReader(IMFSourceReader* pReader, unsigned long dwStreamIndex)
-{
+void ReaderCallback::setSourceReader(IMFSourceReader* pReader, unsigned long dwStreamIndex) {
 	std::lock_guard<std::mutex> mtx_locker(mtx);
 	reader = pReader;
 	streamIndex = dwStreamIndex;
 }
 
-void ReaderCallback::setBufferRevice(function<void(unsigned long, byte*)> reviceFunc)
-{
+void ReaderCallback::setBufferRevice(function<void(unsigned long, byte*)> reviceFunc) {
 	onReviceBuffer = reviceFunc;
 }
 
-void ReaderCallback::setDeviceEvent(onEventHandle eventHandle)
-{
+void ReaderCallback::setDeviceEvent(onEventHandle eventHandle) {
 	onDeviceEvent = eventHandle;
 }
 
-bool ReaderCallback::setPlay(bool pPlayVideo)
-{
+bool ReaderCallback::setPlay(bool pPlayVideo) {
 	std::lock_guard<std::mutex> mtx_locker(mtx);
 	HRESULT hr = 0;
 	//设置播放
@@ -77,15 +71,13 @@ bool ReaderCallback::setPlay(bool pPlayVideo)
 	}
 }
 
-void ReaderCallback::onDeviceHandle(OeipDeviceEventType eventType, int32_t data)
-{
+void ReaderCallback::onDeviceHandle(OeipDeviceEventType eventType, int32_t data) {
 	if (onDeviceEvent) {
 		onDeviceEvent(eventType, data);
 	}
 }
 
-HRESULT ReaderCallback::QueryInterface(REFIID riid, void** ppvObject)
-{
+HRESULT ReaderCallback::QueryInterface(REFIID riid, void** ppvObject) {
 	static const QITAB qit[] =
 	{
 		QITABENT(ReaderCallback, IMFSourceReaderCallback),
@@ -94,13 +86,11 @@ HRESULT ReaderCallback::QueryInterface(REFIID riid, void** ppvObject)
 	return QISearch(this, qit, riid, ppvObject);
 }
 
-ULONG ReaderCallback::AddRef(void)
-{
+ULONG ReaderCallback::AddRef(void) {
 	return InterlockedIncrement(&refCount);
 }
 
-ULONG ReaderCallback::Release(void)
-{
+ULONG ReaderCallback::Release(void) {
 	ULONG uCount = InterlockedDecrement(&refCount);
 	if (uCount == 0) {
 		onReviceBuffer = nullptr;
@@ -110,8 +100,7 @@ ULONG ReaderCallback::Release(void)
 	return uCount;
 }
 
-HRESULT ReaderCallback::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex, DWORD dwStreamFlags, LONGLONG llTimestamp, IMFSample* pSample)
-{
+HRESULT ReaderCallback::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex, DWORD dwStreamFlags, LONGLONG llTimestamp, IMFSample* pSample) {
 	//std::lock_guard<std::mutex> mtx_locker(mtx);
 	HRESULT hr = S_OK;
 	//人为中断
@@ -133,7 +122,7 @@ HRESULT ReaderCallback::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex, DWOR
 				onReviceBuffer(length, (uint8_t*)data);
 				pBuffer->Unlock();
 			}
-		}		
+		}
 	}
 	// Request the next frame.
 	if (SUCCEEDED(hr)) {
@@ -147,14 +136,12 @@ HRESULT ReaderCallback::OnReadSample(HRESULT hrStatus, DWORD dwStreamIndex, DWOR
 	return hr;
 }
 
-HRESULT ReaderCallback::OnFlush(DWORD dwStreamIndex)
-{
+HRESULT ReaderCallback::OnFlush(DWORD dwStreamIndex) {
 	//通知closeDevice能关闭设备了
 	signal.notify_all();
 	return S_OK;
 }
 
-HRESULT ReaderCallback::OnEvent(DWORD dwStreamIndex, IMFMediaEvent* pEvent)
-{
+HRESULT ReaderCallback::OnEvent(DWORD dwStreamIndex, IMFMediaEvent* pEvent) {
 	return S_OK;
 }

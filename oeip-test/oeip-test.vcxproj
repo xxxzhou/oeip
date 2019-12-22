@@ -160,6 +160,9 @@
     <ClCompile Include="oeip-test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\oeip-win\oeip-win.vcxproj">
+      <Project>{10eaed99-a1a9-434f-a8ee-d40e6aae62e1}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\oeip\oeip.vcxproj">
       <Project>{ef8d1bb3-fd0b-4a99-8619-b2060e9f2b50}</Project>
     </ProjectReference>

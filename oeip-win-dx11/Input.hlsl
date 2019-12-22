@@ -27,8 +27,7 @@ groupshared uint4 shared_datat[SIZE_X];
 
 //https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-per-component-math
 [numthreads(SIZE_X, 1, 1)]
-void main(uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex)
-{
+void main(uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex) {
 #if (OEIP_DATA_TYPE != 16)
 	if (DTid.x >= width * height)
 		return;

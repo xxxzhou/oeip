@@ -44,6 +44,7 @@ enum OeipYUVFMT : int32_t
 	OEIP_YUVFMT_YUV420P,//Planar 一般用于传输
 };
 
+//添加相关层需要在BaseLayer::updateParamet里注册下
 enum OeipLayerType : int32_t
 {
 	OEIP_NONE_LAYER,
@@ -51,11 +52,12 @@ enum OeipLayerType : int32_t
 	OEIP_YUV2RGBA_LAYER,
 	OEIP_MAPCHANNEL_LAYER,
 	OEIP_RGBA2YUV_LAYER,
+	OEIP_RESIZE_LAYER,
 	OEIP_OUTPUT_LAYER,
 	OEIP_MAX_LAYER,
 };
 
-#define AllLayerParamet void, InputParamet, YUV2RGBAParamet, MapChannelParamet, void, OutputParamet, void
+#define AllLayerParamet int32_t, InputParamet, YUV2RGBAParamet, MapChannelParamet, RGBA2YUVParamet,ResizeParamet, OutputParamet, void
 
 enum OeipGpgpuType : int32_t
 {
@@ -112,13 +114,18 @@ struct YUV2RGBAParamet
 	OeipYUVFMT yuvType = OEIP_YUVFMT_YUV420SP;
 };
 
+struct RGBA2YUVParamet
+{
+	OeipYUVFMT yuvType = OEIP_YUVFMT_YUV420SP;
+};
+
 //ARGB<->BGRA<->RGBA<->RRRR
 struct MapChannelParamet
 {
 	uint32_t red = 0;
 	uint32_t green = 1;
 	uint32_t blue = 2;
-	uint32_t alpha = 4;
+	uint32_t alpha = 3;
 };
 
 struct ResizeParamet

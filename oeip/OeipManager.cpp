@@ -4,41 +4,35 @@
 
 OeipManager* OeipManager::instance = nullptr;
 
-void cleanPlugin(bool bFactory)
-{
+void cleanPlugin(bool bFactory) {
 	PluginManager<VideoManager>::clean(bFactory);
 	PluginManager<AudioRecord>::clean(bFactory);
 	PluginManager<ImageProcess>::clean(bFactory);
 }
 
-OeipManager* OeipManager::getInstance()
-{
+OeipManager* OeipManager::getInstance() {
 	if (instance == nullptr) {
 		instance = new OeipManager();
 	}
 	return instance;
 }
 
-void OeipManager::shutdown()
-{
+void OeipManager::shutdown() {
 	safeDelete(instance);
 	cleanPlugin(false);
 }
 
-OeipManager::~OeipManager()
-{
+OeipManager::~OeipManager() {
 	for (auto& video : videoList) {
 		video->closeDevice();
 	}
 }
 
-OeipManager::OeipManager()
-{
+OeipManager::OeipManager() {
 	initVideoList();
 }
 
-void OeipManager::initVideoList()
-{
+void OeipManager::initVideoList() {
 	videoList.clear();
 	std::vector<VideoManager*> vmlist;
 	PluginManager<VideoManager>::getInstance().getFactoryDefaultModel(vmlist, -1);
@@ -48,8 +42,7 @@ void OeipManager::initVideoList()
 	}
 }
 
-int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType)
-{
+int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType) {
 	auto vp = PluginManager<ImageProcess>::getInstance().createModel(gpgpuType);
 	if (vp == nullptr)
 		return -1;

@@ -9,21 +9,18 @@
 
 #define UINT82FLOAT 0.00392156862745f
 
-uint u22u1(uint2 uv, uint step)
-{
+uint u22u1(uint2 uv, uint step) {
 	return uv.y * step + uv.x;
 }
 
-uint2 u12u2(uint index, uint step)
-{
+uint2 u12u2(uint index, uint step) {
 	uint2 uv = 0;
 	uv.x = index % step;
 	uv.y = index / step;
 	return uv;
 }
 
-float4 yuv2Rgb(float y, float u, float v, float a)
-{
+float4 yuv2Rgb(float y, float u, float v, float a) {
 	float4 xrgba = 0.f;
 	xrgba.r = clamp(y + 1.402f * v, 0.f, 1.f);
 	xrgba.g = clamp(y - 0.71414f * v - 0.34414f * u, 0.f, 1.f);
@@ -32,8 +29,7 @@ float4 yuv2Rgb(float y, float u, float v, float a)
 	return xrgba;
 }
 
-float4 uchar2float(uint4 rgba)
-{
+float4 uchar2float(uint4 rgba) {
 	float4 xrgba = float4(rgba * UINT82FLOAT);
 	//xrgba.r = clamp(rgba.r * UINT82FLOAT, 0.f, 1.f);
 	//xrgba.g = clamp(rgba.g * UINT82FLOAT, 0.f, 1.f);
@@ -42,20 +38,17 @@ float4 uchar2float(uint4 rgba)
 	return xrgba;
 }
 
-uint4 uint32Unzip(uint data)
-{
+uint4 uint32Unzip(uint data) {
 	uint4 xrgba = uint4(data & 0x000000FF, (data & 0x0000FF00) >> 8, (data & 0x00FF0000) >> 16, (data & 0xFF000000) >> 24);
 	return xrgba;
 }
 
-uint uint8Zip(uint4 rgba)
-{
+uint uint8Zip(uint4 rgba) {
 	uint data = rgba.x | rgba.y << 8 | rgba.z << 16 | rgba.w << 24;
 	return data;
 }
 
-float4 rgb2Yuv(float4 rgba)
-{
+float4 rgb2Yuv(float4 rgba) {
 	float4 yuva;
 	//xyz -> yuv
 	yuva.x = clamp(0.299 * rgba.r + 0.587 * rgba.g + 0.114 * rgba.b, 0, 1);

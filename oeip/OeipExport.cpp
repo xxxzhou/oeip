@@ -198,7 +198,7 @@ int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerT
 {
 	OEIP_CHECKINSTANCEINT
 	OEIP_CHECKPIPEINT
-	pipe->addLayer(layerName, layerType, paramet);
+	return pipe->addLayer(layerName, layerType, paramet);
 }
 
 void connectLayer(int32_t pipeId, int32_t layerIndex, const char * forwardName, int32_t inputIndex, int32_t selfIndex)

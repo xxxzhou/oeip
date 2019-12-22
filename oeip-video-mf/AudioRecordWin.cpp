@@ -116,8 +116,7 @@ bool AudioRecordWin::initRecord(OeipAudioRecordType audiotype, onAudioRecordHand
 	return initRecord();
 }
 
-bool AudioRecordWin::initRecord(OeipAudioRecordType audiotype, std::wstring path)
-{
+bool AudioRecordWin::initRecord(OeipAudioRecordType audiotype, std::wstring path) {
 	if (bStart) {
 		logMessage(OEIP_WARN, "audio recording...");
 		return false;
@@ -129,8 +128,7 @@ bool AudioRecordWin::initRecord(OeipAudioRecordType audiotype, std::wstring path
 	return initRecord();
 }
 
-void AudioRecordWin::close()
-{
+void AudioRecordWin::close() {
 	if (bStart)
 	{
 		bStart = false;
@@ -150,8 +148,7 @@ void AudioRecordWin::close()
 	}
 }
 
-AudioRecord* MFAudioRecordFactory::create(int type)
-{
+AudioRecord* MFAudioRecordFactory::create(int type) {
 	AudioRecordWin* av = new AudioRecordWin();
 	return av;
 }

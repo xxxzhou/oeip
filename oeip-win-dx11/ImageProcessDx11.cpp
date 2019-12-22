@@ -3,23 +3,22 @@
 #include "InputLayerDx11.h"
 #include "OutputLayerDx11.h"
 #include "YUV2RGBALayerDX11.h"
+#include "MapChannelLayerDx11.h"
+#include "ResizeLayerDx11.h"
 
-ImageProcessDx11::ImageProcessDx11()
-{
+ImageProcessDx11::ImageProcessDx11() {
 	createDevice11(&device, &ctx);
 	includeShader = new ShaderInclude(modeName, rctype, 104);
 }
 
-ImageProcessDx11::~ImageProcessDx11()
-{
+ImageProcessDx11::~ImageProcessDx11() {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	safeDelete(includeShader);
 	safeRelease(ctx);
 	safeRelease(device);
 }
 
-BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType)
-{
+BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType) {
 	BaseLayer* layer = nullptr;
 	switch (layerType)
 	{
@@ -32,8 +31,12 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType)
 		layer = new YUV2RGBALayerDX11();
 		break;
 	case OEIP_MAPCHANNEL_LAYER:
+		layer = new MapChannelLayerDx11();
 		break;
 	case OEIP_RGBA2YUV_LAYER:
+		break;
+	case OEIP_RESIZE_LAYER:
+		layer = new ResizeLayerDx11();
 		break;
 	case OEIP_OUTPUT_LAYER:
 		layer = new OutputLayerDx11();
@@ -46,11 +49,14 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType)
 	if (layer) {
 		layer->setImageProcess(this);
 	}
+	else {
+		std::string message = "dx11 not support layer: " + getLayerName(layerType);
+		logMessage(OEIP_WARN, message.c_str());
+	}
 	return layer;
 }
 
-void ImageProcessDx11::onRunLayers()
-{
+void ImageProcessDx11::onRunLayers() {
 	for (auto layer : layers) {
 		if (layer->bDisable || layer->bDisableList)
 			continue;
@@ -58,14 +64,12 @@ void ImageProcessDx11::onRunLayers()
 	}
 }
 
-void ImageProcessDx11::getTexture(int32_t layerIndex, std::shared_ptr<Dx11Texture>& texture, int32_t inIndex)
-{
+void ImageProcessDx11::getTexture(int32_t layerIndex, std::shared_ptr<Dx11Texture>& texture, int32_t inIndex) {
 	auto layer = std::dynamic_pointer_cast<LayerDx11>(layers[layerIndex]);
 	texture = layer->outTextures[inIndex];
 }
 
-ImageProcess* ImageProcessDx11Factory::create(int type)
-{
+ImageProcess* ImageProcessDx11Factory::create(int type) {
 	ImageProcessDx11* pdx11 = new ImageProcessDx11();
 	return pdx11;
 }
@@ -74,7 +78,6 @@ bool bCanLoad() {
 	return true;
 }
 
-void registerFactory()
-{
+void registerFactory() {
 	registerFactory(new ImageProcessDx11Factory(), OeipGpgpuType::OEIP_DX11, "image process dx11");
 }

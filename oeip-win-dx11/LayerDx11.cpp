@@ -1,8 +1,7 @@
 #include "LayerDx11.h"
 #include <math.h>
 
-LayerDx11::LayerDx11()
-{
+LayerDx11::LayerDx11() {
 	inSRVs.resize(inCount);
 	outTextures.resize(outCount);
 	outUAVs.resize(outCount);
@@ -13,8 +12,7 @@ LayerDx11::LayerDx11()
 	computeShader = std::make_unique< Dx11ComputeShader>();
 }
 
-bool LayerDx11::onInitBuffer()
-{
+bool LayerDx11::onInitBuffer() {
 	bool bInit = true;
 	if (layerType != OEIP_OUTPUT_LAYER) {
 		for (int32_t i = 0; i < outCount; i++) {
@@ -42,16 +40,14 @@ bool LayerDx11::onInitBuffer()
 	return bInit;
 }
 
-bool LayerDx11::onInitCBuffer()
-{
+bool LayerDx11::onInitCBuffer() {
 	constBuffer->setBufferSize(sizeof(InputConstant));
 	constBuffer->initResource(dx11->device);
-	constBuffer->cpuData = (uint8_t*)&inputConstant;	
+	constBuffer->cpuData = (uint8_t*)&inputConstant;
 	return true;
 }
 
-bool LayerDx11::updateCBuffer()
-{
+bool LayerDx11::updateCBuffer() {
 	auto dxFormat = getDxFormat(selfConnects[0].dataType);
 	inputConstant.width = threadSizeX;
 	inputConstant.height = threadSizeY;
@@ -61,14 +57,12 @@ bool LayerDx11::updateCBuffer()
 	return true;
 }
 
-void LayerDx11::setImageProcess(ImageProcess* ipdx11)
-{
+void LayerDx11::setImageProcess(ImageProcess* ipdx11) {
 	imageProcess = ipdx11;
 	dx11 = dynamic_cast<ImageProcessDx11*>(ipdx11);
 }
 
-void LayerDx11::onInitLayer()
-{
+void LayerDx11::onInitLayer() {
 	bInitHlsl = initHlsl();
 	if (!bInitHlsl) {
 		std::string message = "check " + layerName + " in:" + std::to_string(layerIndex) + " " + getLayerName(layerType) + "create hlsl fail.";
@@ -76,8 +70,7 @@ void LayerDx11::onInitLayer()
 	}
 }
 
-void LayerDx11::onRunLayer()
-{
+void LayerDx11::onRunLayer() {
 	if (bInitHlsl) {
 		computeShader->runCS(dx11->ctx, groupSize, inSRVs, outUAVs, { constBuffer->buffer });
 	}

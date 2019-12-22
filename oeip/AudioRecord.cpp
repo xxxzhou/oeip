@@ -2,12 +2,10 @@
 
 
 
-AudioRecord::AudioRecord()
-{
+AudioRecord::AudioRecord() {
 }
 
 
-AudioRecord::~AudioRecord() 
-{
+AudioRecord::~AudioRecord() {
 
 }

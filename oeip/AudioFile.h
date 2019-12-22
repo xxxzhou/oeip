@@ -20,10 +20,9 @@ public:
 	bool writeData(uint8_t* data, int lenght);
 	void setAudioInfo(std::wstring path, int numChannels, int numBits, int sampleRate);
 	void close();
-	bool IsInit() { return bInit; } 
+	bool IsInit() { return bInit; }
 private:
-	enum class Endianness
-	{
+	enum Endianness {
 		LittleEndian,
 		BigEndian
 	};

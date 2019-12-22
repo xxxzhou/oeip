@@ -6,8 +6,7 @@
 #include <iomanip>
 #include <string>
 
-bool getSourceMediaList(IMFMediaSource* source, std::vector<MediaType>& mediaTypeList)
-{
+bool getSourceMediaList(IMFMediaSource* source, std::vector<MediaType>& mediaTypeList){
 	bool bExcute = false;
 	CComPtr<IMFPresentationDescriptor> pd = nullptr;
 	CComPtr<IMFStreamDescriptor> sd = nullptr;

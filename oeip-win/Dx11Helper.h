@@ -11,8 +11,8 @@ OEIPWINDLL_EXPORT bool createGUITextureBuffer(ID3D11Device* deviceDx11, int widt
 //用于创建一块CPU不能读的BUFFER到相同规格CPU能读的BUFFER
 OEIPWINDLL_EXPORT void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11Buffer** descBuffer);
 OEIPWINDLL_EXPORT void copyBufferToRead(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11Texture2D** descBuffer);
-//SRV：描述了诸如贴图等，由Shader进行只读访问的内存空间，一般用来做CS中的输入
-//UAV：描述了可以由Shader进行随机读写的内存空间，用于做CS中的输入与输出
+//SRV：描述了诸如贴图时，一般用来做CS中的输入,但是ID3D11Texture2D相应的SRV满足特定几种格式也可以做输入,ID3D11Buffer的SRV没限制
+//UAV：描述了可以由Shader进行随机读写的显存存空间，用于做CS中的输入与输出
 OEIPWINDLL_EXPORT bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11ShaderResourceView** ppSRVOut);
 OEIPWINDLL_EXPORT bool createBufferUAV(ID3D11Device* deviceDx11, ID3D11Buffer* pBuffer, ID3D11UnorderedAccessView** ppUAVOut);
 OEIPWINDLL_EXPORT bool createBufferSRV(ID3D11Device* deviceDx11, ID3D11Texture2D* pBuffer, ID3D11ShaderResourceView** ppSRVOut);

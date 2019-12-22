@@ -45,6 +45,12 @@
     <ClCompile Include="MapChannelLayerDx11.cpp">
       <Filter>layers</Filter>
     </ClCompile>
+    <ClCompile Include="ResizeLayerDx11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="RGBA2YUVLayerDX11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputLayerDx11.h">
@@ -74,6 +80,12 @@
     <ClInclude Include="MapChannelLayerDx11.h">
       <Filter>layers</Filter>
     </ClInclude>
+    <ClInclude Include="ResizeLayerDx11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="RGBA2YUVLayerDX11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -97,6 +109,9 @@
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="MapChannel.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="RGBA2YUV.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

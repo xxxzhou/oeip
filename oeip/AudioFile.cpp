@@ -9,7 +9,7 @@
 #include <iterator>
 
 
-AudioFile::AudioFile() 
+AudioFile::AudioFile()
 {
 	bitDepth = 16;
 	sampleRate = 44100;
@@ -55,7 +55,7 @@ bool AudioFile::writeHeader()
 	return writeDataToFile(fileData, false);
 }
 
-bool AudioFile::writeData(uint8_t * data, int lenght)
+bool AudioFile::writeData(uint8_t* data, int lenght)
 {
 	if (lenght == 0)
 		return true;
@@ -65,8 +65,7 @@ bool AudioFile::writeData(uint8_t * data, int lenght)
 	samples.insert(samples.end(), cdata, cdata + lenght);
 	//这有个问题，音频采样每次大约只有5毫秒，IO写入的时间可能大于这个，就会造成采样时间变长，声音不对
 	//当缓存的数据超过1M，写入文件
-	if (samples.size() > 1024 * 1024 * 10)
-	{
+	if (samples.size() > 1024 * 1024 * 10) {
 		std::vector<uint8_t> newSamples(samples.begin(), samples.end());
 		samples.clear();
 		writeDataToFile(newSamples, true, false);
@@ -100,16 +99,13 @@ bool AudioFile::writeDataToFile(std::vector<uint8_t>& fileData, bool bApp, bool 
 	if (!bApp)
 		fileMask = std::ios::binary;
 	std::ofstream outputFile(filePath, fileMask);
-	if (outputFile.is_open())
-	{
+	if (outputFile.is_open()) {
 		//outputFile.seekp(0, std::ios::end);
 		int length = outputFile.tellp();
-		if (fileData.size() > 0)
-		{
+		if (fileData.size() > 0) {
 			outputFile.write((char*)fileData.data(), fileData.size());
 		}
-		if (bEnd)
-		{
+		if (bEnd) {
 			length = outputFile.tellp();
 
 			outputFile.seekp(4, std::ios::beg);
@@ -144,21 +140,18 @@ void AudioFile::addStringToFileData(std::vector<uint8_t>& fileData, std::string 
 void AudioFile::addInt32ToFileData(std::vector<uint8_t>& fileData, int32_t i, Endianness endianness)
 {
 	uint8_t bytes[4];
-	if (endianness == Endianness::LittleEndian)
-	{
+	if (endianness == Endianness::LittleEndian) {
 		bytes[3] = (i >> 24) & 0xFF;
 		bytes[2] = (i >> 16) & 0xFF;
 		bytes[1] = (i >> 8) & 0xFF;
 		bytes[0] = i & 0xFF;
 	}
-	else
-	{
+	else {
 		bytes[0] = (i >> 24) & 0xFF;
 		bytes[1] = (i >> 16) & 0xFF;
 		bytes[2] = (i >> 8) & 0xFF;
 		bytes[3] = i & 0xFF;
 	}
-
 	for (int i = 0; i < 4; i++)
 		fileData.push_back(bytes[i]);
 }
@@ -169,17 +162,14 @@ void AudioFile::addInt16ToFileData(std::vector<uint8_t>& fileData, int16_t i, En
 {
 	uint8_t bytes[2];
 
-	if (endianness == Endianness::LittleEndian)
-	{
+	if (endianness == Endianness::LittleEndian) {
 		bytes[1] = (i >> 8) & 0xFF;
 		bytes[0] = i & 0xFF;
 	}
-	else
-	{
+	else {
 		bytes[0] = (i >> 8) & 0xFF;
 		bytes[1] = i & 0xFF;
 	}
-
 	fileData.push_back(bytes[0]);
 	fileData.push_back(bytes[1]);
 }

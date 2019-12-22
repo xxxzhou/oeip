@@ -10,6 +10,7 @@
 
 #include "../oeip/OeipExport.h"
 #include "../oeip-win/Dx11Resource.h"
+#include "../oeip/VideoPipe.h"
 #include <vector>
 #include <iostream>
 #include <mutex>
@@ -36,19 +37,20 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void Render();
 
 int32_t devicdIndex = 0;
-int32_t formatIndex = 1;
-int32_t pipeId = 0;
+int32_t formatIndex = 0;
+
 int32_t inputLayerIndex = 0;
 int32_t width = 1920;
 int32_t height = 1080;
 std::vector<uint8_t> data;
 std::mutex mtx;
-YUV2RGBAParamet yuip = {};
+OeipVideoType videoType = OEIP_VIDEO_OTHER;
+VideoPipe* vpipe = nullptr;
 
 void dataRecive(uint8_t* ddata, int32_t width, int32_t height) {
 	std::lock_guard<std::mutex> mtx_locker(mtx);
 	//data = ddata;
-	if (yuip.yuvType == OEIP_VIDEO_NV12)
+	if (videoType == OEIP_VIDEO_NV12)
 		memcpy(data.data(), ddata, width * height * 3 / 2);
 	else
 		memcpy(data.data(), ddata, width * height * 2);
@@ -77,8 +79,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	{
 		initOeip();
-		pipeId = initPipe(OEIP_DX11);
-		setPipeDataAction(pipeId, onPipeData);
+		vpipe = new VideoPipe();
+		setPipeDataAction(vpipe->getPipeId(), onPipeData);
 
 		int32_t deviceCount = getDeviceCount();
 		std::vector<OeipDeviceInfo> devices;
@@ -94,15 +96,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		setFormat(devicdIndex, formatIndex);
 		openDevice(devicdIndex);
 
-		InputParamet ip = {};
-		YUV2RGBAParamet yuip = {};
-		yuip.yuvType = getVideoYUV(formats[formatIndex].videoType);
-		updatePipeParamet(pipeId, 0, &ip);
-		updatePipeParamet(pipeId, 1, &yuip);
-		if (yuip.yuvType == OEIP_VIDEO_NV12)
-			setPipeInput(pipeId, inputLayerIndex, width, height * 3 / 2, OEIP_CV_8UC1);
-		else
-			setPipeInput(pipeId, inputLayerIndex, width / 2, height, OEIP_CV_8UC4);
+		videoType = formats[formatIndex].videoType;
+		vpipe->setVideoFormat(videoType, width, height);
+
 		data.resize(width * height * 2);
 		dx11Tex = new Dx11Texture();
 		dx11Tex->setNoView(true);
@@ -280,10 +276,8 @@ void Render()
 {
 	std::lock_guard<std::mutex> mtx_locker(mtx);
 
-	updatePipeInput(pipeId, inputLayerIndex, data.data());
-	runPipe(pipeId);
-	setPipeOutputGpuTex(pipeId, 2, g_pd3dDevice, dx11Tex->texture);
-
+	vpipe->runVideoPipe(0, data.data());
+	setPipeOutputGpuTex(vpipe->getPipeId(), vpipe->getOutputId(), g_pd3dDevice, dx11Tex->texture);
 	// Just clear the backbuffer
 	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; //red,green,blue,alpha
 	g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, ClearColor);

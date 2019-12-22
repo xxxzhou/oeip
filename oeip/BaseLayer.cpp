@@ -1,8 +1,7 @@
 #include "BaseLayer.h"
 #include "ImageProcess.h"
 
-BaseLayer::BaseLayer(int32_t inSize, int32_t outSize)
-{
+BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 	inCount = inSize;
 	outCount = outSize;
 	forwardNames.resize(inSize);
@@ -19,8 +18,7 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize)
 	}
 }
 
-bool BaseLayer::initLayer()
-{
+bool BaseLayer::initLayer() {
 	std::string inputMeg = layerType == OEIP_INPUT_LAYER ? " input layer " : " forward layer ";
 	std::string layerMeg = "check " + layerName + " in:" + std::to_string(layerIndex) + " " + getLayerName(layerType) + inputMeg;
 	for (uint32_t i = 0; i < inCount; i++) {
@@ -96,40 +94,38 @@ bool BaseLayer::initLayer()
 	return true;
 }
 
-bool BaseLayer::initBuffer()
-{
+bool BaseLayer::initBuffer() {
 	bBufferInit = onInitBuffer();
 	return bBufferInit;
 }
 
-void BaseLayer::runLayer()
-{
+void BaseLayer::runLayer() {
 	if (!bBufferInit)
 		return;
 	onRunLayer();
 }
 
-void BaseLayer::updateParamet(const void* paramet)
-{
-	if (layerType == OEIP_INPUT_LAYER) {
-		using ParametType = LayerParamet<OEIP_INPUT_LAYER, AllLayerParamet>::ParametType;
-		auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);
-		xlayer->updateParamet(paramet);
+//这个函数怎么处理。。。
+void BaseLayer::updateParamet(const void* paramet) {
+	typedef std::function<void(BaseLayer*, const void*)> actionUpdate;
+	static actionUpdate funcs[OEIP_MAX_LAYER] =
+	{
+		nullptr,// updateParametTemplate<OEIP_NONE_LAYER>,
+		updateParametTemplate<OEIP_INPUT_LAYER>,
+		updateParametTemplate<OEIP_YUV2RGBA_LAYER>,
+		updateParametTemplate<OEIP_MAPCHANNEL_LAYER>,
+		updateParametTemplate<OEIP_RGBA2YUV_LAYER>,
+		updateParametTemplate<OEIP_RESIZE_LAYER>,
+		updateParametTemplate<OEIP_OUTPUT_LAYER>,
+	};
+	if (!funcs[layerType]) {
+		logMessage(OEIP_WARN, "update paramet layertype invalid value.");
+		return;
 	}
-	else if (layerType == OEIP_YUV2RGBA_LAYER) {
-		using ParametType = LayerParamet<OEIP_YUV2RGBA_LAYER, AllLayerParamet>::ParametType;
-		auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);
-		xlayer->updateParamet(paramet);
-	}
-	else if (layerType == OEIP_OUTPUT_LAYER) {
-		using ParametType = LayerParamet<OEIP_OUTPUT_LAYER, AllLayerParamet>::ParametType;
-		auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(this);
-		xlayer->updateParamet(paramet);
-	}
+	funcs[layerType](this, paramet);
 }
 
-void BaseLayer::setInputSize(int32_t width, int32_t height, int32_t dataType, int32_t intputIndex)
-{
+void BaseLayer::setInputSize(int32_t width, int32_t height, int32_t dataType, int32_t intputIndex) {
 	if (intputIndex >= inCount)
 		return;
 	selfConnects[intputIndex].width = width;
@@ -137,8 +133,7 @@ void BaseLayer::setInputSize(int32_t width, int32_t height, int32_t dataType, in
 	selfConnects[intputIndex].dataType = dataType;
 }
 
-void BaseLayer::setOutputSize(int32_t width, int32_t height, int32_t dataType, int32_t outputIndex)
-{
+void BaseLayer::setOutputSize(int32_t width, int32_t height, int32_t dataType, int32_t outputIndex) {
 	if (outputIndex >= outCount)
 		return;
 	outConnects[outputIndex].width = width;
@@ -146,22 +141,19 @@ void BaseLayer::setOutputSize(int32_t width, int32_t height, int32_t dataType, i
 	outConnects[outputIndex].dataType = dataType;
 }
 
-void BaseLayer::getInputSize(LayerConnect& inConnect, int32_t inputIndex)
-{
+void BaseLayer::getInputSize(LayerConnect& inConnect, int32_t inputIndex) {
 	if (inputIndex >= inCount)
 		return;
 	inConnect = selfConnects[inputIndex];
 }
 
-void BaseLayer::getOutputSize(LayerConnect& outConnect, int32_t outputIndex)
-{
+void BaseLayer::getOutputSize(LayerConnect& outConnect, int32_t outputIndex) {
 	if (outputIndex >= outCount)
 		return;
 	outConnect = outConnects[outputIndex];
 }
 
-void BaseLayer::setForwardLayer(std::string forwardName, int32_t outputIndex, int32_t inputIndex)
-{
+void BaseLayer::setForwardLayer(std::string forwardName, int32_t outputIndex, int32_t inputIndex) {
 	if (inputIndex >= inCount)
 		return;
 	forwardNames[inputIndex] = forwardName;

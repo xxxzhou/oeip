@@ -4,8 +4,7 @@
 using namespace std;
 using namespace std::placeholders;
 
-MFCaptureDevice::MFCaptureDevice()
-{
+MFCaptureDevice::MFCaptureDevice() {
 	readerCallback = new ReaderCallback();
 	auto hr = MFCreateAttributes(&pAttributes, 2);
 	//开户格式转换，如mgjp 转yuv2
@@ -18,8 +17,7 @@ MFCaptureDevice::MFCaptureDevice()
 	}
 }
 
-MFCaptureDevice::~MFCaptureDevice()
-{
+MFCaptureDevice::~MFCaptureDevice() {
 	if (source != nullptr) {
 		source->Shutdown();
 		source = nullptr;
@@ -27,8 +25,7 @@ MFCaptureDevice::~MFCaptureDevice()
 	}
 }
 
-bool MFCaptureDevice::init(IMFActivate* pActivate, unsigned int num)
-{
+bool MFCaptureDevice::init(IMFActivate* pActivate, unsigned int num) {
 	activate = pActivate;
 	id = num;
 	auto hr = activate->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &deviceName, nullptr);
@@ -59,8 +56,7 @@ bool MFCaptureDevice::init(IMFActivate* pActivate, unsigned int num)
 	return true;
 }
 
-bool MFCaptureDevice::Init(IMFActivate* pActivate)
-{
+bool MFCaptureDevice::Init(IMFActivate* pActivate) {
 	wchar_t* name = nullptr;
 	auto hr = pActivate->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &name, nullptr);
 	//可能会造成设备卡住
@@ -82,8 +78,7 @@ bool MFCaptureDevice::Init(IMFActivate* pActivate)
 	return true;
 }
 
-bool MFCaptureDevice::Open()
-{
+bool MFCaptureDevice::Open() {
 	//可能会造成设备卡住
 	if (!bOpen) {
 		auto hr = activate->ActivateObject(__uuidof(IMFMediaSource), (void**)&source);
@@ -99,8 +94,7 @@ bool MFCaptureDevice::Open()
 	return true;
 }
 
-bool MFCaptureDevice::Close()
-{
+bool MFCaptureDevice::Close() {
 	long hr = 0;
 	if (bOpen) {
 		sourceReader = nullptr;

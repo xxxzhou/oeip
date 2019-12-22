@@ -16,8 +16,7 @@ Texture2D<unorm float4> texIn : register(t0);
 RWTexture2D<unorm float4> texOut : register(u0);
 
 [numthreads(SIZE_X, SIZE_Y, 1)]
-void main(uint3 DTid : SV_DispatchThreadID)
-{
+void main(uint3 DTid : SV_DispatchThreadID) {
 	if (DTid.x >= width || DTid.y >= height)
 		return;
 	float4 color = texIn[DTid.xy];

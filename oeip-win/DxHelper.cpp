@@ -1,8 +1,7 @@
 #include "DxHelper.h"
 #include <exception>
 
-int32_t sizeDxFormatElement(DXGI_FORMAT format)
-{
+int32_t sizeDxFormatElement(DXGI_FORMAT format) {
 	switch (format)
 	{
 	case DXGI_FORMAT_R32G32B32A32_TYPELESS:
@@ -123,8 +122,7 @@ int32_t sizeDxFormatElement(DXGI_FORMAT format)
 	}
 }
 
-DXGI_FORMAT getDxFormat(int32_t dataType)
-{
+DXGI_FORMAT getDxFormat(int32_t dataType) {
 	DXGI_FORMAT dxFormat = DXGI_FORMAT_UNKNOWN;
 	switch (dataType)
 	{
@@ -145,29 +143,3 @@ DXGI_FORMAT getDxFormat(int32_t dataType)
 	}
 	return dxFormat;
 }
-
-//DXGI_FORMAT getDxFormat(OeipImageType oeipFormat)
-//{
-//	DXGI_FORMAT dxFormat = DXGI_FORMAT_UNKNOWN;
-//	switch (oeipFormat)
-//	{
-//	case OEIP_IMAGE_OTHER:
-//		break;
-//	case OEIP_IMAGE_R8:
-//		dxFormat = DXGI_FORMAT_R8_UNORM;
-//		break;
-//	case OEIP_IMAGE_R16:
-//		dxFormat = DXGI_FORMAT_R16_UINT;
-//		break;
-//	case OEIP_IMAGE_RGB24:
-//		//24位并不支持GPU显存共享传输
-//		dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-//		break;
-//	case OEIP_IMAGE_RGBA32:
-//		dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-//		break;
-//	default:
-//		break;
-//	}
-//	return dxFormat;
-//}
