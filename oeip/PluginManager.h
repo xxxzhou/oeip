@@ -12,21 +12,18 @@ public:
 template<typename T>
 class PluginManager
 {
-	struct FactoryIndex
-	{
+	struct FactoryIndex {
 		ObjectFactory<T>* factory = nullptr;
 		int factoryType = -1;
 		std::vector<T*> models;
 		std::string name;
 	};
 public:
-	static PluginManager<T>& getInstance()
-	{
+	static PluginManager<T>& getInstance() {
 		static PluginManager m_instance;
 		return m_instance;
 	};
-	~PluginManager()
-	{
+	~PluginManager() {
 		//Release();
 	};
 private:
@@ -36,8 +33,7 @@ private:
 	std::vector<FactoryIndex> factorys;
 public:
 	//注册生产类,type不能设置为-1,-1表示特殊意义	
-	void registerFactory(ObjectFactory<T>* vpf, int type, std::string name)
-	{
+	void registerFactory(ObjectFactory<T>* vpf, int type, std::string name) {
 		bool bhave = false;
 		for (const auto& fi : factorys) {
 			if (fi.factoryType == type) {
@@ -56,8 +52,7 @@ public:
 		}
 	};
 	//产生一个实体	
-	T* createModel(int type)
-	{
+	T* createModel(int type) {
 		for (auto& fi : factorys) {
 			if (fi.factoryType == type) {
 				T* model = fi.factory->create(type);
@@ -68,8 +63,7 @@ public:
 		return nullptr;
 	};
 
-	bool bHaveType(int type)
-	{
+	bool bHaveType(int type) {
 		bool bHave = false;
 		for (auto& fi : factorys) {
 			if (fi.factoryType == type) {
@@ -81,8 +75,7 @@ public:
 	}
 
 	//vtype取负一，表示所有model
-	void getModelList(std::vector<T*>& models, int vtype)
-	{
+	void getModelList(std::vector<T*>& models, int vtype) {
 		for (auto& fi : factorys) {
 			if (vtype == -1 || fi.factoryType == vtype) {
 				models.insert(models.end(), fi.models.begin(), fi.models.end());
@@ -91,8 +84,7 @@ public:
 	};
 
 	//一般注册的如果是管理类(单例),调用此方法默认创建一个实例
-	void getFactoryDefaultModel(std::vector<T*>& models, int vtype)
-	{
+	void getFactoryDefaultModel(std::vector<T*>& models, int vtype) {
 		for (auto& fi : factorys) {
 			if (vtype == -1 || fi.factoryType == vtype) {
 				if (fi.models.size() == 0)
@@ -102,8 +94,7 @@ public:
 		}
 	};
 	//UE4/Unity3D编辑器时每次Play/EndPlay调用
-	void release()
-	{
+	void release() {
 		for (auto& fi : factorys) {
 			for (auto& model : fi.models) {
 				safeDelete(model);
@@ -113,20 +104,17 @@ public:
 		}
 	};
 	//在引用oeip进程关闭时调用
-	static void clean(bool bFactory = false)
-	{
+	static void clean(bool bFactory = false) {
 		getInstance().release();
 		if (bFactory) {
-			for (auto& fi : getInstance().factorys)
-			{
+			for (auto& fi : getInstance().factorys) {
 				safeDelete(fi.factory);
 			}
 			getInstance().factorys.clear();
 		}
 	}
 
-	std::string getTypeDesc(int type)
-	{
+	std::string getTypeDesc(int type) {
 		for (auto& fi : factorys) {
 			if (fi.factoryType == type) {
 				return fi.name;
@@ -138,7 +126,6 @@ public:
 
 
 template<typename T>
-void registerFactory(ObjectFactory<T>* factory, int32_t type, std::string name)
-{
+void registerFactory(ObjectFactory<T>* factory, int32_t type, std::string name) {
 	PluginManager<T>::getInstance().registerFactory(factory, type, name);
 }

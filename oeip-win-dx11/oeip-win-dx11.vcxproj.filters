@@ -51,6 +51,12 @@
     <ClCompile Include="RGBA2YUVLayerDX11.cpp">
       <Filter>layers</Filter>
     </ClCompile>
+    <ClCompile Include="BlendLayerDx11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="OperateLayerDx11.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputLayerDx11.h">
@@ -86,6 +92,12 @@
     <ClInclude Include="RGBA2YUVLayerDX11.h">
       <Filter>layers</Filter>
     </ClInclude>
+    <ClInclude Include="BlendLayerDx11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="OperateLayerDx11.h">
+      <Filter>layers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -112,6 +124,12 @@
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="RGBA2YUV.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Blend.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="Operate.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

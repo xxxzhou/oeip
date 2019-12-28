@@ -13,19 +13,6 @@
 #define SAFE_DELETE(p)      { if (p) { delete (p); (p)=nullptr; } } 
 #endif
 
-struct UInt3
-{
-	uint32_t X = 1;
-	uint32_t Y = 1;
-	uint32_t Z = 1;
-
-	UInt3(uint32_t x = 1, uint32_t y = 1, uint32_t z = 1) {
-		X = x;
-		Y = y;
-		Z = z;
-	}
-};
-
 OEIPDLL_EXPORT void logMessage(int level, const char* message);
 
 OEIPDLL_EXPORT void setLogEvent(logEventHandle logEvent);

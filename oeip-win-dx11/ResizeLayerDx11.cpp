@@ -22,14 +22,14 @@ bool ResizeLayerDx11::initHlsl() {
 }
 
 void ResizeLayerDx11::onInitLayer() {
+	LayerDx11::onInitLayer();
 	threadSizeX = layerParamet.width;
 	threadSizeY = layerParamet.height;
 	outConnects[0].width = threadSizeX;
 	outConnects[0].height = threadSizeY;
 	groupSize.X = divUp(threadSizeX, sizeX);
 	groupSize.Y = divUp(threadSizeY, sizeY);
-	groupSize.Z = 1;
-	LayerDx11::onInitLayer();
+	groupSize.Z = 1;	
 }
 
 

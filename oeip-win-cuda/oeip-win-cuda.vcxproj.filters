@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="help">
+      <UniqueIdentifier>{6e79f5fe-89e0-4a5f-ab62-f2cd65dc13f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cuda">
+      <UniqueIdentifier>{301af5c4-59ca-46d3-b996-e5f0616fc6fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="layers">
+      <UniqueIdentifier>{04e44ec3-23ca-4c17-bdb7-cf98d6d01a4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cs">
+      <UniqueIdentifier>{35ff4995-2e7b-4d67-a683-4fb6f39e9d22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="grabcut">
+      <UniqueIdentifier>{17bb235f-6ccd-4d14-89f9-13d16556f2c4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common_help.h">
+      <Filter>help</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_help.h">
+      <Filter>help</Filter>
+    </ClInclude>
+    <ClInclude Include="helper_math.h">
+      <Filter>help</Filter>
+    </ClInclude>
+    <ClInclude Include="colorconvert.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="fastguidedfilter.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="InputLayerCuda.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerCuda.h">
+      <Filter>cs</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageProcessCuda.h">
+      <Filter>cs</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputLayerCuda.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaComputeLayer.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="opencvcuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="GuidedFilterLayer.h">
+      <Filter>layers</Filter>
+    </ClInclude>
+    <ClInclude Include="GMMCuda.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+    <ClInclude Include="GrabCutCude.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphCuda.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+    <ClInclude Include="matting_cuda.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+    <ClInclude Include="matting_help.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+    <ClInclude Include="KmeansCuda.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="InputLayerCuda.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerCuda.cpp">
+      <Filter>cs</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageProcessCuda.cpp">
+      <Filter>cs</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputLayerCuda.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="CudaComputeLayer.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="GuidedFilterLayer.cpp">
+      <Filter>layers</Filter>
+    </ClCompile>
+    <ClCompile Include="GMMCuda.cpp">
+      <Filter>grabcut</Filter>
+    </ClCompile>
+    <ClCompile Include="GrabCutCude.cpp">
+      <Filter>grabcut</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphCuda.cpp">
+      <Filter>grabcut</Filter>
+    </ClCompile>
+    <ClCompile Include="KmeansCuda.cpp">
+      <Filter>grabcut</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="CudaWrapper.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="OpencvWrapper.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="matting_cuda.cu">
+      <Filter>grabcut</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

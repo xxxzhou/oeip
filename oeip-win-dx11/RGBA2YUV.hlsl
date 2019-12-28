@@ -1,7 +1,7 @@
 #include "Common.hlsl"
 
 #ifndef OEIP_YUV_TYPE
-#define OEIP_YUV_TYPE 1
+#define OEIP_YUV_TYPE 2
 #endif
 
 cbuffer texSize : register(b0)
@@ -32,8 +32,8 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 
 	if (DTid.x >= width || DTid.y >= height)
 		return;
-	float4 rgba = texIn[DTid.xy];
 #if (OEIP_YUV_TYPE == 1 || OEIP_YUV_TYPE == 5 || OEIP_YUV_TYPE == 6)
+	float4 rgba = texIn[DTid.xy];
 	float4 yuv = rgb2Yuv(rgba);
 	uint2 yIndex = DTid.xy;
 #if (OEIP_YUV_TYPE == 1)//OEIP_YUVFMT_YUV420SP
@@ -41,11 +41,11 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 	uint2 uIndex = uint2(0, height) + uvv;
 	uint2 vIndex = uIndex + uint2(1, 0);
 #elif (OEIP_YUV_TYPE == 5)//OEIP_YUVFMT_YUY2P	
-	uint2 uIndex = uint2(0, height) + uint2(DTid.x >> 1, DTid.y);
-	uint2 vIndex = uint2(0, height * 3 / 2) + uint2(DTid.x >> 1, DTid.y);
+	uint2 uIndex = uint2(0, height) + uint2(DTid.x, DTid.y >> 1);
+	uint2 vIndex = uint2(0, height * 3 / 2) + uint2(DTid.x, DTid.y >> 1);
 #else//OEIP_YUVFMT_YUV420P
-	uint2 uIndex = uint2(0, height) + uint2(DTid.x >> 2, DTid.y);
-	uint2 vIndex = uint2(0, height * 5 / 4) + uint2(DTid.x >> 2, DTid.y);
+	uint2 uIndex = uint2(0, height) + uint2(DTid.x, DTid.y >> 2);
+	uint2 vIndex = uint2(0, height * 5 / 4) + uint2(DTid.x, DTid.y >> 2);
 #endif
 	texOut[yIndex] = yuv.x;
 	texOut[uIndex] = yuv.y;
@@ -60,8 +60,12 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 #if (OEIP_YUV_TYPE == 4)//OEIP_YUVFMT_UYVYI
 	yoffset = 1;
 #endif
-	float4 yuyv = float4(rgba[yoffset], rgba[bitx + (1 - yoffset)], rgba[yoffset + 2], rgba[(2 - bitx) + (1 - yoffset)]);
-	texOut[uint2(DTid.x * 2, DTid.y)] = float4(yuyv.x, yuyv.y, yuyv.w, 1.0f);
-	texOut[uint2(DTid.x * 2 + 1, DTid.y)] = float4(yuyv.z, yuyv.y, yuyv.w, 1.0f);
+	float4 rgba1 = texIn[uint2(DTid.x * 2, DTid.y)];
+	float4 rgba2 = texIn[uint2(DTid.x * 2 + 1, DTid.y)];
+	float4 yuv1 = rgb2Yuv(rgba1);
+	float4 yuv2 = rgb2Yuv(rgba2);
+	float4 yuyv = float4(yuv1.x, (yuv1.y + yuv2.y) / 2.f, yuv2.x, (yuv1.z + yuv2.z) / 2.f);
+	float4 syuyv = float4(yuyv[yoffset], yuyv[bitx + (1 - yoffset)], yuyv[yoffset + 2], yuyv[(2 - bitx) + (1 - yoffset)]);
+	texOut[uint2(DTid.x, DTid.y)] = syuyv;
 #endif
 }

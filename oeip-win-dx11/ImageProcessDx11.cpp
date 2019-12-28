@@ -5,6 +5,9 @@
 #include "YUV2RGBALayerDX11.h"
 #include "MapChannelLayerDx11.h"
 #include "ResizeLayerDx11.h"
+#include "RGBA2YUVLayerDX11.h"
+#include "BlendLayerDx11.h"
+#include "OperateLayerDx11.h"
 
 ImageProcessDx11::ImageProcessDx11() {
 	createDevice11(&device, &ctx);
@@ -27,6 +30,9 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType) {
 	case OEIP_INPUT_LAYER:
 		layer = new InputLayerDx11();
 		break;
+	case OEIP_OUTPUT_LAYER:
+		layer = new OutputLayerDx11();
+		break;
 	case OEIP_YUV2RGBA_LAYER:
 		layer = new YUV2RGBALayerDX11();
 		break;
@@ -34,12 +40,16 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType) {
 		layer = new MapChannelLayerDx11();
 		break;
 	case OEIP_RGBA2YUV_LAYER:
+		layer = new RGBA2YUVLayerDX11();
 		break;
 	case OEIP_RESIZE_LAYER:
 		layer = new ResizeLayerDx11();
 		break;
-	case OEIP_OUTPUT_LAYER:
-		layer = new OutputLayerDx11();
+	case OEIP_OPERATE_LAYER:
+		layer = new OperateLayerDx11();
+		break;
+	case OEIP_BLEND_LAYER:
+		layer = new BlendLayerDx11();
 		break;
 	case OEIP_MAX_LAYER:
 		break;

@@ -45,37 +45,31 @@
 static OeipManager* oInstance = nullptr;
 static bool bInit = false;
 
-void setLogAction(logEventAction logHandle)
-{
+void setLogAction(logEventAction logHandle) {
 	setLogEvent(logHandle);
 }
 
-void setLogHandle(logEventHandle logHandle)
-{
+void setLogHandle(logEventHandle logHandle) {
 	setLogEvent(logHandle);
 }
 
-void initOeip()
-{
+void initOeip() {
 	if (!bInit) {
 		oInstance = OeipManager::getInstance();
 		bInit = true;
 	}
 }
 
-void shutdownOeip()
-{
+void shutdownOeip() {
 	if (bInit) {
 		OeipManager::shutdown();
 		bInit = false;
 	}
 }
 
-OeipYUVFMT getVideoYUV(OeipVideoType videoType)
-{
+OeipYUVFMT getVideoYUV(OeipVideoType videoType) {
 	OeipYUVFMT fmt = OEIP_YUVFMT_OTHER;
-	switch (videoType)
-	{
+	switch (videoType) {
 	case OEIP_VIDEO_NV12:
 		fmt = OEIP_YUVFMT_YUV420SP;
 		break;
@@ -97,15 +91,13 @@ OeipYUVFMT getVideoYUV(OeipVideoType videoType)
 	return fmt;
 }
 
-int getDeviceCount()
-{
-	OEIP_CHECKINSTANCEINT
+int getDeviceCount() {
+	OEIP_CHECKINSTANCEINT;
 	return oInstance->getVideoList().size();
 }
 
-void getDeviceList(OeipDeviceInfo* deviceList, int32_t lenght, int32_t index)
-{
-	OEIP_CHECKINSTANCEVOID
+void getDeviceList(OeipDeviceInfo* deviceList, int32_t lenght, int32_t index) {
+	OEIP_CHECKINSTANCEVOID;
 	auto videoList = oInstance->getVideoList();
 	if (index + lenght > videoList.size()) {
 		logMessage(OEIP_INFO, "getDeviceList length and index out of range.");
@@ -121,17 +113,15 @@ void getDeviceList(OeipDeviceInfo* deviceList, int32_t lenght, int32_t index)
 	}
 }
 
-int32_t getFormatCount(int32_t deviceIndex)
-{
-	OEIP_CHECKINSTANCEINT
-	OEIP_CHECKDEVICEINT
+int32_t getFormatCount(int32_t deviceIndex) {
+	OEIP_CHECKINSTANCEINT;
+	OEIP_CHECKDEVICEINT;
 	return device->getFormats().size();
 }
 
-int32_t getFormatList(int32_t deviceIndex, VideoFormat* formatList, int32_t lenght, int32_t index)
-{
-	OEIP_CHECKINSTANCEINT
-	OEIP_CHECKDEVICEINT
+int32_t getFormatList(int32_t deviceIndex, VideoFormat* formatList, int32_t lenght, int32_t index) {
+	OEIP_CHECKINSTANCEINT;
+	OEIP_CHECKDEVICEINT;
 	int32_t size = device->getFormats().size();
 	if (index + lenght > size) {
 		logMessage(OEIP_INFO, "getFormatList length and index out of range.");
@@ -143,135 +133,116 @@ int32_t getFormatList(int32_t deviceIndex, VideoFormat* formatList, int32_t leng
 	}
 }
 
-int32_t getFormat(int32_t deviceIndex)
-{
-	OEIP_CHECKINSTANCEINT
-	OEIP_CHECKDEVICEINT
+int32_t getFormat(int32_t deviceIndex) {
+	OEIP_CHECKINSTANCEINT;
+	OEIP_CHECKDEVICEINT;
 	return device->getFormat();
 }
 
-void setFormat(int32_t deviceIndex, int32_t formatIndex)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKDEVICEVOID
+void setFormat(int32_t deviceIndex, int32_t formatIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKDEVICEVOID;
 	device->setFormat(formatIndex);
 }
 
-bool openDevice(int32_t deviceIndex)
-{
-	OEIP_CHECKINSTANCEBOOL
-	OEIP_CHECKDEVICEBOOL
+bool openDevice(int32_t deviceIndex) {
+	OEIP_CHECKINSTANCEBOOL;
+	OEIP_CHECKDEVICEBOOL;
 	return device->openDevice();
 }
 
-void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData)
-{
+void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData) {
 	setDeviceDataHandle(deviceIndex, onProcessData);
 }
 
-void setDeviceDataHandle(int32_t deviceIndex, onReviceHandle onProcessData)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKDEVICEVOID
+void setDeviceDataHandle(int32_t deviceIndex, onReviceHandle onProcessData) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKDEVICEVOID;
 	device->setDataHandle(onProcessData);
 }
 
-void setDeviceEventAction(int32_t deviceIndex, onEventAction onDeviceEvent)
-{
+void setDeviceEventAction(int32_t deviceIndex, onEventAction onDeviceEvent) {
 	setDeviceEventHandle(deviceIndex, onDeviceEvent);
 }
 
-void setDeviceEventHandle(int32_t deviceIndex, onEventHandle onDeviceEvent)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKDEVICEVOID
+void setDeviceEventHandle(int32_t deviceIndex, onEventHandle onDeviceEvent) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKDEVICEVOID;
 	device->setDeviceHandle(onDeviceEvent);
 }
 
-int32_t initPipe(OeipGpgpuType gpgpuType)
-{
-	OEIP_CHECKINSTANCEINT
+int32_t initPipe(OeipGpgpuType gpgpuType) {
+	OEIP_CHECKINSTANCEINT;
 	return oInstance->initPipe(gpgpuType);
 }
 
-int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet)
-{
-	OEIP_CHECKINSTANCEINT
-	OEIP_CHECKPIPEINT
+int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet) {
+	OEIP_CHECKINSTANCEINT;
+	OEIP_CHECKPIPEINT;
 	return pipe->addLayer(layerName, layerType, paramet);
 }
 
-void connectLayer(int32_t pipeId, int32_t layerIndex, const char * forwardName, int32_t inputIndex, int32_t selfIndex)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void connectLayer(int32_t pipeId, int32_t layerIndex, const char* forwardName, int32_t inputIndex, int32_t selfIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->connectLayer(layerIndex, forwardName, inputIndex, selfIndex);
 }
 
-void setEnableLayer(int32_t pipeId, int32_t layerIndex, bool bEnable)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void setEnableLayer(int32_t pipeId, int32_t layerIndex, bool bEnable) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->setEnableLayer(layerIndex, bEnable);
 }
 
-void setEnableLayerList(int32_t pipeId, int32_t layerIndex, bool bEnable)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void setEnableLayerList(int32_t pipeId, int32_t layerIndex, bool bEnable) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->setEnableLayerList(layerIndex, bEnable);
 }
 
-void setPipeInput(int32_t pipeId, int32_t layerIndex, int32_t width, int32_t height, int32_t dataType, int32_t intputIndex)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void setPipeInput(int32_t pipeId, int32_t layerIndex, int32_t width, int32_t height, int32_t dataType, int32_t intputIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->setInput(layerIndex, width, height, dataType, intputIndex);
 }
 
-void updatePipeInput(int32_t pipeId, int32_t layerIndex, uint8_t* data, int32_t intputIndex)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void updatePipeInput(int32_t pipeId, int32_t layerIndex, uint8_t* data, int32_t intputIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->updateInput(layerIndex, data, intputIndex);
 }
 
-void setPipeDataAction(int32_t pipeId, onProcessAction onProcessData)
-{
+void setPipeDataAction(int32_t pipeId, onProcessAction onProcessData) {
 	setPipeDataHandle(pipeId, onProcessData);
 }
 
-void setPipeDataHandle(int32_t pipeId, onProcessHandle onProcessData)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void setPipeDataHandle(int32_t pipeId, onProcessHandle onProcessData) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->setDataProcess(onProcessData);
 }
 
-void runPipe(int32_t pipeId)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void runPipe(int32_t pipeId) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->runLayers();
 }
 
-void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t inputIndex)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t inputIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
+	pipe->setInputGpuTex(layerIndex, ctx, tex, inputIndex);
 }
 
-void setPipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t outputIndex)
-{
-	OEIP_CHECKINSTANCEVOID
-	OEIP_CHECKPIPEVOID
+void setPipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t outputIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
 	pipe->setOutputGpuTex(layerIndex, ctx, tex, outputIndex);
 }
 
-bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const void* paramet)
-{
-	OEIP_CHECKINSTANCEBOOL
-	OEIP_CHECKPIPEBOOL
+bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const void* paramet) {
+	OEIP_CHECKINSTANCEBOOL;
+	OEIP_CHECKPIPEBOOL;
 	return pipe->updateLayer(layerIndex, paramet);
 }
 

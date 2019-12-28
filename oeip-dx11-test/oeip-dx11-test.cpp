@@ -79,7 +79,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 	{
 		initOeip();
-		vpipe = new VideoPipe();
+		vpipe = new VideoPipe(OEIP_DX11);
 		setPipeDataAction(vpipe->getPipeId(), onPipeData);
 
 		int32_t deviceCount = getDeviceCount();

@@ -10,6 +10,7 @@ public:
 private:
 	std::vector<std::unique_ptr<Dx11SharedTex>> shardTexs;
 	std::vector<std::unique_ptr<Dx11Buffer>> inBuffers;
+	std::vector<bool> cpuUpdates;
 protected:
 	virtual void onParametChange(InputParamet oldT) override;
 	virtual void onInitLayer() override;

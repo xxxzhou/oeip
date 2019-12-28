@@ -36,10 +36,10 @@ enum OeipVideoType : int32_t
 enum OeipYUVFMT : int32_t
 {
 	OEIP_YUVFMT_OTHER,
-	OEIP_YUVFMT_YUV420SP,//Semi-Planar
-	OEIP_YUVFMT_YUY2I,//Interleaved 设备
-	OEIP_YUVFMT_YVYUI,//Interleaved
-	OEIP_YUVFMT_UYVYI,//Interleaved
+	OEIP_YUVFMT_YUV420SP,//Semi-Planar 一般用于图像设备
+	OEIP_YUVFMT_YUY2I,//Interleaved 一般用于图像设备
+	OEIP_YUVFMT_YVYUI,//Interleaved 一般用于图像设备
+	OEIP_YUVFMT_UYVYI,//Interleaved 一般用于图像设备
 	OEIP_YUVFMT_YUY2P,//Planar 一般用于传输
 	OEIP_YUVFMT_YUV420P,//Planar 一般用于传输
 };
@@ -49,15 +49,20 @@ enum OeipLayerType : int32_t
 {
 	OEIP_NONE_LAYER,
 	OEIP_INPUT_LAYER,
+	OEIP_OUTPUT_LAYER,
 	OEIP_YUV2RGBA_LAYER,
 	OEIP_MAPCHANNEL_LAYER,
 	OEIP_RGBA2YUV_LAYER,
 	OEIP_RESIZE_LAYER,
-	OEIP_OUTPUT_LAYER,
+	OEIP_OPERATE_LAYER,
+	OEIP_BLEND_LAYER,
+	OEIP_GUIDEDFILTER_LAYER,
 	OEIP_MAX_LAYER,
 };
 
-#define AllLayerParamet int32_t, InputParamet, YUV2RGBAParamet, MapChannelParamet, RGBA2YUVParamet,ResizeParamet, OutputParamet, void
+#define AllLayerParamet int32_t, InputParamet, OutputParamet,\
+	YUV2RGBAParamet, MapChannelParamet, RGBA2YUVParamet,\
+	ResizeParamet,OperateParamet,BlendParamet,GuidedFilterParamet, void
 
 enum OeipGpgpuType : int32_t
 {
@@ -135,6 +140,35 @@ struct ResizeParamet
 	int32_t height = 1080;
 };
 
+//方便C#交互不做额外设置，以及GPU参数结构对应,bool全用int表示
+struct OperateParamet
+{
+	int32_t bFlipX = false;
+	int32_t bFlipY = false;
+	float gamma = 1.f;
+};
+
+//二图混合，第二图显示在第一图中下面前四个参数组成的RECT中
+struct BlendParamet
+{
+	//所有值范围在0.1
+	float left = 0.f;
+	float top = 0.f;
+	float width = 0.f;
+	float height = 0.f;
+	//不透明度
+	float opacity = 0.f;
+};
+
+struct GuidedFilterParamet
+{
+	//导向滤波的特性，以缩放后的图像处理能快速得到一样结果
+	int32_t zoom = 8;
+	int32_t	softness = 5;
+	float eps = 0.00001f;
+	float intensity = 0.2f;
+};
+
 struct VideoFormat
 {
 	int32_t index = -1;
@@ -206,5 +240,6 @@ typedef std::function<void(OeipDeviceEventType, int32_t)> onEventHandle;
 typedef void(*onReviceAction)(uint8_t* data, int32_t width, int32_t height);
 typedef std::function<void(uint8_t*, int32_t, int32_t)> onReviceHandle;
 
+//GPU运算管线返回
 typedef void(*onProcessAction)(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex);
 typedef std::function<void(int32_t, uint8_t*, int32_t, int32_t, int32_t)> onProcessHandle;

@@ -50,11 +50,6 @@ protected:
 	virtual void onParametChange(T oldT) {};
 };
 
-#define OEIP_CS_SIZE_X 32
-#define OEIP_CS_SIZE_Y 8
-#define OEIP_CS_SIZE_XSTR OEIP_TOSTRING(32)
-#define OEIP_CS_SIZE_YSTR OEIP_TOSTRING(8)
-
 class OEIPDLL_EXPORT BaseLayer :public virtual CommonLayer
 {
 public:
@@ -72,15 +67,11 @@ public:
 	bool bDisable = false;
 	//当前层及链接在后面的层全部关闭运算
 	bool bDisableList = false;
+	bool bDListChange = false;
 protected:
 	//当前层buffer有没初始化
 	bool bBufferInit = false;
-	int32_t threadSizeX;
-	int32_t threadSizeY;
-	uint32_t sizeX = OEIP_CS_SIZE_X;
-	uint32_t sizeY = OEIP_CS_SIZE_Y;
-	uint32_t sizeZ = 1;
-	UInt3 groupSize = {};
+
 	class ImageProcess* imageProcess = nullptr;
 protected:
 	int32_t inCount = 1;
@@ -154,13 +145,18 @@ public:
 	OutputLayer() {};
 	virtual ~OutputLayer() {};
 };
+
 typedef BaseLayerTemplate<YUV2RGBAParamet> YUV2RGBALayer;
 typedef BaseLayerTemplate<MapChannelParamet> MapChannelLayer;
 typedef BaseLayerTemplate<ResizeParamet> ResizeLayer;
 typedef BaseLayerTemplate<RGBA2YUVParamet> RGBA2YUVLayer;
+typedef BaseLayerTemplate<OperateParamet> OperateLayer;
+//二张输入图，第一张是主图(底图)，第二张是要混合图
+typedef BaseLayerTemplate<BlendParamet> BlendLayer;
+typedef BaseLayerTemplate<GuidedFilterParamet> GuidedFilterLayer;
 
 template<typename T>
-inline void BaseLayerTemplate<T>::updateParamet(const void* paramet){
+inline void BaseLayerTemplate<T>::updateParamet(const void* paramet) {
 	T* tparamet = (T*)paramet;
 	updateParamet(*tparamet);
 }

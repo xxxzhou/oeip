@@ -32,6 +32,7 @@ bool YUV2RGBALayerDX11::initHlsl() {
 }
 
 void YUV2RGBALayerDX11::onInitLayer() {
+	LayerDx11::onInitLayer();
 	if (layerParamet.yuvType == OEIP_YUVFMT_YUV420SP || layerParamet.yuvType == OEIP_YUVFMT_YUV420P || layerParamet.yuvType == OEIP_YUVFMT_YUY2P) {
 		threadSizeX = selfConnects[0].width;
 		threadSizeY = selfConnects[0].height * 2 / 3;
@@ -50,7 +51,6 @@ void YUV2RGBALayerDX11::onInitLayer() {
 	}
 	groupSize.X = divUp(threadSizeX, sizeX);
 	groupSize.Y = divUp(threadSizeY, sizeY);
-	groupSize.Z = 1;
-	LayerDx11::onInitLayer();
+	groupSize.Z = 1;	
 }
 

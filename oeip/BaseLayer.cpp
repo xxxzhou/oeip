@@ -35,11 +35,16 @@ bool BaseLayer::initLayer() {
 			else {
 				forwardLayerIndexs[i] = imageProcess->findLayer(forwardNames[i]);
 			}
-			//bEnableList会关闭所有连接到当前层的后续层
-			bool bEnableList = imageProcess->getEnableLayerList(forwardLayerIndexs[i]);
-			if (!bEnableList) {
-				this->bDisableList = true;
-				continue;
+			//bEnableList会关闭/打开所有连接到当前层的后续层
+			bool bDListChange = false;
+			bool bEnableList = imageProcess->getEnableLayerList(forwardLayerIndexs[i], bDListChange);
+			//如果有改变链表的
+			if (bDListChange) {
+				this->bDListChange = true;
+				this->bDisableList = !bEnableList;
+				if (!bEnableList) {
+					continue;
+				}
 			}
 			bool bEnable = imageProcess->getEnableLayer(forwardLayerIndexs[i]);
 			while (!bEnable) {
@@ -78,14 +83,9 @@ bool BaseLayer::initLayer() {
 		if (layerType == OEIP_OUTPUT_LAYER)
 			selfConnects[i].dataType = lc.dataType;
 	}
-	threadSizeX = selfConnects[0].width;
-	threadSizeY = selfConnects[0].height;
-	groupSize.X = divUp(threadSizeX, sizeX);
-	groupSize.Y = divUp(threadSizeY, sizeY);
-	groupSize.Z = 1;
 	for (uint32_t i = 0; i < outCount; i++) {
-		outConnects[i].width = threadSizeX;
-		outConnects[i].height = threadSizeY;
+		outConnects[i].width = selfConnects[i].width;
+		outConnects[i].height = selfConnects[i].height;
 	}
 	onInitLayer();
 	for (uint32_t i = 0; i < inCount; i++) {
@@ -108,15 +108,17 @@ void BaseLayer::runLayer() {
 //这个函数怎么处理。。。
 void BaseLayer::updateParamet(const void* paramet) {
 	typedef std::function<void(BaseLayer*, const void*)> actionUpdate;
-	static actionUpdate funcs[OEIP_MAX_LAYER] =
-	{
+	static actionUpdate funcs[OEIP_MAX_LAYER] = {
 		nullptr,// updateParametTemplate<OEIP_NONE_LAYER>,
 		updateParametTemplate<OEIP_INPUT_LAYER>,
+		updateParametTemplate<OEIP_OUTPUT_LAYER>,
 		updateParametTemplate<OEIP_YUV2RGBA_LAYER>,
 		updateParametTemplate<OEIP_MAPCHANNEL_LAYER>,
 		updateParametTemplate<OEIP_RGBA2YUV_LAYER>,
 		updateParametTemplate<OEIP_RESIZE_LAYER>,
-		updateParametTemplate<OEIP_OUTPUT_LAYER>,
+		updateParametTemplate<OEIP_OPERATE_LAYER>,
+		updateParametTemplate<OEIP_BLEND_LAYER>,
+		updateParametTemplate<OEIP_GUIDEDFILTER_LAYER>,
 	};
 	if (!funcs[layerType]) {
 		logMessage(OEIP_WARN, "update paramet layertype invalid value.");

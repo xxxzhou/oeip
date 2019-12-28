@@ -43,7 +43,7 @@ public:
 	void setEnableLayer(int32_t layerIndex, bool bEnable);
 	bool getEnableLayer(int32_t layerIndex);
 	void setEnableLayerList(int32_t layerIndex, bool bEnable);
-	bool getEnableLayerList(int32_t layerIndex);
+	bool getEnableLayerList(int32_t layerIndex, bool& bDListChange);
 public:
 	int32_t findLayer(const std::string& name);
 	void getLayerOutConnect(int32_t layerIndex, LayerConnect& outConnect, int32_t outIndex);
@@ -51,8 +51,9 @@ public:
 public:
 	//输入层大小改变后调用这个
 	void setInput(int32_t layerIndex, int32_t width, int32_t height, int32_t dataType, int32_t inputIndex = 0);
-	void updateInput(int32_t layerIndex, uint8_t* data, int32_t inputIndex = 0);
+	void updateInput(int32_t layerIndex, uint8_t* data, int32_t inputIndex = 0);	
 	void outputData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t dataType);
+	void setInputGpuTex(int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);
 	void setOutputGpuTex(int32_t layerIndex, void* device, void* tex, int32_t outputIndex = 0);
 	void setDataProcess(onProcessHandle processHandle) {
 		std::lock_guard<std::recursive_mutex> mtx_locker(mtx);

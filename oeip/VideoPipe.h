@@ -4,7 +4,7 @@
 class OEIPDLL_EXPORT VideoPipe
 {
 public:
-	VideoPipe();
+	VideoPipe(OeipGpgpuType gpuType);
 	~VideoPipe();
 private:
 	int32_t pipeId = -1;

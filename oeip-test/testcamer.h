@@ -21,7 +21,6 @@ using namespace cv;
 namespace OeipCamera
 {
 	//template<int32_t inSize, int32_t outSize>
-
 	cv::Mat* show = nullptr;
 	int32_t devicdIndex = 0;
 	int32_t formatIndex = 0;
@@ -30,8 +29,6 @@ namespace OeipCamera
 	int32_t height = 1080;
 	OeipVideoType videoType = OEIP_VIDEO_OTHER;
 	VideoPipe* vpipe = nullptr;
-
-
 	void dataRecive(uint8_t* data, int32_t width, int32_t height) {
 		//std::cout << width << height << std::endl;
 		vpipe->runVideoPipe(0, data);
@@ -45,7 +42,7 @@ namespace OeipCamera
 	void testCamera() {
 		initOeip();
 
-		vpipe = new VideoPipe();
+		vpipe = new VideoPipe(OEIP_CUDA);
 		setPipeDataAction(vpipe->getPipeId(), onPipeData);
 
 		int32_t deviceCount = getDeviceCount();
@@ -66,16 +63,11 @@ namespace OeipCamera
 		vpipe->setVideoFormat(videoType, width, height);
 		show = new cv::Mat(height, width, CV_8UC4);
 		//const char* window_name = "vvvvvvvv";
-		while (int key = cv::waitKey(1)) {
+		while (int key = cv::waitKey(20)) {
 			cv::imshow("a", *show);
-			switch (key)
-			{
-			case 'q':
-
+			if (key == 'q')
 				break;
-			default:
-				break;
-			}
 		}
+		shutdownOeip();
 	}
 }

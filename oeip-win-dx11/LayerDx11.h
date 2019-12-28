@@ -10,6 +10,11 @@
 #include "Dx11ComputeShader.h"
 #include "ImageProcessDx11.h"
 
+#define OEIP_CS_SIZE_X 32
+#define OEIP_CS_SIZE_Y 8
+#define OEIP_CS_SIZE_XSTR OEIP_TOSTRING(32)
+#define OEIP_CS_SIZE_YSTR OEIP_TOSTRING(8)
+
 struct InputConstant
 {
 	uint32_t width;
@@ -25,8 +30,25 @@ struct InputConstant
 class LayerDx11 : public BaseLayer
 {
 public:
-	LayerDx11();
+	LayerDx11() :LayerDx11(1, 1) {};
+	LayerDx11(int32_t inSize, int32_t outSize) :BaseLayer(inSize, outSize) {
+		inSRVs.resize(inCount);
+		outTextures.resize(outCount);
+		outUAVs.resize(outCount);
+		for (int32_t i = 0; i < outCount; i++) {
+			outTextures[i] = std::make_shared< Dx11Texture>();
+		}
+		constBuffer = std::make_unique<Dx11Constant>();
+		computeShader = std::make_unique< Dx11ComputeShader>();
+	};
 	virtual ~LayerDx11() {};
+protected:
+	int32_t threadSizeX;
+	int32_t threadSizeY;
+	uint32_t sizeX = OEIP_CS_SIZE_X;
+	uint32_t sizeY = OEIP_CS_SIZE_Y;
+	uint32_t sizeZ = 1;
+	UInt3 groupSize = {};
 public:
 	std::vector <std::shared_ptr<Dx11Texture>> outTextures;
 protected:
@@ -51,10 +73,10 @@ protected:
 	virtual void onInitLayer(int32_t index) override {};
 	//当上下文设定大小后,开始创建对应纹理与buffer
 	virtual bool onInitBuffer() override;
+	//初始化上传的参数BUFFER
 	virtual bool onInitCBuffer();
 	virtual bool updateCBuffer();
 	virtual void onRunLayer() override;
-
 };
 
 

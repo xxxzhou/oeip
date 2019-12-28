@@ -40,11 +40,11 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 	uint2 uIndex = uint2(0, height) + uvv;
 	uint2 vIndex = uIndex + uint2(1, 0);
 #elif (OEIP_YUV_TYPE == 5)//OEIP_YUVFMT_YUY2P	
-	uint2 uIndex = uint2(0, height) + uint2(DTid.x >> 1, DTid.y);
-	uint2 vIndex = uint2(0, height * 3 / 2) + uint2(DTid.x >> 1, DTid.y);
+	uint2 uIndex = uint2(0, height) + uint2(DTid.x, DTid.y >> 1);
+	uint2 vIndex = uint2(0, height * 3 / 2) + uint2(DTid.x, DTid.y >> 1);
 #else//OEIP_YUVFMT_YUV420P
-	uint2 uIndex = uint2(0, height) + uint2(DTid.x >> 2, DTid.y);
-	uint2 vIndex = uint2(0, height * 5 / 4) + uint2(DTid.x >> 2, DTid.y);
+	uint2 uIndex = uint2(0, height) + uint2(DTid.x, DTid.y >> 2);
+	uint2 vIndex = uint2(0, height * 5 / 4) + uint2(DTid.x, DTid.y >> 2);
 #endif
 	float y = texIn[yIndex];
 	float u = texIn[uIndex] - 0.5f;

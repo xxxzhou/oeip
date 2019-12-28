@@ -4,6 +4,7 @@
 InputLayerDx11::InputLayerDx11() {
 	shardTexs.resize(inCount);
 	inBuffers.resize(inCount);
+	cpuUpdates.resize(inCount, false);
 	for (int32_t i = 0; i < inCount; i++) {
 		shardTexs[i] = std::make_unique< Dx11SharedTex>();
 		inBuffers[i] = std::make_unique< Dx11Buffer>();
@@ -19,19 +20,23 @@ void InputLayerDx11::onParametChange(InputParamet oldT) {
 }
 
 void InputLayerDx11::onInitLayer() {
+	LayerDx11::onInitLayer();
 	//因StructureByteStride只能为4的倍数,相应buffer要重新设计,图片的宽度不为4的倍数后面想办法处理
 	if (selfConnects[0].dataType == OEIP_CV_8UC1) {
 		threadSizeX = divUp(threadSizeX, 4);
+	}
+	else if (selfConnects[0].dataType == OEIP_CV_8UC3) {
+		//OEIP_CV_8UC3经过运算转成OEIP_CV_8UC4,DX11中没有适配OEIP_CV_8UC3的格式
+		outConnects[0].dataType = OEIP_CV_8UC4;
 	}
 	//threadSizeX在这表示有多少个像素点，每个像素点可能是C1/C3/C4
 	//240=3*4*5*4,8UC3为免访问SB显存指针冲突，用共享显存来处理,3的倍数块可以只访问本块共享显存
 	//同时也避免一些CPU数据直接上传到纹理要求的一些宽度对齐,如32倍数这些
 	groupSize.X = divUp(threadSizeX * threadSizeY, 240);
 	groupSize.Y = 1;
-	groupSize.Z = 1;
-	LayerDx11::onInitLayer();
+	groupSize.Z = 1;	
 }
-
+//OEIP_CV_8UC3 没有相应的纹理格式
 bool InputLayerDx11::onInitBuffer() {
 	for (int32_t i = 0; i < inCount; i++) {
 		DXGI_FORMAT dxFormat = getDxFormat(selfConnects[i].dataType);
@@ -64,8 +69,10 @@ bool InputLayerDx11::initHlsl() {
 
 void InputLayerDx11::onRunLayer() {
 	for (int32_t i = 0; i < inCount; i++) {
-		if (layerParamet.bCpu) {
+		if (layerParamet.bCpu && cpuUpdates[i]) {
+			inBuffers[i]->updateResource(dx11->ctx);
 			computeShader->runCS(dx11->ctx, groupSize, inBuffers[i]->srvView, outTextures[i]->uavView, constBuffer->buffer);
+			cpuUpdates[i] = false;
 		}
 		if (layerParamet.bGpu) {
 			if (shardTexs[i]->texture == nullptr || !shardTexs[i]->bGpuUpdate)
@@ -83,8 +90,9 @@ void InputLayerDx11::onRunLayer() {
 }
 
 void InputLayerDx11::inputCpuData(uint8_t* byteData, int32_t inputIndex) {
-	inBuffers[inputIndex]->cpuData = byteData;
-	inBuffers[inputIndex]->updateResource(dx11->ctx);
+	//CPU更新
+	inBuffers[inputIndex]->cpuData = byteData;	
+	cpuUpdates[inputIndex] = true;
 }
 
 void InputLayerDx11::inputGpuTex(void* device, void* texture, int32_t inputIndex) {
