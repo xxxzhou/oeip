@@ -1,7 +1,8 @@
 #include "GuidedFilterLayer.h"
 
-//void resize_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream);
+void resize_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream);
 void resize_gpuf(PtrStepSz<float4> source, PtrStepSz<float4> dest, bool bLinear, cudaStream_t stream);
+void uchar2float_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, cudaStream_t stream);
 
 void findMatrix_gpu(PtrStepSz<float4> source, PtrStepSz<float3> dest,
 	PtrStepSz<float3> dest1, PtrStepSz<float3> dest2, cudaStream_t stream);
@@ -11,8 +12,6 @@ void guidedFilterResult_gpu(PtrStepSz<float4> source, PtrStepSz<float4> guid, Pt
 	float intensity, cudaStream_t stream);
 
 GuidedFilterLayerCuda::GuidedFilterLayerCuda() {
-	selfConnects[0].dataType = OEIP_CV_32FC4;
-	outConnects[0].dataType = OEIP_CV_8UC4;
 }
 
 GuidedFilterLayerCuda::~GuidedFilterLayerCuda() {
@@ -31,7 +30,8 @@ bool GuidedFilterLayerCuda::onInitBuffer() {
 	scaleWidth = width / layerParamet.zoom;
 	scaleHeight = height / layerParamet.zoom;
 
-	gpuResize.create(scaleHeight, scaleWidth, CV_32FC4);//I_sub+p_sub
+	resizeMat.create(scaleHeight, scaleWidth, CV_8UC4);
+	resizeMatf.create(scaleHeight, scaleWidth, CV_32FC4);//I_sub+p_sub
 	mean_I.create(scaleHeight, scaleWidth, CV_32FC4);
 	mean_Ipv.create(scaleHeight, scaleWidth, CV_32FC3);
 	var_I_rxv.create(scaleHeight, scaleWidth, CV_32FC3);
@@ -54,10 +54,11 @@ void GuidedFilterLayerCuda::onRunLayer() {
 	NppiSize oMaskSize = { softness,softness };
 	NppiPoint oAnchor = { softness / 2,softness / 2 };
 	//缩放大小
-	resize_gpuf(inMats[0], gpuResize, false, ipCuda->cudaStream);
-	findMatrix_gpu(gpuResize, mean_Ipv, var_I_rxv, var_I_gbxfv, ipCuda->cudaStream);
+	resize_gpu(inMats[0], resizeMat, false, ipCuda->cudaStream);
+	uchar2float_gpu(resizeMat, resizeMatf, ipCuda->cudaStream);
+	findMatrix_gpu(resizeMatf, mean_Ipv, var_I_rxv, var_I_gbxfv, ipCuda->cudaStream);
 	//模糊原始值
-	nppiFilterBoxBorder_32f_C4R((Npp32f*)gpuResize.ptr<float4>(), gpuResize.step, oSizeROI, oSrcOffset, (Npp32f*)mean_I.ptr<float4>(), mean_I.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);
+	nppiFilterBoxBorder_32f_C4R((Npp32f*)resizeMatf.ptr<float4>(), resizeMatf.step, oSizeROI, oSrcOffset, (Npp32f*)mean_I.ptr<float4>(), mean_I.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);
 	//模糊矩阵
 	nppiFilterBoxBorder_32f_C3R((Npp32f*)mean_Ipv.ptr<float3>(), mean_Ipv.step, oSizeROI, oSrcOffset, (Npp32f*)mean_Ip.ptr<float3>(), mean_Ip.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);
 	nppiFilterBoxBorder_32f_C3R((Npp32f*)var_I_rxv.ptr<float3>(), var_I_rxv.step, oSizeROI, oSrcOffset, (Npp32f*)var_I_rx.ptr<float3>(), var_I_rx.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);

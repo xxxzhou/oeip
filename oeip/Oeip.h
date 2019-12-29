@@ -57,12 +57,16 @@ enum OeipLayerType : int32_t
 	OEIP_OPERATE_LAYER,
 	OEIP_BLEND_LAYER,
 	OEIP_GUIDEDFILTER_LAYER,
+	//此层计划只有CUDA的实现，DX11实现太麻烦了
+	OEIP_GRABCUT_LAYER,
+	OEIP_DARKNET_LAYER,
 	OEIP_MAX_LAYER,
 };
 
 #define AllLayerParamet int32_t, InputParamet, OutputParamet,\
 	YUV2RGBAParamet, MapChannelParamet, RGBA2YUVParamet,\
-	ResizeParamet,OperateParamet,BlendParamet,GuidedFilterParamet, void
+	ResizeParamet,OperateParamet,BlendParamet,\
+	GuidedFilterParamet,GrabcutParamet, DarknetParamet,void
 
 enum OeipGpgpuType : int32_t
 {
@@ -167,6 +171,37 @@ struct GuidedFilterParamet
 	int32_t	softness = 5;
 	float eps = 0.00001f;
 	float intensity = 0.2f;
+};
+
+struct GrabcutParamet
+{
+	int32_t iterCount = 1;
+	float gamma = 90.f;
+	float lambda = 450.f;
+	int32_t count = 250;
+};
+
+struct DarknetParamet
+{
+	//控制网络是否加载
+	int32_t bLoad = false;
+	char confile[512];
+	char weightfile[512];
+	//框的
+	float thresh = 0.2f;
+	float nms = 0.4f;
+	int32_t bDraw = false;
+	uint32_t drawColor = 255;
+};
+
+struct PersonBox
+{
+	//是人的概率
+	float prob = 0.f;
+	float centerX = 0.f;
+	float centerY = 0.f;
+	float width = 0.f;
+	float height = 0.f;
 };
 
 struct VideoFormat

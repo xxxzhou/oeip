@@ -138,7 +138,7 @@ inline __global__ void blend(PtrStepSz<uchar4> source, PtrStepSz<uchar4> blendTe
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
 	if (idx < dest.cols && idy < dest.rows) {
 		float4 rgba = rgbauchar42float4(source(idy, idx));
-		if (idx >= left && idx < left + blendTex.cols&& idy >= top && idy < top + blendTex.rows) {
+		if (idx >= left && idx < left + blendTex.cols && idy >= top && idy < top + blendTex.rows) {
 			float4 rgba2 = rgbauchar42float4(blendTex(idy - top, idx - left));
 			rgba = rgba2 * (1.f - opacity) + rgba * opacity;
 		}
@@ -159,8 +159,16 @@ inline __global__ void operate(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest,
 			iy = source.rows - idy;
 		}
 		float4 rgba = rgbauchar42float4(source(iy, ix));
-		float4 grgba = make_float4(powf(rgba.x, paramt.gamma), powf(rgba.y, paramt.gamma), powf(rgba.z, paramt.gamma),rgba.w);
+		float4 grgba = make_float4(powf(rgba.x, paramt.gamma), powf(rgba.y, paramt.gamma), powf(rgba.z, paramt.gamma), rgba.w);
 		dest(idy, idx) = rgbafloat42uchar4(grgba);
+	}
+}
+
+inline __global__ void uchar2float(PtrStepSz<uchar4> source, PtrStepSz<float4> dest) {
+	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+	if (idx < dest.cols && idy < dest.rows) {
+		dest(idy, idx) = rgbauchar42float4(source(idy, idx));
 	}
 }
 

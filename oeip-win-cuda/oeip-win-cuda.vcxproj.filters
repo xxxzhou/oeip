@@ -16,6 +16,9 @@
     <Filter Include="grabcut">
       <UniqueIdentifier>{17bb235f-6ccd-4d14-89f9-13d16556f2c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="darknet">
+      <UniqueIdentifier>{b216816a-29c4-4c3a-85a0-507d1250b723}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common_help.h">
@@ -72,6 +75,9 @@
     <ClInclude Include="KmeansCuda.h">
       <Filter>grabcut</Filter>
     </ClInclude>
+    <ClInclude Include="DarknetLayer.h">
+      <Filter>darknet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="InputLayerCuda.cpp">
@@ -103,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="KmeansCuda.cpp">
       <Filter>grabcut</Filter>
+    </ClCompile>
+    <ClCompile Include="DarknetLayer.cpp">
+      <Filter>darknet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="cuda">
+      <UniqueIdentifier>{bf5d424d-b3da-4f82-ac32-3d47d49c76fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="activation_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="avgpool_layer_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="blas_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="col2im_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="convolutional_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="crop_layer_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="deconvolutional_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="dropout_layer_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="im2col_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="maxpool_layer_kernels.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="activations.c" />
+    <ClCompile Include="activation_layer.c" />
+    <ClCompile Include="avgpool_layer.c" />
+    <ClCompile Include="batchnorm_layer.c" />
+    <ClCompile Include="blas.c" />
+    <ClCompile Include="box.c" />
+    <ClCompile Include="col2im.c" />
+    <ClCompile Include="compare.c" />
+    <ClCompile Include="connected_layer.c" />
+    <ClCompile Include="convolutional_layer.c" />
+    <ClCompile Include="cost_layer.c" />
+    <ClCompile Include="crnn_layer.c" />
+    <ClCompile Include="crop_layer.c" />
+    <ClCompile Include="cuda.c" />
+    <ClCompile Include="data.c" />
+    <ClCompile Include="deconvolutional_layer.c" />
+    <ClCompile Include="demo.c" />
+    <ClCompile Include="detection_layer.c" />
+    <ClCompile Include="dropout_layer.c" />
+    <ClCompile Include="gemm.c" />
+    <ClCompile Include="gru_layer.c" />
+    <ClCompile Include="im2col.c" />
+    <ClCompile Include="image.c" />
+    <ClCompile Include="image_opencv.cpp" />
+    <ClCompile Include="iseg_layer.c" />
+    <ClCompile Include="l2norm_layer.c" />
+    <ClCompile Include="layer.c" />
+    <ClCompile Include="list.c" />
+    <ClCompile Include="local_layer.c" />
+    <ClCompile Include="logistic_layer.c" />
+    <ClCompile Include="lstm_layer.c" />
+    <ClCompile Include="mainfile.cpp" />
+    <ClCompile Include="matrix.c" />
+    <ClCompile Include="maxpool_layer.c" />
+    <ClCompile Include="network.c" />
+    <ClCompile Include="normalization_layer.c" />
+    <ClCompile Include="option_list.c" />
+    <ClCompile Include="parser.c" />
+    <ClCompile Include="region_layer.c" />
+    <ClCompile Include="reorg_layer.c" />
+    <ClCompile Include="rnn_layer.c" />
+    <ClCompile Include="route_layer.c" />
+    <ClCompile Include="shortcut_layer.c" />
+    <ClCompile Include="softmax_layer.c" />
+    <ClCompile Include="tree.c" />
+    <ClCompile Include="upsample_layer.c" />
+    <ClCompile Include="utils.c" />
+    <ClCompile Include="yolo_layer.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="activations.h" />
+    <ClInclude Include="activation_layer.h" />
+    <ClInclude Include="avgpool_layer.h" />
+    <ClInclude Include="batchnorm_layer.h" />
+    <ClInclude Include="blas.h" />
+    <ClInclude Include="box.h" />
+    <ClInclude Include="classifier.h" />
+    <ClInclude Include="col2im.h" />
+    <ClInclude Include="connected_layer.h" />
+    <ClInclude Include="convolutional_layer.h" />
+    <ClInclude Include="cost_layer.h" />
+    <ClInclude Include="crnn_layer.h" />
+    <ClInclude Include="crop_layer.h" />
+    <ClInclude Include="cuda.h" />
+    <ClInclude Include="darknet.h" />
+    <ClInclude Include="data.h" />
+    <ClInclude Include="deconvolutional_layer.h" />
+    <ClInclude Include="demo.h" />
+    <ClInclude Include="detection_layer.h" />
+    <ClInclude Include="dropout_layer.h" />
+    <ClInclude Include="gemm.h" />
+    <ClInclude Include="gru_layer.h" />
+    <ClInclude Include="im2col.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="iseg_layer.h" />
+    <ClInclude Include="l2norm_layer.h" />
+    <ClInclude Include="layer.h" />
+    <ClInclude Include="list.h" />
+    <ClInclude Include="local_layer.h" />
+    <ClInclude Include="logistic_layer.h" />
+    <ClInclude Include="lstm_layer.h" />
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="maxpool_layer.h" />
+    <ClInclude Include="network.h" />
+    <ClInclude Include="normalization_layer.h" />
+    <ClInclude Include="option_list.h" />
+    <ClInclude Include="parser.h" />
+    <ClInclude Include="region_layer.h" />
+    <ClInclude Include="reorg_layer.h" />
+    <ClInclude Include="rnn_layer.h" />
+    <ClInclude Include="route_layer.h" />
+    <ClInclude Include="shortcut_layer.h" />
+    <ClInclude Include="softmax_layer.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="tree.h" />
+    <ClInclude Include="upsample_layer.h" />
+    <ClInclude Include="utils.h" />
+    <ClInclude Include="yolo_layer.h" />
+  </ItemGroup>
+</Project>

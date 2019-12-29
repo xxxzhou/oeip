@@ -42,8 +42,7 @@ OEIPDLL_EXPORT std::string getLayerName(OeipLayerType layerType);
 OEIPDLL_EXPORT uint32_t divUp(int32_t x, int32_t y);
 
 template <class T>
-void safeRelease(T*& ppT)
-{
+void safeRelease(T*& ppT) {
 	if (ppT != nullptr) {
 		(ppT)->Release();
 		ppT = nullptr;
@@ -51,8 +50,7 @@ void safeRelease(T*& ppT)
 }
 
 template <class T>
-void safeReleaseAll(T*& ppT)
-{
+void safeReleaseAll(T*& ppT) {
 	if (ppT != nullptr) {
 		long e = (ppT)->Release();
 		while (e) {
@@ -63,8 +61,7 @@ void safeReleaseAll(T*& ppT)
 }
 
 template <class T>
-void safeDelete(T*& ppT)
-{
+void safeDelete(T*& ppT) {
 	if (ppT != nullptr) {
 		delete ppT;
 		ppT = nullptr;
@@ -72,8 +69,7 @@ void safeDelete(T*& ppT)
 }
 
 template<typename  T>
-void clearList(std::vector<T*> list)
-{
+void clearList(std::vector<T*> list) {
 	for (T* t : list) {
 		safeDelete(t);
 	}

@@ -24,6 +24,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oeip-dx11-test", "oeip-dx11
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oeip-win-cuda", "oeip-win-cuda\oeip-win-cuda.vcxproj", "{B4BF595D-9FE7-45FE-8D67-60C18EC2F927}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "darknet", "darknet\darknet.vcxproj", "{5B5545F2-0725-4C9A-B6B2-CC819AE94272}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -86,6 +88,12 @@ Global
 		{B4BF595D-9FE7-45FE-8D67-60C18EC2F927}.Release|x64.ActiveCfg = Release|x64
 		{B4BF595D-9FE7-45FE-8D67-60C18EC2F927}.Release|x64.Build.0 = Release|x64
 		{B4BF595D-9FE7-45FE-8D67-60C18EC2F927}.Release|x86.ActiveCfg = Release|x64
+		{5B5545F2-0725-4C9A-B6B2-CC819AE94272}.Debug|x64.ActiveCfg = Debug|x64
+		{5B5545F2-0725-4C9A-B6B2-CC819AE94272}.Debug|x64.Build.0 = Debug|x64
+		{5B5545F2-0725-4C9A-B6B2-CC819AE94272}.Debug|x86.ActiveCfg = Debug|x64
+		{5B5545F2-0725-4C9A-B6B2-CC819AE94272}.Release|x64.ActiveCfg = Release|x64
+		{5B5545F2-0725-4C9A-B6B2-CC819AE94272}.Release|x64.Build.0 = Release|x64
+		{5B5545F2-0725-4C9A-B6B2-CC819AE94272}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

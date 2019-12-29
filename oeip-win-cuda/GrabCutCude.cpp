@@ -43,8 +43,7 @@ void GrabCutCude::init(int dwidth, int dheight, cudaStream_t stream) {
 }
 
 void GrabCutCude::setSeedMode(bool bDraw) {
-	if (bDraw)
-	{
+	if (bDraw) {
 		cudaMemset2DAsync(mask.ptr(), mask.step, 3, mask.cols, mask.rows, cudaStream);
 		bComputeSeed = false;
 	}
@@ -66,8 +65,7 @@ void GrabCutCude::renderFrame(GpuMat source, cv::Rect rect) {
 	//计算图论的边
 	graph->addEdges(source, gamma);
 	int index = 0;
-	while (index++ < iterCount)
-	{
+	while (index++ < iterCount) {
 		//根据mask重新分配分类的索引值
 		gmm->assign(source, clusterIndex, mask);
 		//根据分类重新计算GMM模型

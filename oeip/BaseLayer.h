@@ -3,10 +3,9 @@
 #include <string>
 #include <memory>
 
-//每层的width/height根据输入自动变动,而elementCount/elementByte需要每层初始化定义好
+//每层的width/height根据上层自动变动,而elementCount/elementByte需要每层初始化定义好
 struct LayerConnect
 {
-	//OeipImageType imageType = OEIP_IMAGE_OTHER;	
 	int32_t width = 0;
 	int32_t height = 0;
 	//数据类型,前三BIT表示类型，后三BIT表示通道个数
@@ -65,7 +64,7 @@ public:
 	std::vector<int32_t> forwardOutIndexs;
 	//当前层是否关闭
 	bool bDisable = false;
-	//当前层及链接在后面的层全部关闭运算
+	//当前层及链接在后面的层全部关闭运算，一般是有多个输出链路，根据相应条件关闭某些输出链路
 	bool bDisableList = false;
 	bool bDListChange = false;
 protected:
@@ -79,8 +78,8 @@ protected:
 	//对个每个输入的层索引(结合forwardOutIndexs),假设有三个转入层 可能是[4,0]/[4,1]/[5,0]
 	std::vector<int32_t> forwardLayerIndexs;
 	//每层selfConnect与outConnect的elementByte自己设定
-	std::vector<LayerConnect> selfConnects = {};
-	std::vector<LayerConnect> outConnects = {};
+	std::vector<LayerConnect> selfConnects;
+	std::vector<LayerConnect> outConnects;
 protected:
 	//所有层公共的初始化
 	virtual void onInitLayer() {};
@@ -154,6 +153,8 @@ typedef BaseLayerTemplate<OperateParamet> OperateLayer;
 //二张输入图，第一张是主图(底图)，第二张是要混合图
 typedef BaseLayerTemplate<BlendParamet> BlendLayer;
 typedef BaseLayerTemplate<GuidedFilterParamet> GuidedFilterLayer;
+typedef BaseLayerTemplate<GrabcutParamet> GrabcutLayer;
+typedef BaseLayerTemplate<DarknetParamet> DarknetLayer;
 
 template<typename T>
 inline void BaseLayerTemplate<T>::updateParamet(const void* paramet) {
@@ -167,8 +168,7 @@ inline void BaseLayerTemplate<T>::updateParamet(const void* paramet) {
 	xlayer->updateParamet(paramet);
 
 template<OeipLayerType layerType>
-void updateParametTemplate(BaseLayer* layer, const void* paramet)
-{
+void updateParametTemplate(BaseLayer* layer, const void* paramet) {
 	using ParametType = LayerParamet<layerType, AllLayerParamet>::ParametType;
 	auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(layer);
 	xlayer->updateParamet(paramet);

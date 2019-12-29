@@ -111,6 +111,11 @@ void operate_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, OperateParame
 	operate << <grid, block, 0, stream >> > (source, dest, paramt);
 }
 
+void uchar2float_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, cudaStream_t stream){
+	dim3 grid(divUp(source.cols, block.x), divUp(source.rows, block.y));
+	uchar2float << <grid, block, 0, stream >> > (source, dest);
+}
+
 
 
 

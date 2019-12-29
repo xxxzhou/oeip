@@ -15,8 +15,9 @@ static std::vector<HINSTANCE> hdlls;
 typedef bool(*bCanLoad)();
 typedef void(*registerfactory)();
 
-void loadDll(std::wstring dllName, std::wstring subDirt)
-{
+//logMessage在加载dll，Unity3D/UE4使用logMessage可能会引起问题
+
+void loadDll(std::wstring dllName, std::wstring subDirt) {
 	HINSTANCE hdll = LoadLibraryEx(dllName.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 	std::string sdname = wstring2string(dllName);
 	if (hdll == nullptr) {
@@ -24,7 +25,7 @@ void loadDll(std::wstring dllName, std::wstring subDirt)
 			wchar_t temp[512] = { 0 };
 			GetDllDirectory(512, temp);
 			wchar_t sz[512] = { 0 };
-			HMODULE ihdll = GetModuleHandle(L"zmf.dll");
+			HMODULE ihdll = GetModuleHandle(L"oeip.dll");
 			::GetModuleFileName(ihdll, sz, 512);
 			::PathRemoveFileSpec(sz);
 			::PathAppend(sz, subDirt.c_str());
@@ -34,8 +35,8 @@ void loadDll(std::wstring dllName, std::wstring subDirt)
 		}
 		if (hdll == nullptr) {
 			DWORD error_id = GetLastError();
-			std::string message = "load dll:" + sdname + " error-" + std::to_string(error_id);
-			logMessage(OEIP_ERROR, message.c_str());
+			//std::string message = "load dll:" + sdname + " error-" + std::to_string(error_id);
+			//logMessage(OEIP_ERROR, message.c_str());
 		}
 	}
 	if (hdll) {
@@ -44,21 +45,20 @@ void loadDll(std::wstring dllName, std::wstring subDirt)
 			registerfactory rf = (registerfactory)GetProcAddress(hdll, "registerFactory");
 			if (rf)
 				rf();
-			std::string message = "load dll:" + sdname + " sucess.";
-			logMessage(OEIP_INFO, message.c_str());
+			//std::string message = "load dll:" + sdname + " sucess.";
+			//logMessage(OEIP_INFO, message.c_str());
 			hdlls.push_back(hdll);
 		}
 		else {
 			FreeLibrary(hdll);
 			hdll = nullptr;
-			std::string message = "dll:" + sdname + " loading conditions do not match.";
-			logMessage(OEIP_ERROR, message.c_str());
+			//std::string message = "dll:" + sdname + " loading conditions do not match.";
+			//logMessage(OEIP_ERROR, message.c_str());
 		}
 	}
 }
 
-void loadDllArray(std::vector<std::wstring> dllNames)
-{
+void loadDllArray(std::vector<std::wstring> dllNames) {
 	wchar_t temp[512] = { 0 };
 	GetDllDirectory(512, temp);
 	wchar_t sz[512] = { 0 };
@@ -76,8 +76,7 @@ void loadDllArray(std::vector<std::wstring> dllNames)
 	SetDllDirectory(temp);
 }
 
-std::string getProgramPath()
-{
+std::string getProgramPath() {
 	char sz[512] = { 0 };
 	HMODULE ihdll = GetModuleHandle(L"oeip.dll");
 	::GetModuleFileNameA(ihdll, sz, 512);
@@ -87,14 +86,12 @@ std::string getProgramPath()
 }
 //vector<wstring> videoTypeList = { L"MFVideoFormat_NV12" ,L"MFVideoFormat_YUY2"
 
-void loadAllDll()
-{
-	std::vector<std::wstring> dllList = { L"oeip-win-dx11",L"oeip-win-cuda",L"oeip-video-mf",L"oeip-video-realsense",L"oeip-video-decklink" };
+void loadAllDll() {
+	std::vector<std::wstring> dllList = { L"oeip-win-dx11",L"oeip-win-cuda",L"oeip-video-mf",L"oeip-video-decklink" };
 	loadDllArray(dllList);
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved)
-{
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved) {
 	if (dwReason == DLL_PROCESS_ATTACH) {
 		if (!bLoad) {
 			loadAllDll();

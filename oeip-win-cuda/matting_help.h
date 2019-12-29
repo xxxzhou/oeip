@@ -574,8 +574,7 @@ inline __global__ void addTermWeights(PtrStepSz<uchar4> source, PtrStepSz<uchar>
 }
 
 inline __global__ void addTermWeights(PtrStepSz<uchar4> source, PtrStepSz<float> push, PtrStepSz<float> sink,
-	gmmI& gmmbg, gmmI& gmmfg, float weightOffset)
-{
+	gmmI& gmmbg, gmmI& gmmfg, float weightOffset) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
 	if (idx < source.cols && idy < source.rows)
@@ -601,7 +600,7 @@ inline __global__ void addTermWeights(PtrStepSz<uchar4> source, PtrStepSz<float>
 //前景区域 push大sink小 背景相反
 //经测试,如果显存块又写又读,会有问题
 template<int blockx, int blocky>
-__global__ void push_relabel(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
+__global__ void push_relabe(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
 	PtrStepSz<float> rightEdge, PtrStepSz<float> leftEdge, PtrStepSz<float> upEdge, PtrStepSz<float> downEdge,
 	PtrStepSz<float> rightPull, PtrStepSz<float> leftPull, PtrStepSz<float> upPull, PtrStepSz<float> downPull)
 {
@@ -682,6 +681,176 @@ __global__ void push_relabel(PtrStepSz<float> push, PtrStepSz<float> sink, PtrSt
 
 		__syncthreads();
 
+		//Push 计算拉入的值
+		leftFlow = rightPull(idy, idx);
+		rightFlow = leftPull(idy, idx);
+		downFlow = upPull(idy, idx);
+		upFlow = downPull(idy, idx);
+
+		if (leftFlow > 0.f) {
+			leftedge += leftFlow;
+			flowPush += leftFlow;
+		}
+		if (rightFlow > 0.f) {
+			rightedge += rightFlow;
+			flowPush += rightFlow;
+		}
+		if (downFlow > 0.f) {
+			downedge += downFlow;
+			flowPush += downFlow;
+		}
+		if (upFlow > 0.f) {
+			upedge += upFlow;
+			flowPush += upFlow;
+		}
+		//relabel 重新标记各个单元对应高度
+		int gheight = 1;
+		if (sinkPush <= 0.f) {
+			int minHeight = push.cols * push.rows;
+			if (leftedge > 0.f && minHeight > leftHeight) {
+				minHeight = leftHeight;
+			}
+			if (rightedge > 0.f && minHeight > rightHeight) {
+				minHeight = rightHeight;
+			}
+			if (downedge > 0.f && minHeight > downHeight) {
+				minHeight = downHeight;
+			}
+			if (upedge > 0.f && minHeight > upHeight) {
+				minHeight = upHeight;
+			}
+			gheight = minHeight + 1;
+		}
+		//记录对应各个数据的新值
+		push(idy, idx) = flowPush;
+		sink(idy, idx) = sinkPush;
+		leftEdge(idy, idx) = leftedge;
+		rightEdge(idy, idx) = rightedge;
+		downEdge(idy, idx) = downedge;
+		upEdge(idy, idx) = upedge;
+
+		graphHeight(idy, idx) = gheight;
+	}
+}
+
+template<int blockx, int blocky>
+__global__ void push_relabel(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
+	PtrStepSz<float> rightEdge, PtrStepSz<float> leftEdge, PtrStepSz<float> upEdge, PtrStepSz<float> downEdge,
+	PtrStepSz<float> rightPull, PtrStepSz<float> leftPull, PtrStepSz<float> upPull, PtrStepSz<float> downPull)
+{
+	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+	float leftFlow = 0.f;
+	float rightFlow = 0.f;
+	float downFlow = 0.f;
+	float upFlow = 0.f;
+	if (idx > 0 && idx < push.cols - 1 && idy > 0 && idy < push.rows - 1) {
+		__shared__ int heights[(blocky + 2) * (blockx + 2)];
+		int hIndex = (threadIdx.y + 1) * (blockx + 2) + threadIdx.x + 1;
+		heights[hIndex] = graphHeight(idy, idx);
+		if (threadIdx.x == 0 && idx > 0)
+			heights[hIndex - 1] = graphHeight(idy, idx - 1);
+		if (threadIdx.x == blockx - 1 && idx < push.cols - 1)
+			heights[hIndex + 1] = graphHeight(idy, idx + 1);
+		if (threadIdx.y == 0 && idy > 0)
+			heights[hIndex - (blockx + 2)] = graphHeight(idy - 1, idx);
+		if (threadIdx.y == blocky - 1 && idy < push.rows - 1)
+			heights[hIndex + (blockx + 2)] = graphHeight(idy + 1, idx);
+
+		float flowPush = push(idy, idx);
+		float sinkPush = sink(idy, idx);
+		float leftedge = leftEdge(idy, idx);
+		float rightedge = rightEdge(idy, idx);
+		float downedge = downEdge(idy, idx);
+		float upedge = upEdge(idy, idx);
+
+		__syncthreads();
+		int height = heights[hIndex];// graphHeight(idy, idx);
+		int leftHeight = heights[hIndex - 1];// graphHeight(idy, idx - 1);// heights[hIndex - 1];
+		int rightHeight = heights[hIndex + 1];// graphHeight(idy, idx + 1);// heights[hIndex + 1];
+		int downHeight = heights[hIndex + (blockx + 2)]; // graphHeight(idy + 1, idx);// heights[hIndex + (blockx + 2)];
+		int upHeight = heights[hIndex - (blockx + 2)];// graphHeight(idy - 1, idx); //heights[hIndex - (blockx + 2)];
+
+		//Push 计算推出去的流
+		//toward sink		
+		if (flowPush > 0.f && sinkPush > 0.f && height == 1) {
+			float minFlow = min(flowPush, sinkPush);
+			flowPush -= minFlow;
+			sinkPush -= minFlow;
+		}
+		//toward left		
+		if (flowPush > 0.f && leftedge > 0.f && height == leftHeight + 1) {
+			float minFlow = min(flowPush, leftedge);
+			flowPush -= minFlow;
+			leftedge -= minFlow;
+			leftFlow = minFlow;
+		}
+		//toward right
+		if (flowPush > 0.f && rightedge > 0.f && height == rightHeight + 1) {
+			float minFlow = min(flowPush, rightedge);
+			flowPush -= minFlow;
+			rightedge -= minFlow;
+			rightFlow = minFlow;
+		}
+		//toward down
+		if (flowPush > 0.f && downedge > 0.f && height == downHeight + 1) {
+			float minFlow = min(flowPush, downedge);
+			flowPush -= minFlow;
+			downedge -= minFlow;
+			downFlow = minFlow;
+		}
+		//toward up
+		if (flowPush > 0.f && upedge > 0.f && height == upHeight + 1) {
+			float minFlow = min(flowPush, upedge);
+			flowPush -= minFlow;
+			upedge -= minFlow;
+			upFlow = minFlow;
+		}
+
+		leftPull(idy, idx - 1) = leftFlow;
+		rightPull(idy, idx + 1) = rightFlow;
+		downPull(idy + 1, idx) = downFlow;
+		upPull(idy - 1, idx) = upFlow;
+	}
+}
+
+template<int blockx, int blocky>
+__global__ void push_relabel2(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
+	PtrStepSz<float> rightEdge, PtrStepSz<float> leftEdge, PtrStepSz<float> upEdge, PtrStepSz<float> downEdge,
+	PtrStepSz<float> rightPull, PtrStepSz<float> leftPull, PtrStepSz<float> upPull, PtrStepSz<float> downPull)
+{
+	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+	float leftFlow = 0.f;
+	float rightFlow = 0.f;
+	float downFlow = 0.f;
+	float upFlow = 0.f;
+	if (idx > 0 && idx < push.cols - 1 && idy > 0 && idy < push.rows - 1) {
+		__shared__ int heights[(blocky + 2) * (blockx + 2)];
+		int hIndex = (threadIdx.y + 1) * (blockx + 2) + threadIdx.x + 1;
+		heights[hIndex] = graphHeight(idy, idx);
+		if (threadIdx.x == 0 && idx > 0)
+			heights[hIndex - 1] = graphHeight(idy, idx - 1);
+		if (threadIdx.x == blockx - 1 && idx < push.cols - 1)
+			heights[hIndex + 1] = graphHeight(idy, idx + 1);
+		if (threadIdx.y == 0 && idy > 0)
+			heights[hIndex - (blockx + 2)] = graphHeight(idy - 1, idx);
+		if (threadIdx.y == blocky - 1 && idy < push.rows - 1)
+			heights[hIndex + (blockx + 2)] = graphHeight(idy + 1, idx);
+
+		float flowPush = push(idy, idx);
+		float sinkPush = sink(idy, idx);
+		float leftedge = leftEdge(idy, idx);
+		float rightedge = rightEdge(idy, idx);
+		float downedge = downEdge(idy, idx);
+		float upedge = upEdge(idy, idx);
+
+		__syncthreads();
+		int height = heights[hIndex];// graphHeight(idy, idx);
+		int leftHeight = heights[hIndex - 1];// graphHeight(idy, idx - 1);// heights[hIndex - 1];
+		int rightHeight = heights[hIndex + 1];// graphHeight(idy, idx + 1);// heights[hIndex + 1];
+		int downHeight = heights[hIndex + (blockx + 2)]; // graphHeight(idy + 1, idx);// heights[hIndex + (blockx + 2)];
+		int upHeight = heights[hIndex - (blockx + 2)];// graphHeight(idy - 1, idx); //heights[hIndex - (blockx + 2)];
 		//Push 计算拉入的值
 		leftFlow = rightPull(idy, idx);
 		rightFlow = leftPull(idy, idx);
@@ -1000,8 +1169,7 @@ inline __global__ void drawRect(PtrStepSz<uchar4> source, int xmin, int xmax, in
 		int sum = (xy.x < radius) + (xy.y < radius) + (xy.z < radius) + (xy.w < radius);
 		float2 lr = make_float2(xy.x + xy.y, xy.z + xy.w);
 		float2 rl = make_float2(xmax - xmin, ymax - ymin);
-		if (sum > 0 && length(lr - rl) < radius)
-		{
+		if (sum > 0 && length(lr - rl) < radius) {
 			source(idy, idx) = drawColor;
 		}
 	}

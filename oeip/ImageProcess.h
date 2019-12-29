@@ -51,7 +51,7 @@ public:
 public:
 	//输入层大小改变后调用这个
 	void setInput(int32_t layerIndex, int32_t width, int32_t height, int32_t dataType, int32_t inputIndex = 0);
-	void updateInput(int32_t layerIndex, uint8_t* data, int32_t inputIndex = 0);	
+	void updateInput(int32_t layerIndex, uint8_t* data, int32_t inputIndex = 0);
 	void outputData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t dataType);
 	void setInputGpuTex(int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);
 	void setOutputGpuTex(int32_t layerIndex, void* device, void* tex, int32_t outputIndex = 0);
@@ -75,4 +75,6 @@ inline bool ImageProcess::updateLayer(int32_t index, const T& t) {
 	layer->updateParamet(t);
 	return true;
 };
+
+//实例化如下模版函数，用于导出时生成相应接口(具体化可以针对特定类实现不同模板的逻辑)
 template OEIPDLL_EXPORT void registerFactory<ImageProcess>(ObjectFactory<ImageProcess>* factory, int32_t type, std::string name);

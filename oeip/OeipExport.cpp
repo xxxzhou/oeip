@@ -91,6 +91,13 @@ OeipYUVFMT getVideoYUV(OeipVideoType videoType) {
 	return fmt;
 }
 
+uint32_t getColor(float r, float g, float b, float a) {
+	return ((uint32_t)(a*255.0f) << 24) |
+		((uint32_t)(b*255.0f) << 16) |
+		((uint32_t)(g*255.0f) << 8) |
+		((uint32_t)(r*255.0f));
+}
+
 int getDeviceCount() {
 	OEIP_CHECKINSTANCEINT;
 	return oInstance->getVideoList().size();
@@ -131,6 +138,7 @@ int32_t getFormatList(int32_t deviceIndex, VideoFormat* formatList, int32_t leng
 			break;
 		formatList[i - index] = device->getFormats()[i];
 	}
+	return fmin(size - index, lenght);
 }
 
 int32_t getFormat(int32_t deviceIndex) {

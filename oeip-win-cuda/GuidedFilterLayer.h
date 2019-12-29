@@ -10,7 +10,8 @@ private:
 	int32_t scaleWidth = 1;
 	int32_t scaleHeight = 1;
 private:
-	cv::cuda::GpuMat gpuResize;
+	cv::cuda::GpuMat resizeMat;
+	cv::cuda::GpuMat resizeMatf;
 	cv::cuda::GpuMat mean_I;
 	cv::cuda::GpuMat mean_Ipv;
 	cv::cuda::GpuMat var_I_rxv;

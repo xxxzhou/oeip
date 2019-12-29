@@ -95,6 +95,6 @@ inline void reCudaAllocGpu(void** data, int32_t length) {
 }
 
 #ifndef SAFE_GPUDATA
-#define SAFE_GPUDATA(p)  { if (p) { cudaFree(p); p=nullptr; } } 
+#define SAFE_GPUDATA(p)  { if (p) { cudaFree(p); p = nullptr; } } 
 #endif
 

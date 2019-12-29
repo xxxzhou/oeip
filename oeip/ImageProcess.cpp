@@ -25,6 +25,7 @@ bool ImageProcess::initLayers() {
 	bInitLayers = onInitLayers();
 	if (bInitLayers) {
 		for (auto layer : layers) {
+			//状态重置
 			layer->bDListChange = false;
 			if (layer->bDisable || layer->bDisableList)
 				continue;

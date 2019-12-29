@@ -16,9 +16,6 @@
     <Filter Include="layers">
       <UniqueIdentifier>{ef049326-5a1d-4f04-b04f-af4c7c72b5b1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="interface">
-      <UniqueIdentifier>{92c1d758-ce0c-4e9c-af3f-f460da28cb22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="audio">
       <UniqueIdentifier>{cb314450-2ced-49bc-b802-8489cea3d4c0}</UniqueIdentifier>
     </Filter>
@@ -27,6 +24,9 @@
     </Filter>
     <Filter Include="fixpipe">
       <UniqueIdentifier>{dd4d2901-e789-4397-8ebc-2909badab9ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="video">
+      <UniqueIdentifier>{92c1d758-ce0c-4e9c-af3f-f460da28cb22}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,10 +40,10 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="VideoDevice.h">
-      <Filter>interface</Filter>
+      <Filter>video</Filter>
     </ClInclude>
     <ClInclude Include="VideoManager.h">
-      <Filter>interface</Filter>
+      <Filter>video</Filter>
     </ClInclude>
     <ClInclude Include="AudioFile.h">
       <Filter>audio</Filter>
@@ -81,10 +81,10 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="VideoDevice.cpp">
-      <Filter>interface</Filter>
+      <Filter>video</Filter>
     </ClCompile>
     <ClCompile Include="VideoManager.cpp">
-      <Filter>interface</Filter>
+      <Filter>video</Filter>
     </ClCompile>
     <ClCompile Include="AudioFile.cpp">
       <Filter>audio</Filter>

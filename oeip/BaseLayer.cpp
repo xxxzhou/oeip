@@ -119,7 +119,13 @@ void BaseLayer::updateParamet(const void* paramet) {
 		updateParametTemplate<OEIP_OPERATE_LAYER>,
 		updateParametTemplate<OEIP_BLEND_LAYER>,
 		updateParametTemplate<OEIP_GUIDEDFILTER_LAYER>,
+		updateParametTemplate<OEIP_GRABCUT_LAYER>,
+		updateParametTemplate<OEIP_DARKNET_LAYER>
 	};
+	if (layerType <= 0 || layerType >= OEIP_MAX_LAYER) {
+		logMessage(OEIP_ERROR, "update paramet layertype invalid index.");
+		return;
+	}
 	if (!funcs[layerType]) {
 		logMessage(OEIP_WARN, "update paramet layertype invalid value.");
 		return;

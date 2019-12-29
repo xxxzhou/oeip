@@ -22,6 +22,8 @@ extern "C"
 	OEIPDLL_EXPORT void shutdownOeip();
 	//根据设备的视频类型返回对应YUV类型，如果非YUV类型，返回OEIP_YUVFMT_OTHER
 	OEIPDLL_EXPORT OeipYUVFMT getVideoYUV(OeipVideoType videoType);
+	//相应颜色参数一般用uint32_t来表示，用来给用户根据各个通道分量生成uint32_t颜色，通道分量范围0.f-1.f
+	OEIPDLL_EXPORT uint32_t getColor(float r, float g, float b, float a);
 
 #pragma region camera device 
 	//得到支持的捕获视频设备数量(主要包含webCamera,decklink)

@@ -161,8 +161,7 @@ int64_t getNowTimestamp() {
 
 int32_t getDataType(OeipVideoType videoType) {
 	int32_t imageType = -1;
-	switch (videoType)
-	{
+	switch (videoType) {
 	case OEIP_VIDEO_OTHER:
 		break;
 	case OEIP_VIDEO_NV12:
