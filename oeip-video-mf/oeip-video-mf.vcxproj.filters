@@ -13,51 +13,57 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="audio">
+      <UniqueIdentifier>{4e38704c-7b0e-4261-ba76-67b87d9698d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="video">
+      <UniqueIdentifier>{849fe1fe-5d36-4131-ba16-479adbfeb305}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AudioRecordWin.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="FormatReader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="MediaStruct.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="AudioRecordWin.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
     <ClCompile Include="MFCaptureDevice.cpp">
-      <Filter>源文件</Filter>
+      <Filter>video</Filter>
     </ClCompile>
     <ClCompile Include="MFVideoManager.cpp">
-      <Filter>源文件</Filter>
+      <Filter>video</Filter>
     </ClCompile>
     <ClCompile Include="ReaderCallback.cpp">
-      <Filter>源文件</Filter>
+      <Filter>video</Filter>
     </ClCompile>
     <ClCompile Include="VideoCaptureDevice.cpp">
-      <Filter>源文件</Filter>
+      <Filter>video</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AudioRecordWin.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="FormatReader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MediaStruct.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MFCaptureDevice.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="MFVideoManager.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ReaderCallback.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="AudioRecordWin.h">
+      <Filter>audio</Filter>
     </ClInclude>
     <ClInclude Include="VideoCaptureDevice.h">
-      <Filter>头文件</Filter>
+      <Filter>video</Filter>
+    </ClInclude>
+    <ClInclude Include="ReaderCallback.h">
+      <Filter>video</Filter>
+    </ClInclude>
+    <ClInclude Include="MFVideoManager.h">
+      <Filter>video</Filter>
+    </ClInclude>
+    <ClInclude Include="MFCaptureDevice.h">
+      <Filter>video</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

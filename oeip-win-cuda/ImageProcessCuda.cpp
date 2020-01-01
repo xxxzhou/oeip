@@ -71,11 +71,6 @@ void ImageProcessCuda::getGpuMat(int32_t layerIndex, cv::cuda::GpuMat & gpuMat, 
 	gpuMat = layer->outMats[inIndex];
 }
 
-ImageProcess * ImageProcessCudaFactory::create(int type) {
-	ImageProcessCuda* pCuda = new ImageProcessCuda();
-	return pCuda;
-}
-
 bool bCanLoad() {
 	int32_t count = cv::cuda::getCudaEnabledDeviceCount();
 	if (count > 0) {

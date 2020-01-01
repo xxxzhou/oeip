@@ -68,7 +68,7 @@ inline bool ImageProcess::updateLayer(int32_t index, const T& t) {
 		return false;
 	BaseLayerTemplate<T>* layer = dynamic_cast<BaseLayerTemplate<T>*>(layers[index].get());
 	if (layer == nullptr) {
-		std::string message = "update layer in:" + std::to_string(index) + " paramet no match " + typeid(T).name();
+		std::string message = "update layer in: " + std::to_string(index) + " paramet no match " + typeid(T).name();
 		logMessage(OEIP_WARN, message.c_str());
 		return false;
 	}
@@ -77,4 +77,5 @@ inline bool ImageProcess::updateLayer(int32_t index, const T& t) {
 };
 
 //实例化如下模版函数，用于导出时生成相应接口(具体化可以针对特定类实现不同模板的逻辑)
-template OEIPDLL_EXPORT void registerFactory<ImageProcess>(ObjectFactory<ImageProcess>* factory, int32_t type, std::string name);
+OEIP_DEFINE_PLUGIN_TYPE(ImageProcess);
+//template OEIPDLL_EXPORT void registerFactory<ImageProcess>(ObjectFactory<ImageProcess>* factory, int32_t type, std::string name);

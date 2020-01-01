@@ -13,12 +13,9 @@ MFVideoManager::MFVideoManager() {
 		IMFActivate** ppDevices = nullptr;
 		UINT32 count = -1;
 		hr = MFEnumDeviceSources(pAttributes, &ppDevices, &count);
-		if (SUCCEEDED(hr))
-		{
-			if (count > 0)
-			{
-				for (UINT32 i = 0; i < count; i++)
-				{
+		if (SUCCEEDED(hr)) {
+			if (count > 0) {
+				for (UINT32 i = 0; i < count; i++) {
 					//过滤掉RealSense2					
 					if (MFCaptureDevice::Init(ppDevices[i])) {
 						VideoCaptureDevice* vc = new VideoCaptureDevice();
@@ -29,8 +26,10 @@ MFVideoManager::MFVideoManager() {
 							delete vc;
 						}
 					}
+					ppDevices[i]->Release();
 				}
 			}
+			CoTaskMemFree(ppDevices);
 		}
 	}
 }
@@ -43,11 +42,6 @@ MFVideoManager::~MFVideoManager() {
 
 std::vector<VideoDevice*> MFVideoManager::getDeviceList() {
 	return videoList;
-}
-
-VideoManager* MFVideoManagerFactory::create(int type) {
-	MFVideoManager* mf = new MFVideoManager();
-	return mf;
 }
 
 bool bCanLoad() {
@@ -66,5 +60,5 @@ bool bCanLoad() {
 
 void registerFactory() {
 	registerFactory(new MFVideoManagerFactory(), VideoDeviceType::OEIP_MF, "video mf");
-	registerFactory(new MFAudioRecordFactory(), VideoDeviceType::OEIP_MF, "audio record mf");
+	registerFactory(new AudioRecordWinFactory(), 0, "audio record mf");
 }

@@ -22,7 +22,7 @@ MFCaptureDevice::~MFCaptureDevice() {
 		source->Shutdown();
 		source = nullptr;
 		//safeRelease(source);
-	}
+	}	
 }
 
 bool MFCaptureDevice::init(IMFActivate* pActivate, unsigned int num) {
@@ -37,24 +37,15 @@ bool MFCaptureDevice::init(IMFActivate* pActivate, unsigned int num) {
 		logMessage(OEIP_INFO, "create media soure fail.");
 		return false;
 	}
-#if REALSENSE 
-	wstring deviceNameStr = deviceName;
-	//过滤掉RealSense2
-	int index = deviceNameStr.find(L"Intel(R) RealSense(TM)");
-	if (index >= 0) {
-		return false;
-	}
-#endif
 	hr = MFCreateSourceReaderFromMediaSource(source, pAttributes, &sourceReader);
 	readerCallback->setSourceReader(sourceReader, streamIndex);
-	//safeRelease(pAttributes);
 	if (FAILED(hr)) {
 		logMessage(OEIP_ERROR, "create soure reader fail.");
 		return false;
 	}
 	bOpen = true;
 	return true;
-}
+	}
 
 bool MFCaptureDevice::Init(IMFActivate* pActivate) {
 	wchar_t* name = nullptr;

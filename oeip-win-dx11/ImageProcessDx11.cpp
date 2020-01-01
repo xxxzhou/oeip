@@ -79,11 +79,6 @@ void ImageProcessDx11::getTexture(int32_t layerIndex, std::shared_ptr<Dx11Textur
 	texture = layer->outTextures[inIndex];
 }
 
-ImageProcess* ImageProcessDx11Factory::create(int type) {
-	ImageProcessDx11* pdx11 = new ImageProcessDx11();
-	return pdx11;
-}
-
 bool bCanLoad() {
 	return true;
 }

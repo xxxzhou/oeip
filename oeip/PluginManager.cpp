@@ -4,9 +4,12 @@
 #include <ctime>
 #include <iomanip>
 #include <Shlwapi.h>
+#include <iostream>
 #include "OeipCommon.h"
 #include "OeipManager.h"
 #pragma comment(lib,"shlwapi.lib")
+
+#define OEIP_MODEL_NAME L"oeip.dll"
 
 //static HINSTANCE hdll = nullptr;
 static bool bLoad = false;
@@ -14,8 +17,6 @@ static std::vector<HINSTANCE> hdlls;
 
 typedef bool(*bCanLoad)();
 typedef void(*registerfactory)();
-
-//logMessage在加载dll，Unity3D/UE4使用logMessage可能会引起问题
 
 void loadDll(std::wstring dllName, std::wstring subDirt) {
 	HINSTANCE hdll = LoadLibraryEx(dllName.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -25,7 +26,7 @@ void loadDll(std::wstring dllName, std::wstring subDirt) {
 			wchar_t temp[512] = { 0 };
 			GetDllDirectory(512, temp);
 			wchar_t sz[512] = { 0 };
-			HMODULE ihdll = GetModuleHandle(L"oeip.dll");
+			HMODULE ihdll = GetModuleHandle(OEIP_MODEL_NAME);
 			::GetModuleFileName(ihdll, sz, 512);
 			::PathRemoveFileSpec(sz);
 			::PathAppend(sz, subDirt.c_str());
@@ -35,8 +36,10 @@ void loadDll(std::wstring dllName, std::wstring subDirt) {
 		}
 		if (hdll == nullptr) {
 			DWORD error_id = GetLastError();
-			//std::string message = "load dll:" + sdname + " error-" + std::to_string(error_id);
-			//logMessage(OEIP_ERROR, message.c_str());
+#if OEIP_LOADDLL_OUTPUT
+			std::string message = "load dll:" + sdname + " error-" + std::to_string(error_id);
+			loadMessage(OEIP_ERROR, message.c_str());
+#endif
 		}
 	}
 	if (hdll) {
@@ -45,15 +48,19 @@ void loadDll(std::wstring dllName, std::wstring subDirt) {
 			registerfactory rf = (registerfactory)GetProcAddress(hdll, "registerFactory");
 			if (rf)
 				rf();
-			//std::string message = "load dll:" + sdname + " sucess.";
-			//logMessage(OEIP_INFO, message.c_str());
+#if OEIP_LOADDLL_OUTPUT
+			std::string message = "load dll:" + sdname + " sucess.";
+			loadMessage(OEIP_INFO, message.c_str());
+#endif
 			hdlls.push_back(hdll);
 		}
 		else {
 			FreeLibrary(hdll);
 			hdll = nullptr;
-			//std::string message = "dll:" + sdname + " loading conditions do not match.";
-			//logMessage(OEIP_ERROR, message.c_str());
+#if OEIP_LOADDLL_OUTPUT
+			std::string message = "dll:" + sdname + " loading conditions do not match.";
+			loadMessage(OEIP_ERROR, message.c_str());
+#endif
 		}
 	}
 }
@@ -62,7 +69,7 @@ void loadDllArray(std::vector<std::wstring> dllNames) {
 	wchar_t temp[512] = { 0 };
 	GetDllDirectory(512, temp);
 	wchar_t sz[512] = { 0 };
-	HMODULE ihdll = GetModuleHandle(L"zmf.dll");
+	HMODULE ihdll = GetModuleHandle(OEIP_MODEL_NAME);
 	::GetModuleFileName(ihdll, sz, 512);
 	::PathRemoveFileSpec(sz);
 	SetDllDirectory(sz);
@@ -78,16 +85,15 @@ void loadDllArray(std::vector<std::wstring> dllNames) {
 
 std::string getProgramPath() {
 	char sz[512] = { 0 };
-	HMODULE ihdll = GetModuleHandle(L"oeip.dll");
+	HMODULE ihdll = GetModuleHandle(OEIP_MODEL_NAME);
 	::GetModuleFileNameA(ihdll, sz, 512);
 	::PathRemoveFileSpecA(sz);
 	std::string path = sz;
 	return path;
 }
-//vector<wstring> videoTypeList = { L"MFVideoFormat_NV12" ,L"MFVideoFormat_YUY2"
 
 void loadAllDll() {
-	std::vector<std::wstring> dllList = { L"oeip-win-dx11",L"oeip-win-cuda",L"oeip-video-mf",L"oeip-video-decklink" };
+	std::vector<std::wstring> dllList = { L"oeip-win-dx11",L"oeip-win-cuda",L"oeip-video-mf",L"oeip-video-decklink",L"oeip-ffmpeg" };
 	loadDllArray(dllList);
 }
 
@@ -109,7 +115,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved) {
 			bLoad = false;
 		}
 	}
-	else if (dwReason == DLL_THREAD_ATTACH) {
-	}
 	return TRUE;
+}
+
+void loadMessage(int level, const char* message) {
+	auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	struct tm t;   //tm结构指针
+	localtime_s(&t, &now);   //获取当地日期和时间
+	//用std::cout会导致UE4烘陪失败,记录下
+	std::wstring wmessage = string2wstring(message);
+	std::wcout << std::put_time(&t, L"%Y-%m-%d %X") << L" Level: " << level << L" " << wmessage << std::endl;
 }

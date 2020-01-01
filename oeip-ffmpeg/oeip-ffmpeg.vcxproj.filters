@@ -13,21 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="audio">
+      <UniqueIdentifier>{6ea3107c-34b3-4a17-9edc-fe2fd62c44f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="oeip-test.cpp">
-      <Filter>源文件</Filter>
+    <ClInclude Include="AudioResample.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioMixer.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Oeipffmpeg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FAudioOutput.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AudioMixer.cpp">
+      <Filter>audio</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="testcamer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="templatetest.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="testaudio.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
+    <ClCompile Include="AudioResample.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="FAudioOutput.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

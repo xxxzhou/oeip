@@ -85,7 +85,7 @@ public:
 private:
 	int32_t elementSize = 0;
 	int32_t dataType = 0;
-	//Structured Buffer 需要最少四字节,如果非四字节，改成bRawBuffer比较好
+	//Structured Buffer 需要最少四字节
 	bool bRawBuffer = false;
 public:
 	void setBufferSize(int32_t elementSize, int32_t dataType, bool rawBuffer = false);
@@ -136,7 +136,7 @@ class OEIPWINDLL_EXPORT ShaderInclude : public ID3DInclude
 public:
 	ShaderInclude(std::string modelName, std::string rctype, int32_t rcId);
 	~ShaderInclude() {};
-
+public:
 	// 通过 ID3DInclude 继承
 	virtual HRESULT STDMETHODCALLTYPE Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes) override;
 	virtual HRESULT STDMETHODCALLTYPE Close(LPCVOID pData) override;

@@ -150,7 +150,7 @@ typedef BaseLayerTemplate<MapChannelParamet> MapChannelLayer;
 typedef BaseLayerTemplate<ResizeParamet> ResizeLayer;
 typedef BaseLayerTemplate<RGBA2YUVParamet> RGBA2YUVLayer;
 typedef BaseLayerTemplate<OperateParamet> OperateLayer;
-//二张输入图，第一张是主图(底图)，第二张是要混合图
+//需要二张输入图，第一张是主图(底图)，第二张是要混合图
 typedef BaseLayerTemplate<BlendParamet> BlendLayer;
 typedef BaseLayerTemplate<GuidedFilterParamet> GuidedFilterLayer;
 typedef BaseLayerTemplate<GrabcutParamet> GrabcutLayer;

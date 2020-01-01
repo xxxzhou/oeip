@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{EF8D1BB3-FD0B-4A99-8619-B2060E9F2B50}</ProjectGuid>
-    <RootNamespace>oeip</RootNamespace>
+    <ProjectGuid>{5B0CD88E-DE8F-46F3-974C-3FB93651144D}</ProjectGuid>
+    <RootNamespace>oeipffmpeg</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -69,22 +69,31 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)oeip;$(SolutionDir)ThirdParty/FFmpeg/include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)ThirdParty/FFmpeg/lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>$(SolutionDir)ThirdParty/FFmpeg/lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IncludePath>$(SolutionDir)oeip;$(SolutionDir)ThirdParty/FFmpeg/include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>OEIP_EXPORT;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;libx264.lib;swresample.lib;swscale.lib;avcodec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,46 +118,28 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>OEIP_EXPORT;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;libx264.lib;swresample.lib;swscale.lib;avcodec.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AudioOutput.h" />
-    <ClInclude Include="AudioRecord.h" />
-    <ClInclude Include="BaseLayer.h" />
-    <ClInclude Include="ImageProcess.h" />
-    <ClInclude Include="Oeip.h" />
-    <ClInclude Include="OeipCommon.h" />
-    <ClInclude Include="OeipDefine.h" />
-    <ClInclude Include="OeipExport.h" />
-    <ClInclude Include="OeipManager.h" />
-    <ClInclude Include="PluginManager.h" />
-    <ClInclude Include="RingBuffer.h" />
-    <ClInclude Include="VideoDevice.h" />
-    <ClInclude Include="VideoManager.h" />
-    <ClInclude Include="VideoPipe.h" />
+    <ClInclude Include="AudioMixer.h" />
+    <ClInclude Include="FAudioOutput.h" />
+    <ClInclude Include="AudioResample.h" />
+    <ClInclude Include="Oeipffmpeg.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AudioOutput.cpp" />
-    <ClCompile Include="AudioRecord.cpp" />
-    <ClCompile Include="BaseLayer.cpp" />
-    <ClCompile Include="ImageProcess.cpp" />
-    <ClCompile Include="OeipCommon.cpp" />
-    <ClCompile Include="OeipExport.cpp" />
-    <ClCompile Include="OeipManager.cpp" />
-    <ClCompile Include="PluginManager.cpp" />
-    <ClCompile Include="RingBuffer.cpp" />
-    <ClCompile Include="VideoDevice.cpp" />
-    <ClCompile Include="VideoManager.cpp" />
-    <ClCompile Include="VideoPipe.cpp" />
+    <ClCompile Include="AudioMixer.cpp" />
+    <ClCompile Include="FAudioOutput.cpp" />
+    <ClCompile Include="AudioResample.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\README.md" />
-    <None Include="cpp.hint" />
+    <ProjectReference Include="..\oeip\oeip.vcxproj">
+      <Project>{ef8d1bb3-fd0b-4a99-8619-b2060e9f2b50}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

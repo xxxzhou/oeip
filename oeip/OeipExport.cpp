@@ -16,6 +16,10 @@
 	auto pipe = oInstance->getPipe(pipeId);\
 	if (!pipe)\
 		return;
+#define OEIP_CHECKAUDIOVOID \
+	auto audioOutput = oInstance->getAudioOutput();\
+	if(!audioOutput)\
+		return;
 
 #define OEIP_CHECKINSTANCEINT \
 	if (!oInstance) \
@@ -92,10 +96,10 @@ OeipYUVFMT getVideoYUV(OeipVideoType videoType) {
 }
 
 uint32_t getColor(float r, float g, float b, float a) {
-	return ((uint32_t)(a*255.0f) << 24) |
-		((uint32_t)(b*255.0f) << 16) |
-		((uint32_t)(g*255.0f) << 8) |
-		((uint32_t)(r*255.0f));
+	return ((uint32_t)(a * 255.0f) << 24) |
+		((uint32_t)(b * 255.0f) << 16) |
+		((uint32_t)(g * 255.0f) << 8) |
+		((uint32_t)(r * 255.0f));
 }
 
 int getDeviceCount() {
@@ -159,6 +163,12 @@ bool openDevice(int32_t deviceIndex) {
 	return device->openDevice();
 }
 
+void closeDevice(int32_t deviceIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKDEVICEVOID;
+	device->closeDevice();
+}
+
 void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData) {
 	setDeviceDataHandle(deviceIndex, onProcessData);
 }
@@ -177,6 +187,25 @@ void setDeviceEventHandle(int32_t deviceIndex, onEventHandle onDeviceEvent) {
 	OEIP_CHECKINSTANCEVOID;
 	OEIP_CHECKDEVICEVOID;
 	device->setDeviceHandle(onDeviceEvent);
+}
+
+void startAudioOutput(bool bMic, bool bLoopback, OeipAudioDesc desc, onAudioDataHandle dataHandle) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKAUDIOVOID;
+	audioOutput->onDataHandle = dataHandle;
+	audioOutput->start(bMic, bLoopback, desc);
+}
+
+void setAudioOutputHandle(onAudioOutputHandle outDatahandle) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKAUDIOVOID;
+	audioOutput->onAudioHandle = outDatahandle;
+}
+
+void closeAudioOutput() {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKAUDIOVOID;
+	audioOutput->stop();
 }
 
 int32_t initPipe(OeipGpgpuType gpgpuType) {

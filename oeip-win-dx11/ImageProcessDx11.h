@@ -25,14 +25,7 @@ public:
 	void getTexture(int32_t layerIndex, std::shared_ptr<Dx11Texture>& texture, int32_t inIndex);
 };
 
-class ImageProcessDx11Factory :public ObjectFactory<ImageProcess>
-{
-public:
-	ImageProcessDx11Factory() {};
-	~ImageProcessDx11Factory() {};
-public:
-	virtual ImageProcess* create(int type) override;
-};
+OEIP_DEFINE_PLUGIN_CLASS(ImageProcess, ImageProcessDx11)
 
 extern "C" __declspec(dllexport) bool bCanLoad();
 extern "C" __declspec(dllexport) void registerFactory();

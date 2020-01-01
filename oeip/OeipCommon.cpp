@@ -88,6 +88,7 @@ bool readResouce(std::string modelName, int32_t rcId, std::string rctype, std::s
 	resouce = (char*&)pBuffer;// LPVOID  ---> String        
 	resouce = resouce.substr(0, dwSize); //去除各种文件的附加信息。
 	dataType = resouce.size();
+	return true;
 }
 
 void splitString(const std::string& str, std::vector<std::string>& strarray, const std::string& split) {
@@ -226,3 +227,15 @@ std::string getLayerName(OeipLayerType layerType) {
 uint32_t divUp(int32_t x, int32_t y) {
 	return (x + y - 1) / y;
 }
+
+//#if defined(_WIN32)
+//std::string to_utf8(const wchar_t* w)
+//{
+//	std::string output;
+//	const size_t size = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
+//	if (size == 0) return output;
+//	output.resize(size - 1);
+//	WideCharToMultiByte(CP_UTF8, 0, w, -1, output.data(), static_cast<int>(size) - 1, nullptr, nullptr);
+//	return output;
+//}
+//#endif

@@ -45,9 +45,6 @@
     <ClInclude Include="VideoManager.h">
       <Filter>video</Filter>
     </ClInclude>
-    <ClInclude Include="AudioFile.h">
-      <Filter>audio</Filter>
-    </ClInclude>
     <ClInclude Include="AudioRecord.h">
       <Filter>audio</Filter>
     </ClInclude>
@@ -69,6 +66,12 @@
     <ClInclude Include="VideoPipe.h">
       <Filter>fixpipe</Filter>
     </ClInclude>
+    <ClInclude Include="RingBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioOutput.h">
+      <Filter>audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseLayer.cpp">
@@ -86,9 +89,6 @@
     <ClCompile Include="VideoManager.cpp">
       <Filter>video</Filter>
     </ClCompile>
-    <ClCompile Include="AudioFile.cpp">
-      <Filter>audio</Filter>
-    </ClCompile>
     <ClCompile Include="AudioRecord.cpp">
       <Filter>audio</Filter>
     </ClCompile>
@@ -103,6 +103,12 @@
     </ClCompile>
     <ClCompile Include="VideoPipe.cpp">
       <Filter>fixpipe</Filter>
+    </ClCompile>
+    <ClCompile Include="RingBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioOutput.cpp">
+      <Filter>audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

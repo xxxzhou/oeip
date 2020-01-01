@@ -26,14 +26,8 @@ public:
 	void getGpuMat(int32_t layerIndex, cv::cuda::GpuMat& gpuMat, int32_t inIndex);
 };
 
-class ImageProcessCudaFactory :public ObjectFactory<ImageProcess>
-{
-public:
-	ImageProcessCudaFactory() {};
-	~ImageProcessCudaFactory() {};
-public:
-	virtual ImageProcess* create(int type) override;
-};
+OEIP_DEFINE_PLUGIN_CLASS(ImageProcess, ImageProcessCuda)
+
 
 extern "C" __declspec(dllexport) bool bCanLoad();
 extern "C" __declspec(dllexport) void registerFactory();

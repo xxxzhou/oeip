@@ -35,8 +35,7 @@ namespace Templatetest
 	{
 		int index = 0;
 	public:
-		void update(void* index)
-		{
+		void update(void* index) {
 			Fruit<0> xxx;
 			//auto xx = xxx.t;
 			using xxxx = At<LayerType, int, double, char>::ptype;

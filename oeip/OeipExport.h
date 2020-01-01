@@ -40,6 +40,8 @@ extern "C"
 	OEIPDLL_EXPORT void setFormat(int32_t deviceIndex, int32_t formatIndex);
 	//运行设备
 	OEIPDLL_EXPORT bool openDevice(int32_t deviceIndex);
+	//关闭设备
+	OEIPDLL_EXPORT void closeDevice(int32_t deviceIndex);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型,用于C/C#使用
 	OEIPDLL_EXPORT void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型。用于C++使用。
@@ -48,6 +50,15 @@ extern "C"
 	OEIPDLL_EXPORT void setDeviceEventAction(int32_t deviceIndex, onEventAction onDeviceEvent);
 	//设置捕获视频设备事件回调，如没有正常打开,意外断掉等。用于C++使用
 	OEIPDLL_EXPORT void setDeviceEventHandle(int32_t deviceIndex, onEventHandle onDeviceEvent);
+#pragma endregion
+
+#pragma region audio
+	//返回麦或声卡的原始数据
+	OEIPDLL_EXPORT void setAudioOutputHandle(onAudioOutputHandle outDatahandle);
+	//开始采集麦与声卡，并返回麦与声卡的经给定格式的重采样输出,如果麦与声卡都为true,则混合输出
+	OEIPDLL_EXPORT void startAudioOutput(bool bMic, bool bLoopback, OeipAudioDesc desc, onAudioDataHandle dataHandle);
+	//关闭采集麦与声卡
+	OEIPDLL_EXPORT void closeAudioOutput();
 #pragma endregion
 
 #pragma region gpgpu pipe

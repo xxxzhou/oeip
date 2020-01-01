@@ -4,15 +4,14 @@
 #include <iostream>
 #include "testcamer.h"
 #include "templatetest.h"
+#include "testaudio.h"
 #include <mutex>
 #include "../oeip-win/DxHelper.h"
 
 int main()
 {
-	Templatetest::TemplateLayer<1> t1;
-	double x = 1;
-	t1.update(&x);
-	OeipCamera::testCamera();
+	//OeipCamera::testCamera();
+	OeipAudio::test();
 	std::cout << "Hello World!\n";
 }
 

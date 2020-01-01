@@ -104,6 +104,15 @@ enum VideoDeviceType : int32_t
 	OEIP_Virtual,
 };
 
+enum OeipAudioDataType : int32_t
+{
+	//静音
+	OEIP_AudioData_None = 0,
+	OEIP_Audio_Data,
+	OEIP_Audio_WavHeader,
+};
+
+
 //C#/C++里bool都只有一字节，但是可能因为不同对齐方式导致差异，故与C#交互的结构bool全使用int32
 //默认从CPU输入,如果要支持GPU输入,bGpu=true
 struct InputParamet
@@ -187,8 +196,9 @@ struct DarknetParamet
 	int32_t bLoad = false;
 	char confile[512];
 	char weightfile[512];
-	//框的
-	float thresh = 0.2f;
+	//框的显示阀值(越大则要求准确性越高)
+	float thresh = 0.3f;
+	//交并多少合并(越大则有重合的框容易合成一个)
 	float nms = 0.4f;
 	int32_t bDraw = false;
 	uint32_t drawColor = 255;
@@ -252,6 +262,19 @@ struct OeipDeviceInfo
 	wchar_t deviceID[512];
 };
 
+//声音与图像类似,录取设备一般用交差格式,而传输一般用平面格式
+struct OeipAudioDesc
+{
+	int32_t channel;
+	int32_t sampleRate;//8000,11025,22050,44100
+	int32_t bitSize;//16，24，32
+
+	bool operator == (OeipAudioDesc& rhs) const {
+		return (channel == rhs.channel &&
+			sampleRate == rhs.sampleRate &&
+			bitSize == rhs.bitSize);
+	};
+};
 
 struct OeipDateDesc
 {
@@ -263,9 +286,12 @@ struct OeipDateDesc
 typedef void(*logEventAction)(int32_t level, const char* message);
 typedef std::function<void(int32_t, const char*)> logEventHandle;
 
-//截取的声音回调
-typedef void(*onAudioRecordAction)(void* data, int32_t dataLen, int32_t sampleRate, int32_t numChannels);
-typedef std::function<void(void*, int32_t, int32_t, int32_t)> onAudioRecordHandle;
+//原始声音回调
+typedef void(*onAudioRecordAction)(uint8_t* data, int32_t dataLen, OeipAudioDataType dataType);
+typedef std::function<void(uint8_t*, int32_t, OeipAudioDataType)> onAudioRecordHandle;
+typedef std::function<void(bool bMic, uint8_t* data, int32_t size, OeipAudioDataType type)> onAudioOutputHandle;
+//处理后声音回调
+typedef std::function<void(uint8_t* data, int32_t size)> onAudioDataHandle;
 
 //设备事件，如中断等
 typedef void(*onEventAction)(OeipDeviceEventType type, int32_t code);

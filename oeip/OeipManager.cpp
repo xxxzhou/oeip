@@ -1,13 +1,14 @@
 #include "OeipManager.h"
 #include "VideoManager.h"
-#include "AudioRecord.h"
+
 
 OeipManager* OeipManager::instance = nullptr;
 
 void cleanPlugin(bool bFactory) {
 	PluginManager<VideoManager>::clean(bFactory);
-	PluginManager<AudioRecord>::clean(bFactory);
 	PluginManager<ImageProcess>::clean(bFactory);
+	PluginManager<AudioRecord>::clean(bFactory);
+	PluginManager<AudioOutput>::clean(bFactory);
 }
 
 OeipManager* OeipManager::getInstance() {
@@ -26,17 +27,22 @@ OeipManager::~OeipManager() {
 	for (auto& video : videoList) {
 		video->closeDevice();
 	}
+	videoList.clear();
 }
 
 OeipManager::OeipManager() {
 	initVideoList();
+	audioOutput = PluginManager<AudioOutput>::getInstance().createModel(0);
+	if (audioOutput) {
+
+	}
 }
 
 void OeipManager::initVideoList() {
 	videoList.clear();
 	std::vector<VideoManager*> vmlist;
 	PluginManager<VideoManager>::getInstance().getFactoryDefaultModel(vmlist, -1);
-	for (VideoManager* vm : vmlist) {
+	for (auto& vm : vmlist) {
 		std::vector<VideoDevice*> deviceList = vm->getDeviceList();
 		videoList.insert(videoList.end(), deviceList.begin(), deviceList.end());
 	}
@@ -48,6 +54,10 @@ int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType) {
 		return -1;
 	imagePipeList.push_back(vp);
 	return imagePipeList.size() - 1;
+}
+
+bool OeipManager::closePipe(int32_t pipeId) {
+	return 0;
 }
 
 
