@@ -7,7 +7,37 @@
 #include <iostream>
 #include "OeipCommon.h"
 #include "OeipManager.h"
+
 #pragma comment(lib,"shlwapi.lib")
+
+#ifdef _WINDLL
+#include <Windows.h>
+#include <sysinfoapi.h>
+#include <dbghelp.h>
+#pragma comment(lib, "dbghelp.lib")
+
+LONG WINAPI MyUnhandledFilter(struct _EXCEPTION_POINTERS* lpExceptionInfo) {
+	LONG ret = EXCEPTION_EXECUTE_HANDLER;
+
+	TCHAR szFileName[64];
+	SYSTEMTIME st;
+	::GetLocalTime(&st);
+	wsprintf(szFileName, TEXT("OEIP_%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp"), st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, GetCurrentProcessId(), GetCurrentThreadId());
+
+	HANDLE hFile = ::CreateFile(szFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile != INVALID_HANDLE_VALUE) {
+		MINIDUMP_EXCEPTION_INFORMATION ExInfo;
+		ExInfo.ThreadId = ::GetCurrentThreadId();
+		ExInfo.ExceptionPointers = lpExceptionInfo;
+		ExInfo.ClientPointers = false;
+
+		// write the dump
+		BOOL bOK = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &ExInfo, NULL, NULL);
+		::CloseHandle(hFile);
+	}
+	return ret;
+}
+#endif // _WINDLL
 
 #define OEIP_MODEL_NAME L"oeip.dll"
 
@@ -73,8 +103,7 @@ void loadDllArray(std::vector<std::wstring> dllNames) {
 	::GetModuleFileName(ihdll, sz, 512);
 	::PathRemoveFileSpec(sz);
 	SetDllDirectory(sz);
-	for (auto dll : dllNames)
-	{
+	for (auto dll : dllNames) {
 		std::wstring subDirt = L"";
 		if (dll == L"oeip-win-cuda")
 			subDirt = L"cuda";
@@ -93,7 +122,7 @@ std::string getProgramPath() {
 }
 
 void loadAllDll() {
-	std::vector<std::wstring> dllList = { L"oeip-win-dx11",L"oeip-win-cuda",L"oeip-video-mf",L"oeip-video-decklink",L"oeip-ffmpeg" };
+	std::vector<std::wstring> dllList = { L"oeip-win-dx11",L"oeip-win-cuda",L"oeip-win-mf",L"oeip-ffmpeg" };
 	loadDllArray(dllList);
 }
 
@@ -102,6 +131,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  dwReason, LPVOID lpReserved) {
 		if (!bLoad) {
 			loadAllDll();
 			bLoad = true;
+#ifdef _WINDLL
+			SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)MyUnhandledFilter);
+#endif
 		}
 	}
 	else if (dwReason == DLL_PROCESS_DETACH) {

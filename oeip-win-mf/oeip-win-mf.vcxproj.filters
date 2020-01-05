@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="FormatReader.cpp" />
+    <ClCompile Include="MediaStruct.cpp" />
+    <ClCompile Include="AudioRecordWin.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="MFCaptureDevice.cpp">
+      <Filter>video</Filter>
+    </ClCompile>
+    <ClCompile Include="MFVideoManager.cpp">
+      <Filter>video</Filter>
+    </ClCompile>
+    <ClCompile Include="ReaderCallback.cpp">
+      <Filter>video</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoCaptureDevice.cpp">
+      <Filter>video</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FormatReader.h" />
+    <ClInclude Include="MediaStruct.h" />
+    <ClInclude Include="AudioRecordWin.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="MFCaptureDevice.h">
+      <Filter>video</Filter>
+    </ClInclude>
+    <ClInclude Include="MFVideoManager.h">
+      <Filter>video</Filter>
+    </ClInclude>
+    <ClInclude Include="ReaderCallback.h">
+      <Filter>video</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoCaptureDevice.h">
+      <Filter>video</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="audio">
+      <UniqueIdentifier>{245d2353-67cd-4885-a6b8-71af5a22d604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="video">
+      <UniqueIdentifier>{b1b5f441-6ab1-49b4-89a2-51f70d4b533d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,7 +1,7 @@
 #include "Common.hlsl"
 
 #ifndef OEIP_YUV_TYPE
-#define OEIP_YUV_TYPE 1
+#define OEIP_YUV_TYPE 6
 #endif
 
 cbuffer texSize : register(b0)
@@ -43,8 +43,9 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 	uint2 uIndex = uint2(0, height) + uint2(DTid.x, DTid.y >> 1);
 	uint2 vIndex = uint2(0, height * 3 / 2) + uint2(DTid.x, DTid.y >> 1);
 #else//OEIP_YUVFMT_YUV420P
-	uint2 uIndex = uint2(0, height) + uint2(DTid.x, DTid.y >> 2);
-	uint2 vIndex = uint2(0, height * 5 / 4) + uint2(DTid.x, DTid.y >> 2);
+	uint2 nuv = u12u2(u22u1(DTid.xy / 2, width / 2), width);
+	uint2 uIndex = uint2(0, height) + nuv;// uint2(DTid.x, DTid.y >> 2);
+	uint2 vIndex = uint2(0, height * 5 / 4) + nuv;// +uint2(DTid.x, DTid.y >> 2);
 #endif
 	float y = texIn[yIndex];
 	float u = texIn[uIndex] - 0.5f;

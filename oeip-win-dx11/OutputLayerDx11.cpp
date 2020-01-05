@@ -17,9 +17,12 @@ OutputLayerDx11::OutputLayerDx11() {
 bool OutputLayerDx11::onInitBuffer() {
 	for (int32_t i = 0; i < inCount; i++) {
 		if (layerParamet.bCpu) {
-			if (selfConnects[i].dataType == OEIP_CV_8UC4) {
+			if (selfConnects[i].dataType == OEIP_CV_8UC4 || selfConnects[i].dataType == OEIP_CV_8UC1) {
+				int32_t size = selfConnects[i].width * selfConnects[i].height;
+				if (selfConnects[i].dataType == OEIP_CV_8UC1)
+					size = selfConnects[i].width * selfConnects[i].height / 4;
 				outBuffers[i]->setOnlyUAV(true);
-				outBuffers[i]->setBufferSize(4, selfConnects[i].width * selfConnects[i].height);
+				outBuffers[i]->setBufferSize(4, size);
 				outBuffers[i]->initResource(dx11->device);
 				cpuReadBuffer[i].Release();
 				copyBufferToRead(dx11->device, outBuffers[i]->buffer, &cpuReadBuffer[i]);
@@ -47,7 +50,19 @@ void OutputLayerDx11::onParametChange(OutputParamet oldParamet) {
 }
 
 bool OutputLayerDx11::initHlsl() {
-	return computeShader->initResource(dx11->device, nullptr, dx11->includeShader);
+	std::string yuvTypestr = std::to_string(selfConnects[0].dataType);
+	D3D_SHADER_MACRO defines[] = { "OEIP_DATA_TYPE",yuvTypestr.c_str(),"SIZE_X", "240", "SIZE_Y","1",nullptr,nullptr };
+	return computeShader->initResource(dx11->device, defines, dx11->includeShader);
+}
+
+void OutputLayerDx11::onInitLayer() {
+	LayerDx11::onInitLayer();
+	if (selfConnects[0].dataType == OEIP_CV_8UC1) {
+		threadSizeX = divUp(threadSizeX, 4);
+	}
+	groupSize.X = divUp(threadSizeX * threadSizeY, 240);
+	groupSize.Y = 1;
+	groupSize.Z = 1;
 }
 
 void OutputLayerDx11::outputGpuTex(void* device, void* texture, int32_t outputIndex) {

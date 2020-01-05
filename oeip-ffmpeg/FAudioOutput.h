@@ -18,7 +18,7 @@ private:
 	std::unique_ptr<AudioMixer> mixer = nullptr;
 protected:
 	virtual int32_t onStart() override;
-	virtual int32_t onStop() override { return 0; };
+	virtual int32_t onStop() override;
 	virtual int32_t onDataRecord(bool bmic, uint8_t* data, int dataLen, OeipAudioDataType type) override;
 private:
 	void onResampleData(bool bmic, uint8_t* data, int32_t lenght);

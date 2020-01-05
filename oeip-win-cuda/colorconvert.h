@@ -15,7 +15,7 @@ __global__ void yuv2rgb(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest) {
 		uchar u = 0;
 		uchar v = 0;
 		float3 yuv = make_float3(0.f, 0.f, 0.f);
-		//编译时确定分支
+		//编译时优化掉选择
 		if (yuvpType == 1) {
 			int halfidx = idx >> 1;
 			int halfidy = idy >> 1;
@@ -27,8 +27,9 @@ __global__ void yuv2rgb(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest) {
 			v = source(idy / 2 + dest.rows * 3 / 2, idx);
 		}
 		if (yuvpType == 6) {
-			u = source(idy / 4 + dest.rows, idx);
-			v = source(idy / 4 + dest.rows * 5 / 4, idx);
+			int2 nuv = u12u2(u22u1(make_int2(idx / 2, idy / 2), dest.cols / 2), dest.cols);
+			u = source(nuv.y + dest.rows, nuv.x);
+			v = source(nuv.y + dest.rows * 5 / 4, nuv.x);
 		}
 		yuv = rgbauchar32float3(make_uchar3(y, u, v));
 		dest(idy, idx) = rgbafloat42uchar4(make_float4(yuv2Rgb(yuv), 1.f));
@@ -57,25 +58,66 @@ template <int32_t yuvpType>
 __global__ void rgb2yuv(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows) {
-		float3 rgb = make_float3(rgbauchar42float4(source(idy, idx)));
-		float3 yuv = rgb2Yuv(rgb);
-		dest(idy, idx) = rgbafloat2ucha1(yuv.x);
-		if (yuvpType == 1) {
-			int halfidx = idx >> 1;
-			int halfidy = idy >> 1;
-			dest(halfidy + source.rows, halfidx * 2) = rgbafloat2ucha1(yuv.y);
-			dest(halfidy + source.rows, halfidx * 2 + 1) = rgbafloat2ucha1(yuv.z);
-		}
-		if (yuvpType == 5) {
-			dest(idy / 2 + source.rows, idx) = rgbafloat2ucha1(yuv.y);
-			dest(idy / 2 + source.rows * 3 / 2, idx) = rgbafloat2ucha1(yuv.z);
-		}
-		if (yuvpType == 6) {
-			dest(idy / 4 + source.rows, idx) = rgbafloat2ucha1(yuv.y);
-			dest(idy / 4 + source.rows * 5 / 4, idx) = rgbafloat2ucha1(yuv.z);
+	if (yuvpType == 5) {
+		if (idx < source.cols && idy < source.rows / 2) {
+			int2 uvt = make_int2(idx, idy * 2);
+			int2 uvb = make_int2(idx, idy * 2 + 1);
+			float3 yuvt = rgb2Yuv(make_float3(rgbauchar42float4(source(uvt.y, uvt.x))));
+			float3 yuvb = rgb2Yuv(make_float3(rgbauchar42float4(source(uvb.y, uvb.x))));
+			dest(uvt.y, uvt.x) = rgbafloat2ucha1(yuvt.x);
+			dest(uvb.y, uvb.x) = rgbafloat2ucha1(yuvb.x);
+			dest(source.rows + idy, idx) = rgbafloat2ucha1((yuvt.y + yuvb.y) / 2.0f);
+			dest(source.rows * 3 / 2 + idy, idx) = rgbafloat2ucha1((yuvt.z + yuvb.z) / 2.0f);
 		}
 	}
+	if (yuvpType == 1 || yuvpType == 6) {
+		if (idx < source.cols / 2 && idy < source.rows / 2) {
+			int2 uvlt = make_int2(idx * 2, idy * 2);
+			int2 uvlb = make_int2(idx * 2, idy * 2 + 1);
+			int2 uvrt = make_int2(idx * 2 + 1, idy * 2);
+			int2 uvrb = make_int2(idx * 2 + 1, idy * 2 + 1);
+			float3 yuvlt = rgb2Yuv(make_float3(rgbauchar42float4(source(uvlt.y, uvlt.x))));
+			float3 yuvlb = rgb2Yuv(make_float3(rgbauchar42float4(source(uvlb.y, uvlb.x))));
+			float3 yuvrt = rgb2Yuv(make_float3(rgbauchar42float4(source(uvrt.y, uvrt.x))));
+			float3 yuvrb = rgb2Yuv(make_float3(rgbauchar42float4(source(uvrb.y, uvrb.x))));
+			float3 ayuv = yuvlt + yuvlb + yuvrt + yuvrb;
+			if (yuvpType == 1) {
+				int2 uindex = make_int2(idx * 2, source.rows + idy);
+				int2 vindex = make_int2(idx * 2 + 1, source.rows + idy);
+				dest(uindex.y, uindex.x) = rgbafloat2ucha1(ayuv.y / 4.0f);
+				dest(vindex.y, vindex.x) = rgbafloat2ucha1(ayuv.z / 4.0f);
+			}
+			if (yuvpType == 6) {
+				int2 nuv = u12u2(u22u1(make_int2(idx, idy), source.cols / 2), source.cols);
+				dest(source.rows + nuv.y, nuv.x) = rgbafloat2ucha1(ayuv.y / 4.0f);
+				dest(source.rows * 5 / 4 + nuv.y, nuv.x) = rgbafloat2ucha1(ayuv.z / 4.0f);
+			}
+			dest(uvlt.y, uvlt.x) = rgbafloat2ucha1(yuvlt.x);
+			dest(uvlb.y, uvlb.x) = rgbafloat2ucha1(yuvlb.x);
+			dest(uvrt.y, uvrt.x) = rgbafloat2ucha1(yuvrt.x);
+			dest(uvrb.y, uvrb.x) = rgbafloat2ucha1(yuvrb.x);
+		}
+	}
+
+	//if (idx < source.cols / 2 && idy < source.rows / 2) {
+	//	float3 rgb = make_float3(rgbauchar42float4(source(idy, idx)));
+	//	float3 yuv = rgb2Yuv(rgb);
+	//	dest(idy, idx) = rgbafloat2ucha1(yuv.x);
+	//	if (yuvpType == 1) {
+	//		int halfidx = idx >> 1;
+	//		int halfidy = idy >> 1;
+	//		dest(halfidy + source.rows, halfidx * 2) = rgbafloat2ucha1(yuv.y);
+	//		dest(halfidy + source.rows, halfidx * 2 + 1) = rgbafloat2ucha1(yuv.z);
+	//	}
+	//	if (yuvpType == 5) {
+	//		dest(idy / 2 + source.rows, idx) = rgbafloat2ucha1(yuv.y);
+	//		dest(idy / 2 + source.rows * 3 / 2, idx) = rgbafloat2ucha1(yuv.z);
+	//	}
+	//	if (yuvpType == 6) {
+	//		dest(idy / 4 + source.rows, idx) = rgbafloat2ucha1(yuv.y);
+	//		dest(idy / 4 + source.rows * 5 / 4, idx) = rgbafloat2ucha1(yuv.z);
+	//	}
+	//}
 }
 
 //dest 一点分二点

@@ -42,6 +42,7 @@ bool ImageProcess::initLayers() {
 void ImageProcess::runLayers() {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	if (!bInitLayers) {
+		logMessage(OEIP_INFO, "init layers.");
 		initLayers();
 	}
 	if (bInitLayers && bInitBuffers) {
@@ -149,7 +150,7 @@ int32_t ImageProcess::findLayer(const std::string& name) {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	int32_t index = 0;
 	for (auto layer : layers) {
-		if (layer->layerName.compare(name)) {
+		if (layer->layerName.compare(name) == 0) {
 			return index;
 		}
 		index += 1;

@@ -45,14 +45,16 @@ void yuv2rgb_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool ufront, 
 	yuv2rgb << <grid, block, 0, stream >> > (source, dest, bitx, yoffset);
 }
 
-void rgb2yuv_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest, int32_t yuvtype, cudaStream_t stream) {
-	dim3 grid(divUp(source.cols, block.x), divUp(source.rows, block.y));
+void rgb2yuv_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest, int32_t yuvtype, cudaStream_t stream) {	
+	dim3 grid(divUp(source.cols/2, block.x), divUp(source.rows/2, block.y));
 	if (yuvtype == 1)
 		rgb2yuv<1> << <grid, block, 0, stream >> > (source, dest);
-	else if (yuvtype == 5)
-		rgb2yuv<5> << <grid, block, 0, stream >> > (source, dest);
 	else if (yuvtype == 6)
 		rgb2yuv<6> << <grid, block, 0, stream >> > (source, dest);
+	else if (yuvtype == 5){
+		dim3 grid(divUp(source.cols, block.x), divUp(source.rows/2, block.y));
+		rgb2yuv<5> << <grid, block, 0, stream >> > (source, dest);
+		}
 }
 
 //packed ufront/yfront (yuyv true/true)/(yvyu false/true)/(uyvy true/false)

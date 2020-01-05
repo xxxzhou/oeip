@@ -68,7 +68,7 @@ void AudioMixer::mixerData() {
 	int32_t sampleTime = 40;
 	int sampleSize = audioDesc.sampleRate * audioDesc.channel * sampleTime / 1000;
 	int frameSize = sampleSize * audioDesc.bitSize / 8;//这里功能暂限定bitsize只能是16
-	int16_t * pcmbuf = new int16_t[sampleSize];
+	int16_t* pcmbuf = new int16_t[sampleSize];
 	long total = 0;
 	while (bStart) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(sampleTime));
@@ -104,6 +104,9 @@ void AudioMixer::close() {
 		auto status = signal.wait_for(lck, std::chrono::seconds(2));
 		if (status == std::cv_status::timeout) {
 			logMessage(OEIP_WARN, "audio mixer is not closed properly.");
+		}
+		for (int32_t i = 0; i < resampleBuffers.size(); i++) {
+			resampleBuffers[i]->clear();
 		}
 		onDataHandle = nullptr;
 	}

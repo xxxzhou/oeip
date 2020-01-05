@@ -35,8 +35,8 @@ namespace OeipCamera
 	}
 
 	void onPipeData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex) {
-		//std::cout << width << height << std::endl;
-		memcpy(show->ptr<char>(0), data, width * height * 4);
+		if (vpipe->getOutputId() == layerIndex)			
+			memcpy(show->ptr<char>(0), data, width * height * 4);
 	}
 
 	void testCamera() {

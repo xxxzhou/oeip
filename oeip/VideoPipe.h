@@ -13,6 +13,7 @@ private:
 	int32_t mapChannel = -1;
 	int32_t outMap = -1;
 	int32_t outIndex = -1;
+	int32_t outYuv2Index = -1;
 	int32_t resizeIndex = -1;
 
 	int32_t inputWidth = 0;
@@ -28,6 +29,9 @@ public:
 	int32_t getPipeId() { return pipeId; };
 	int32_t getOutputId() {
 		return outIndex;
+	}
+	int32_t getOutYuvId() {
+		return outYuv2Index;
 	}
 	void setVideoFormat(OeipVideoType videoType, int32_t width, int32_t height);
 	void runVideoPipe(int32_t layerIndex, uint8_t* data);

@@ -20,7 +20,11 @@ OeipManager* OeipManager::getInstance() {
 
 void OeipManager::shutdown() {
 	safeDelete(instance);
+#if _DEBUG
+	cleanPlugin(true);
+#elif
 	cleanPlugin(false);
+#endif
 }
 
 OeipManager::~OeipManager() {

@@ -64,10 +64,14 @@ extern "C"
 #pragma region gpgpu pipe
 	//初始化一个GPU计算管线
 	OEIPDLL_EXPORT int32_t initPipe(OeipGpgpuType gpgpuType);
+	//释放一个GPU计算管线,相应pipeId在没有再次initPipe得到,不能调用下面运用管线的API
+	OEIPDLL_EXPORT bool closePipe(int32_t pipeId);
 	//管线添加一层,paramet表示管线对应的参数结构,请传递对应结构
 	OEIPDLL_EXPORT int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet = nullptr);
 	//设定连接层级,一般跨级连接调用，默认下层连接上层
-	OEIPDLL_EXPORT void connectLayer(int32_t pipeId, int32_t layerIndex, const char* forwardName, int32_t inputIndex = 0, int32_t selfIndex = 0);
+	OEIPDLL_EXPORT void connectLayerName(int32_t pipeId, int32_t layerIndex, const char* forwardName, int32_t inputIndex = 0, int32_t selfIndex = 0);
+	//设定连接层级,一般跨级连接调用，默认下层连接上层
+	OEIPDLL_EXPORT void connectLayerIndex(int32_t pipeId, int32_t layerIndex, int32_t forwardIndex, int32_t inputIndex = 0, int32_t selfIndex = 0);
 	//设定当前层是否可用
 	OEIPDLL_EXPORT void setEnableLayer(int32_t pipeId, int32_t layerIndex, bool bEnable);
 	//设定当前层及关联这层的分支全部不可用

@@ -14,6 +14,7 @@ private:
 protected:
 	virtual void onParametChange(OutputParamet oldT) override;	
 	virtual bool initHlsl() override;
+	virtual void onInitLayer() override;
 	virtual bool onInitBuffer() override;
 	virtual void onRunLayer() override;
 public:

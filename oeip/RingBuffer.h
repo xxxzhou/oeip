@@ -78,8 +78,9 @@ public:
 			logMessage(OEIP_WARN, "push ring buffer is full.");
 			return -1;
 		}
+		//应该从循环写区头重新开始写，暂时先这样
 		if (sizeWrite() < len) {
-			logMessage(OEIP_WARN, "push ring buffer is maxout.");
+			//logMessage(OEIP_WARN, "push ring buffer is maxout.");
 			return -1;
 		}
 		if (ring.write < ring.read || ring.size - ring.write >= len) {

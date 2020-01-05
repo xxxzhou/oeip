@@ -37,11 +37,17 @@ public:
 	};
 	virtual ~BaseLayerTemplate() {};
 public:
-	//一定引发onParametChange,是否需要重置当前管线看onParametChange的决定
+	//需要重置当前管线看onParametChange的决定
 	void updateParamet(const T& t) {
 		T oldParamet = layerParamet;
 		layerParamet = t;
 		onParametChange(oldParamet);
+		////memcmp需要注意内存对齐,后续比较替代方案
+		//if (memcmp(&layerParamet, &t, sizeof(T)) != 0) {
+		//	T oldParamet = layerParamet;
+		//	layerParamet = t;
+		//	onParametChange(oldParamet);
+		//}
 	};
 	void updateParamet(const void* paramet);
 protected:

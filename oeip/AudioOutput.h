@@ -14,12 +14,15 @@ protected:
 	bool bMic = false;
 	bool bMixer = false;
 	bool bLoopBack = false;
+	//麦声音描述
 	OeipAudioDesc micAudioDesc = {};
 	OeipAudioDesc loopAudioDesc = {};
 	OeipAudioDesc destAudioDesc = {};
 	AudioRecord* micRecord = nullptr;
 	AudioRecord* loopRecord = nullptr;
 public:
+	//音频设备事件
+	onEventAction onDeviceHandle;
 	//经过处理的数据
 	onAudioDataHandle onDataHandle;
 	//原始声卡或麦的数据

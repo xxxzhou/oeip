@@ -36,7 +36,7 @@ enum OeipVideoType : int32_t
 enum OeipYUVFMT : int32_t
 {
 	OEIP_YUVFMT_OTHER,
-	OEIP_YUVFMT_YUV420SP,//Semi-Planar 一般用于图像设备
+	OEIP_YUVFMT_YUV420SP,//Semi-Planar 一般用于图像设备 NV12
 	OEIP_YUVFMT_YUY2I,//Interleaved 一般用于图像设备
 	OEIP_YUVFMT_YVYUI,//Interleaved 一般用于图像设备
 	OEIP_YUVFMT_UYVYI,//Interleaved 一般用于图像设备
@@ -76,16 +76,10 @@ enum OeipGpgpuType : int32_t
 	OEIP_Vulkun,
 };
 
-enum OeipAudioRecordType : int32_t
-{
-	OEIP_Mic = 1,
-	OEIP_Loopback = 2,
-	OEIP_Mic_Loopback = 3
-};
-
 enum OeipDeviceEventType :int32_t
 {
 	OEIP_Event_Other,
+	//关闭成功
 	OEIP_DeviceStop,
 	//打开成功
 	OEIP_DeviceOpen,
@@ -112,8 +106,8 @@ enum OeipAudioDataType : int32_t
 	OEIP_Audio_WavHeader,
 };
 
-
-//C#/C++里bool都只有一字节，但是可能因为不同对齐方式导致差异，故与C#交互的结构bool全使用int32
+//Paramet结构里不用一字节类型数据，一是memcmp后面会用，
+//二是C#/C++里bool都只有一字节，但是可能因为不同对齐方式导致差异，故与C#交互的结构bool全使用int32
 //默认从CPU输入,如果要支持GPU输入,bGpu=true
 struct InputParamet
 {
@@ -262,18 +256,26 @@ struct OeipDeviceInfo
 	wchar_t deviceID[512];
 };
 
-//声音与图像类似,录取设备一般用交差格式,而传输一般用平面格式
+//声音与图像类似,对应硬件捕获设备一般用交差格式,而传输一般用平面格式
 struct OeipAudioDesc
 {
-	int32_t channel;
+	int32_t channel;//1,2 
 	int32_t sampleRate;//8000,11025,22050,44100
-	int32_t bitSize;//16，24，32
+	int32_t bitSize;//16，24，32 
 
 	bool operator == (OeipAudioDesc& rhs) const {
 		return (channel == rhs.channel &&
 			sampleRate == rhs.sampleRate &&
 			bitSize == rhs.bitSize);
 	};
+};
+
+struct OeipVideoDesc
+{
+	int32_t width;
+	int32_t height;
+	int32_t fps;
+	OeipVideoType videoType;
 };
 
 struct OeipDateDesc
@@ -289,13 +291,14 @@ typedef std::function<void(int32_t, const char*)> logEventHandle;
 //原始声音回调
 typedef void(*onAudioRecordAction)(uint8_t* data, int32_t dataLen, OeipAudioDataType dataType);
 typedef std::function<void(uint8_t*, int32_t, OeipAudioDataType)> onAudioRecordHandle;
-typedef std::function<void(bool bMic, uint8_t* data, int32_t size, OeipAudioDataType type)> onAudioOutputHandle;
-//处理后声音回调
-typedef std::function<void(uint8_t* data, int32_t size)> onAudioDataHandle;
+//原始声音回调，指明是否是麦
+typedef std::function<void(bool bMic, uint8_t * data, int32_t size, OeipAudioDataType type)> onAudioOutputHandle;
+//处理后声音回调(如重采样,混音)
+typedef std::function<void(uint8_t * data, int32_t size)> onAudioDataHandle;
 
 //设备事件，如中断等
-typedef void(*onEventAction)(OeipDeviceEventType type, int32_t code);
-typedef std::function<void(OeipDeviceEventType, int32_t)> onEventHandle;
+typedef void(*onEventAction)(int32_t type, int32_t code);
+typedef std::function<void(int32_t, int32_t)> onEventHandle;
 
 //摄像机的数据处理回调，dataType指明data数据类型
 typedef void(*onReviceAction)(uint8_t* data, int32_t width, int32_t height);

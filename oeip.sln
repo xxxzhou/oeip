@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oeip-win-dx11", "oeip-win-d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oeip-win", "oeip-win\oeip-win.vcxproj", "{10EAED99-A1A9-434F-A8EE-D40E6AAE62E1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oeip-video-mf", "oeip-video-mf\oeip-video-mf.vcxproj", "{0AE24C9E-4F61-4B43-BE8A-8AE9D0229D06}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "oeip-win-mf", "oeip-win-mf\oeip-win-mf.vcxproj", "{0AE24C9E-4F61-4B43-BE8A-8AE9D0229D06}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{29179A03-D660-4523-8B96-92577B700A55}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,6 +37,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "live", "live", "{4030139F-CFA2-478D-8EDC-7E83C3C2443B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "win", "win", "{65310FD3-F10E-4D01-9821-FFD7A17AFA67}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "signalR", "signalR", "{C8CD6E95-63FC-4741-BDA4-248C76E56775}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -172,6 +174,7 @@ Global
 		{5B0CD88E-DE8F-46F3-974C-3FB93651144D} = {F0BB015D-4F06-44EB-8F48-76B7D3C3790F}
 		{09EEDB66-7F6A-4488-B522-6FD4EDAB0E22} = {6B2F8F05-8DE0-4F4C-8306-FF2269B40020}
 		{E276DCDB-DB6F-42C6-A6BE-6FC460EBB9A9} = {6B2F8F05-8DE0-4F4C-8306-FF2269B40020}
+		{C8CD6E95-63FC-4741-BDA4-248C76E56775} = {4030139F-CFA2-478D-8EDC-7E83C3C2443B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E521F32-50C1-42EF-96A4-5466E45A171B}

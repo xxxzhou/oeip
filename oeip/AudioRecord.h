@@ -43,6 +43,8 @@ protected:
 	bool bStart = false;
 	onAudioRecordHandle onRecordHandle;
 	OeipAudioDesc audioDesc;
+	//音频设备事件
+	onEventAction onDeviceHandle;
 protected:
 	virtual bool initRecord() { return false; };
 public:

@@ -60,8 +60,9 @@ bool BaseLayer::initLayer() {
 				return false;
 			}
 			imageProcess->getLayerOutConnect(forwardLayerIndexs[i], lc, forwardOutIndexs[i]);
-			if (lc.dataType != selfConnects[i].dataType) {
-				std::string message = layerMeg + "no match current layer element byte size.";
+			//OEIP_OUTPUT_LAYER层自动匹配上一层的dataType
+			if (layerType != OEIP_OUTPUT_LAYER && lc.dataType != selfConnects[i].dataType) {
+				std::string message = layerMeg + "no match current layer dataType.";
 				logMessage(OEIP_ERROR, message.c_str());
 				return false;
 			}

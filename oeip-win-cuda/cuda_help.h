@@ -56,7 +56,7 @@ inline __device__ float4 rgbauchar42float4(uchar4 c) {
 }
 
 inline __device__ uchar rgbafloat2ucha1(float x) {
-	return (uchar)(__saturatef(x)*255.0f);
+	return (uchar)(__saturatef(x) * 255.0f);
 }
 
 inline __device__ uchar4 rgbafloat42uchar4(float4 c) {
@@ -89,20 +89,20 @@ inline __host__ __device__ int4 operator*(int4 a, float b) {
 }
 
 inline __host__ __device__ void inverseMat3x3(const float3& col0, const float3& col1, const float3& col2, float3& invCol0, float3& invCol1, float3& invCol2) {
-	float det = col0.x*(col1.y*col2.z - col2.y*col1.z)
-		- col0.y*(col1.x*col2.z - col1.z*col2.x)
-		+ col0.z*(col1.x*col2.y - col1.y*col2.x);
+	float det = col0.x * (col1.y * col2.z - col2.y * col1.z)
+		- col0.y * (col1.x * col2.z - col1.z * col2.x)
+		+ col0.z * (col1.x * col2.y - col1.y * col2.x);
 	if (det > 0) {
 		float invdet = 1.0f / det;
-		invCol0.x = (col1.y*col2.z - col2.y*col1.z)*invdet;
-		invCol0.y = (col0.z*col2.y - col0.y*col2.z)*invdet;
-		invCol0.z = (col0.y*col1.z - col0.z*col1.y)*invdet;
-		invCol1.x = (col1.z*col2.x - col1.x*col2.z)*invdet;
-		invCol1.y = (col0.x*col2.z - col0.z*col2.x)*invdet;
-		invCol1.z = (col1.x*col0.z - col0.x*col1.z)*invdet;
-		invCol2.x = (col1.x*col2.y - col2.x*col1.y)*invdet;
-		invCol2.y = (col2.x*col0.y - col0.x*col2.y)*invdet;
-		invCol2.z = (col0.x*col1.y - col1.x*col0.y)*invdet;
+		invCol0.x = (col1.y * col2.z - col2.y * col1.z) * invdet;
+		invCol0.y = (col0.z * col2.y - col0.y * col2.z) * invdet;
+		invCol0.z = (col0.y * col1.z - col0.z * col1.y) * invdet;
+		invCol1.x = (col1.z * col2.x - col1.x * col2.z) * invdet;
+		invCol1.y = (col0.x * col2.z - col0.z * col2.x) * invdet;
+		invCol1.z = (col1.x * col0.z - col0.x * col1.z) * invdet;
+		invCol2.x = (col1.x * col2.y - col2.x * col1.y) * invdet;
+		invCol2.y = (col2.x * col0.y - col0.x * col2.y) * invdet;
+		invCol2.z = (col0.x * col1.y - col1.x * col0.y) * invdet;
 	}
 }
 
@@ -168,6 +168,14 @@ inline __device__ float3 rgb2Yuv(float3 rgb) {
 	yuv.y = clamp(-0.1687 * rgb.x - 0.3313 * rgb.y + 0.5 * rgb.z + 0.5f, 0.f, 1.f);
 	yuv.z = clamp(0.5 * rgb.x - 0.4187 * rgb.y - 0.0813 * rgb.z + 0.5f, 0.f, 1.f);
 	return yuv;
+}
+
+inline __device__ int u22u1(int2 uv, int step) {
+	return uv.y * step + uv.x;
+}
+
+inline __device__ int2 u12u2(int index, int step) {
+	return make_int2(index % step, index / step);
 }
 
 

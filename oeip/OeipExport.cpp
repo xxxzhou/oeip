@@ -213,16 +213,26 @@ int32_t initPipe(OeipGpgpuType gpgpuType) {
 	return oInstance->initPipe(gpgpuType);
 }
 
+bool closePipe(int32_t pipeId)
+{
+	OEIP_CHECKINSTANCEBOOL;
+	OEIP_CHECKPIPEBOOL;
+	return oInstance->closePipe(pipeId);
+}
+
 int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet) {
 	OEIP_CHECKINSTANCEINT;
 	OEIP_CHECKPIPEINT;
 	return pipe->addLayer(layerName, layerType, paramet);
 }
 
-void connectLayer(int32_t pipeId, int32_t layerIndex, const char* forwardName, int32_t inputIndex, int32_t selfIndex) {
+void connectLayerName(int32_t pipeId, int32_t layerIndex, const char* forwardName, int32_t inputIndex, int32_t selfIndex) {
 	OEIP_CHECKINSTANCEVOID;
 	OEIP_CHECKPIPEVOID;
 	pipe->connectLayer(layerIndex, forwardName, inputIndex, selfIndex);
+}
+
+void connectLayerIndex(int32_t pipeId, int32_t layerIndex, int32_t forwardIndex, int32_t inputIndex, int32_t selfIndex) {
 }
 
 void setEnableLayer(int32_t pipeId, int32_t layerIndex, bool bEnable) {

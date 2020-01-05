@@ -5,32 +5,24 @@ AudioResample::AudioResample() {
 
 
 AudioResample::~AudioResample() {
-	if (swrCtx) {
-		swr_free(&swrCtx);
-		swrCtx = nullptr;
-		bInit = false;
-	}
 }
 
 int32_t AudioResample::init(OeipAudioDesc sour, OeipAudioDesc dest) {
-	if (swrCtx) {
-		swr_free(&swrCtx);
-		swrCtx = nullptr;
-	}
 	this->sour = sour;
 	this->dest = dest;
 	sourBlockAlign = sour.channel * (sour.bitSize / 8);
 	destBlockAlign = dest.channel * (dest.bitSize / 8);
-	swrCtx = swr_alloc_set_opts(nullptr, av_get_default_channel_layout(dest.channel),
+	auto temp = swr_alloc_set_opts(nullptr, av_get_default_channel_layout(dest.channel),
 		dest.bitSize == 16 ? AV_SAMPLE_FMT_S16 : AV_SAMPLE_FMT_FLT, dest.sampleRate,
 		av_get_default_channel_layout(sour.channel),
 		sour.bitSize == 16 ? AV_SAMPLE_FMT_S16 : AV_SAMPLE_FMT_FLT, sour.sampleRate,
 		0, nullptr);
-	if (!swrCtx) {
+	if (!temp) {
 		logMessage(OEIP_ERROR, "could not allocate resampler context!");
 		return -1;
 	}
-	int ret = swr_init(swrCtx);
+	swrCtx = getUniquePtr(temp);
+	int ret = swr_init(swrCtx.get());
 	if (ret < 0) {
 		logMessage(OEIP_ERROR, "failed to initialize the resampling context!");
 		return -2;
@@ -39,8 +31,8 @@ int32_t AudioResample::init(OeipAudioDesc sour, OeipAudioDesc dest) {
 	return 0;
 }
 
-////av_get_bytes_per_sample(AV_SAMPLE_FMT_S16)
-int32_t AudioResample::resampleData(const uint8_t * indata, int32_t inSize) {
+//av_get_bytes_per_sample(AV_SAMPLE_FMT_S16)
+int32_t AudioResample::resampleData(const uint8_t* indata, int32_t inSize) {
 	if (!bInit)
 		return -1;
 	//时间 毫秒
@@ -59,9 +51,9 @@ int32_t AudioResample::resampleData(const uint8_t * indata, int32_t inSize) {
 	uint8_t* out[1] = { outdata.data() };
 	const uint8_t* in[1] = { indata };
 
-	int osize = swr_get_out_samples(swrCtx, inSize);
+	int osize = swr_get_out_samples(swrCtx.get(), inSize);
 	int32_t ret = 0;
-	ret = swr_convert(swrCtx, out, osize, in, frameSize);
+	ret = swr_convert(swrCtx.get(), out, osize, in, frameSize);
 	//string message = " outSize:" + to_string(outsize) + "-" + to_string(osize) + " ret:" + to_string(ret);
 	//logMessage(zmf_info, message.c_str());
 	if (fabs(ret - oframeSize) > 1) {

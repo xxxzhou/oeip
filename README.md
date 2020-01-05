@@ -18,6 +18,9 @@
 2 (已完成)完善层连接逻辑，如输入流NV12/YUV422/ARGB32不同数据流输出相同数据的处理
 3 完成一个CUDA初步模块,提供Grabcut算法,darknet集成。
 4 多媒体直播(推流，拉流等)
+5 完善C#封装层,C# WinForm相关DEMO代码
+5 完善UE4/Unity3D 相关DEMO代码
+
 
 
 

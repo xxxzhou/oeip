@@ -16,6 +16,12 @@
     <Filter Include="audio">
       <UniqueIdentifier>{6ea3107c-34b3-4a17-9edc-fe2fd62c44f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="encoder">
+      <UniqueIdentifier>{b777a811-c93b-44ff-9100-83f4399098e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="live">
+      <UniqueIdentifier>{1445a012-c4d0-4bd2-bbae-c4eca6ea09e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioResample.h">
@@ -30,6 +36,33 @@
     <ClInclude Include="FAudioOutput.h">
       <Filter>audio</Filter>
     </ClInclude>
+    <ClInclude Include="FH264Encoder.h">
+      <Filter>encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="OeipFree.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FEncoder.h">
+      <Filter>encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="FAACEncoder.h">
+      <Filter>encoder</Filter>
+    </ClInclude>
+    <ClInclude Include="FNetOutput.h">
+      <Filter>live</Filter>
+    </ClInclude>
+    <ClInclude Include="FRtmpOutput.h">
+      <Filter>live</Filter>
+    </ClInclude>
+    <ClInclude Include="FLiveOutput.h">
+      <Filter>live</Filter>
+    </ClInclude>
+    <ClInclude Include="FRtmpInput.h">
+      <Filter>live</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioMixer.cpp">
@@ -40,6 +73,21 @@
     </ClCompile>
     <ClCompile Include="FAudioOutput.cpp">
       <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="FH264Encoder.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="FAACEncoder.cpp">
+      <Filter>encoder</Filter>
+    </ClCompile>
+    <ClCompile Include="FRtmpOutput.cpp">
+      <Filter>live</Filter>
+    </ClCompile>
+    <ClCompile Include="FLiveOutput.cpp">
+      <Filter>live</Filter>
+    </ClCompile>
+    <ClCompile Include="FRtmpInput.cpp">
+      <Filter>live</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

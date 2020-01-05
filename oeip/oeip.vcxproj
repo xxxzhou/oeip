@@ -121,6 +121,7 @@
     <ClInclude Include="AudioRecord.h" />
     <ClInclude Include="BaseLayer.h" />
     <ClInclude Include="ImageProcess.h" />
+    <ClInclude Include="LivePipe.h" />
     <ClInclude Include="Oeip.h" />
     <ClInclude Include="OeipCommon.h" />
     <ClInclude Include="OeipDefine.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="AudioRecord.cpp" />
     <ClCompile Include="BaseLayer.cpp" />
     <ClCompile Include="ImageProcess.cpp" />
+    <ClCompile Include="LivePipe.cpp" />
     <ClCompile Include="OeipCommon.cpp" />
     <ClCompile Include="OeipExport.cpp" />
     <ClCompile Include="OeipManager.cpp" />

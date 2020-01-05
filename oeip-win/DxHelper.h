@@ -16,4 +16,6 @@ OEIPWINDLL_EXPORT int sizeDxFormatElement(DXGI_FORMAT format);
 
 OEIPWINDLL_EXPORT DXGI_FORMAT getDxFormat(int32_t dataType);
 
+OEIPWINDLL_EXPORT bool checkHR(HRESULT hr, const char* message);
+
 

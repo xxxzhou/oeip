@@ -29,5 +29,14 @@
     <ClInclude Include="testaudio.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="testencodervideo.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testencoderaudio.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testliveoutput.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -66,10 +66,13 @@
     <ClInclude Include="VideoPipe.h">
       <Filter>fixpipe</Filter>
     </ClInclude>
-    <ClInclude Include="RingBuffer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="AudioOutput.h">
+      <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="LivePipe.h">
+      <Filter>fixpipe</Filter>
+    </ClInclude>
+    <ClInclude Include="RingBuffer.h">
       <Filter>audio</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,10 +107,13 @@
     <ClCompile Include="VideoPipe.cpp">
       <Filter>fixpipe</Filter>
     </ClCompile>
-    <ClCompile Include="RingBuffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="AudioOutput.cpp">
+      <Filter>audio</Filter>
+    </ClCompile>
+    <ClCompile Include="LivePipe.cpp">
+      <Filter>fixpipe</Filter>
+    </ClCompile>
+    <ClCompile Include="RingBuffer.cpp">
       <Filter>audio</Filter>
     </ClCompile>
   </ItemGroup>

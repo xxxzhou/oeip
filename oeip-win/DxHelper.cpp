@@ -143,3 +143,11 @@ DXGI_FORMAT getDxFormat(int32_t dataType) {
 	}
 	return dxFormat;
 }
+
+bool checkHR(HRESULT hr, const char* message) {
+	if (FAILED(hr)) {
+		std::string msg = std::string(message) + " hr:" + std::to_string(hr);
+		logMessage(OEIP_ERROR, msg.c_str());
+	}
+	return SUCCEEDED(hr);
+}

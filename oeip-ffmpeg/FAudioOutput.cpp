@@ -11,7 +11,14 @@ FAudioOutput::~FAudioOutput() {
 }
 
 int32_t FAudioOutput::onStart() {
+	if (bMixer) {
+		mixer = std::make_unique< AudioMixer>();
+		onAudioDataHandle mixHandle = std::bind(&FAudioOutput::onMixData, this, _1, _2);
+		mixer->onDataHandle = mixHandle;
+		mixer->init(destAudioDesc);
+	}
 	if (bMic) {
+		//是否需要重采样
 		bReMic = !(micAudioDesc == destAudioDesc);
 		if (bReMic) {
 			micResample = std::make_unique< AudioResample>();
@@ -21,6 +28,7 @@ int32_t FAudioOutput::onStart() {
 		}
 	}
 	if (bLoopBack) {
+		//是否需要重采样
 		bReLoopBack = !(loopAudioDesc == destAudioDesc);
 		if (bReLoopBack) {
 			loopResample = std::make_unique< AudioResample>();
@@ -29,12 +37,11 @@ int32_t FAudioOutput::onStart() {
 			loopResample->init(loopAudioDesc, destAudioDesc);
 		}
 	}
-	if (bMixer) {
-		mixer = std::make_unique< AudioMixer>();
-		onAudioDataHandle mixHandle = std::bind(&FAudioOutput::onMixData, this, _1, _2);
-		mixer->onDataHandle = mixHandle;
-		mixer->init(destAudioDesc);
-	}
+	return 0;
+}
+
+int32_t FAudioOutput::onStop() {
+	mixer->close();
 	return 0;
 }
 
@@ -77,7 +84,7 @@ void FAudioOutput::onMixData(uint8_t* data, int32_t lenght) {
 
 bool bCanLoad() {
 	auto version = avformat_version();
-	return true;
+	return version > 0;
 }
 
 void registerFactory() {

@@ -6,6 +6,8 @@
 using namespace std;
 namespace OeipAudio
 {
+	//std::unique_ptr<FILE, int(*)(FILE*)> f{ fopen("foo.txt", "r"), &fclose };
+
 	vector<uint8_t> micData;
 	vector<uint8_t> loopData;
 	vector<uint8_t> mixData;

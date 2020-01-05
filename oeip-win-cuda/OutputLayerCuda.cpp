@@ -11,7 +11,9 @@ OutputLayerCuda::OutputLayerCuda() {
 
 OutputLayerCuda::~OutputLayerCuda() {
 	for (int32_t i = 0; i < inCount; i++) {
+		cpudatas[i].clear();
 	}
+	cpudatas.clear();
 }
 
 void OutputLayerCuda::onParametChange(OutputParamet oldT) {
