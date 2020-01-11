@@ -119,7 +119,7 @@ void getDeviceList(OeipDeviceInfo* deviceList, int32_t lenght, int32_t index) {
 		OeipDeviceInfo& device = deviceList[i - index];
 		VideoDevice* capture = videoList[i];
 		copywcharstr(device.deviceName, capture->getDeviceName(), sizeof(device.deviceName));
-		copywcharstr(device.deviceID, capture->getDeviceID(), sizeof(device.deviceID));
+		copywcharstr(device.deviceId, capture->getDeviceID(), sizeof(device.deviceId));
 		device.id = i;
 	}
 }
@@ -167,6 +167,24 @@ void closeDevice(int32_t deviceIndex) {
 	OEIP_CHECKINSTANCEVOID;
 	OEIP_CHECKDEVICEVOID;
 	device->closeDevice();
+}
+
+bool bOpen(int32_t deviceIndex) {
+	OEIP_CHECKINSTANCEBOOL;
+	OEIP_CHECKDEVICEBOOL;
+	return device->bOpen();
+}
+
+void getDeviceParametrs(int32_t deviceIndex, CamParametrs* parametrs) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKDEVICEVOID;
+	memcpy(parametrs, &device->getParametrs(), sizeof(CamParametrs));
+}
+
+void setDeviceParametrs(int32_t deviceIndex, const CamParametrs* parametrs) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKDEVICEVOID;
+	device->setParametrs(*parametrs);
 }
 
 void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData) {
@@ -233,6 +251,9 @@ void connectLayerName(int32_t pipeId, int32_t layerIndex, const char* forwardNam
 }
 
 void connectLayerIndex(int32_t pipeId, int32_t layerIndex, int32_t forwardIndex, int32_t inputIndex, int32_t selfIndex) {
+	OEIP_CHECKINSTANCEVOID;
+	OEIP_CHECKPIPEVOID;
+	pipe->connectLayer(layerIndex, forwardIndex, inputIndex, selfIndex);
 }
 
 void setEnableLayer(int32_t pipeId, int32_t layerIndex, bool bEnable) {

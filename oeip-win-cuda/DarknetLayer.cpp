@@ -18,7 +18,7 @@ void DarknetLayerCuda::onParametChange(DarknetParamet oldT) {
 		bool bInCfg = std::tr2::sys::exists(layerParamet.confile);
 		bool bInWgt = std::tr2::sys::exists(layerParamet.weightfile);
 		if (!bInCfg || !bInWgt) {
-			logMessage(OEIP_WARN, "cfg or weights not find.");
+			logMessage(OEIP_ERROR, "cfg or weights not find.");
 			return;
 		}
 		net = load_network(layerParamet.confile, layerParamet.weightfile, 0);
@@ -26,12 +26,12 @@ void DarknetLayerCuda::onParametChange(DarknetParamet oldT) {
 		netHeight = network_height(net);
 		set_batch_network(net, 1);
 		netFrame.create(netHeight, netWidth, CV_8UC4);
-		reCudaAllocGpu((void**)&netInput, netHeight*netWidth * sizeof(float) * 3);
+		reCudaAllocGpu((void**)&netInput, netHeight * netWidth * sizeof(float) * 3);
 	}
 }
 
 bool DarknetLayerCuda::onInitBuffer() {
-	return false;
+	return true;
 }
 
 void DarknetLayerCuda::onRunLayer() {
@@ -41,7 +41,7 @@ void DarknetLayerCuda::onRunLayer() {
 	image2netData_gpu(netFrame, netInput);
 	network_predict_gpudata(net, netInput);
 	int nboxes = 0;
-	detection *dets = get_network_boxes(net, netWidth, netHeight, layerParamet.thresh, 0, 0, 1, &nboxes);
+	detection* dets = get_network_boxes(net, netWidth, netHeight, layerParamet.thresh, 0, 0, 1, &nboxes);
 	//排序,nms 合并框(满足条件的放前面,被合并的放后面并置0)
 	if (layerParamet.nms)
 		do_nms_sort(dets, nboxes, classs, layerParamet.nms);
@@ -59,13 +59,14 @@ void DarknetLayerCuda::onRunLayer() {
 			personDets.push_back(box);
 			if (layerParamet.bDraw) {
 				cv::Rect rectangle2;
-				rectangle2.width = box.width*inMats[0].cols;
-				rectangle2.height = box.height*inMats[0].rows;
-				rectangle2.x = box.centerX*inMats[0].cols - rectangle2.width / 2;
-				rectangle2.y = box.centerY*inMats[0].rows - rectangle2.height / 2;
+				rectangle2.width = box.width * inMats[0].cols;
+				rectangle2.height = box.height * inMats[0].rows;
+				rectangle2.x = box.centerX * inMats[0].cols - rectangle2.width / 2;
+				rectangle2.y = box.centerY * inMats[0].rows - rectangle2.height / 2;
 				//drawRect_gpu(sourceOpFrame, rectangle2, 3, make_uchar4(255, 0, 0, 255), cudaStream);
 			}
 		}
 	}
+	//输出
 	ipCuda->outputData(layerIndex, (uint8_t*)personDets.data(), sizeof(PersonBox), personDets.size(), 0);
 }

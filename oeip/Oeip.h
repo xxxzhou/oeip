@@ -253,7 +253,7 @@ struct OeipDeviceInfo
 {
 	int32_t id = -1;
 	wchar_t deviceName[512];
-	wchar_t deviceID[512];
+	wchar_t deviceId[512];
 };
 
 //声音与图像类似,对应硬件捕获设备一般用交差格式,而传输一般用平面格式

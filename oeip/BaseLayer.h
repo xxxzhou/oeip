@@ -68,6 +68,8 @@ public:
 	std::vector<std::string> forwardNames;
 	//对应每层的输出索引
 	std::vector<int32_t> forwardOutIndexs;
+	//对个每个输入的层索引(结合forwardOutIndexs),假设有三个转入层 可能是[4,0]/[4,1]/[5,0]
+	std::vector<int32_t> forwardLayerIndexs;
 	//当前层是否关闭
 	bool bDisable = false;
 	//当前层及链接在后面的层全部关闭运算，一般是有多个输出链路，根据相应条件关闭某些输出链路
@@ -81,8 +83,6 @@ protected:
 protected:
 	int32_t inCount = 1;
 	int32_t outCount = 1;
-	//对个每个输入的层索引(结合forwardOutIndexs),假设有三个转入层 可能是[4,0]/[4,1]/[5,0]
-	std::vector<int32_t> forwardLayerIndexs;
 	//每层selfConnect与outConnect的elementByte自己设定
 	std::vector<LayerConnect> selfConnects;
 	std::vector<LayerConnect> outConnects;

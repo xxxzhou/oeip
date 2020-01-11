@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="darknet">
+      <UniqueIdentifier>{2abc9d07-2ce2-429e-8cda-7e57ae7d7027}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="trainDarknet.h">
+      <Filter>darknet</Filter>
+    </ClInclude>
+    <ClInclude Include="testdarknet.h">
+      <Filter>darknet</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="trainDarknet.cpp">
+      <Filter>darknet</Filter>
+    </ClCompile>
+    <ClCompile Include="oeip-cude-test.cpp" />
+  </ItemGroup>
+</Project>

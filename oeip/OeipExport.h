@@ -42,6 +42,12 @@ extern "C"
 	OEIPDLL_EXPORT bool openDevice(int32_t deviceIndex);
 	//关闭设备
 	OEIPDLL_EXPORT void closeDevice(int32_t deviceIndex);
+	//设备是否打开状态中
+	OEIPDLL_EXPORT bool bOpen(int32_t deviceIndex);
+	//得到WebCamera的如曝光，焦距等等参数
+	OEIPDLL_EXPORT void getDeviceParametrs(int32_t deviceIndex, CamParametrs* parametrs);
+	//设置WebCamera的如曝光，焦距等等参数
+	OEIPDLL_EXPORT void setDeviceParametrs(int32_t deviceIndex, const CamParametrs* parametrs);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型,用于C/C#使用
 	OEIPDLL_EXPORT void setDeviceDataAction(int32_t deviceIndex, onReviceAction onProcessData);
 	//设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型。用于C++使用。
@@ -88,7 +94,7 @@ extern "C"
 	OEIPDLL_EXPORT void runPipe(int32_t pipeId);
 	//把另一个DX11上下文中的纹理当做当前管线的输入源
 	OEIPDLL_EXPORT void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);
-	//把当前管线的输出结果直接放入另一个DX11上下文的纹理中
+	//把当前管线的输出结果直接放入另一个DX11上下文的纹理中,因为相应的纹理一般在单独的渲染线程，回调需要切换线程，固让用户根据需要在对应渲染线程获取
 	OEIPDLL_EXPORT void setPipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t outputIndex = 0);
 	//更新当前层的参数，需要注意paramet是当前层的参数结构，不同会引发想不到的问题
 	OEIPDLL_EXPORT bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const void* paramet);

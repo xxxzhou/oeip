@@ -35,17 +35,16 @@ inline void setNppStream(cudaStream_t& stream) {
 	}
 };
 
-//把CUDA资源复制给DX11纹理
+//把CUDA资源复制给DX11纹理(这里有个算是我遇到最奇怪的BUG之一,有行中文注释会导致这函数不能运行?)
 inline void gpuMat2D3dTexture(cv::cuda::GpuMat frame, Dx11CudaResource& cudaResource, cudaStream_t stream) {
 	if (cudaResource.texture != nullptr) {
 		//cuda map dx11,资源数组间map
-		cudaGraphicsMapResources(1, &cudaResource.cudaResource, stream);
-		//map单个资源
-		cudaGraphicsSubResourceGetMappedArray(&cudaResource.cuArray, cudaResource.cudaResource, 0, 0);
-		//从cuda显存里把数据复制给dx11注册的cuda显存里
-		cudaMemcpy2DToArray(cudaResource.cuArray, 0, 0, frame.ptr(), frame.step, frame.cols * sizeof(int32_t), frame.rows, cudaMemcpyDeviceToDevice);
+		cudaError_t cerror = cudaGraphicsMapResources(1, &cudaResource.cudaResource, stream);
+		//map单个资源 cuda->(dx11 bind cuda resource)
+		cerror = cudaGraphicsSubResourceGetMappedArray(&cudaResource.cuArray, cudaResource.cudaResource, 0, 0);
+		cerror = cudaMemcpy2DToArray(cudaResource.cuArray, 0, 0, frame.ptr(), frame.step, frame.cols * sizeof(int32_t), frame.rows, cudaMemcpyDeviceToDevice);
 		//cuda unmap dx11
-		cudaGraphicsUnmapResources(1, &cudaResource.cudaResource, stream);
+		cerror = cudaGraphicsUnmapResources(1, &cudaResource.cudaResource, stream);
 	}
 };
 
@@ -54,9 +53,8 @@ inline void d3dTexture2GpuMat(cv::cuda::GpuMat frame, Dx11CudaResource& cudaReso
 	if (cudaResource.texture != nullptr) {
 		//cuda map dx11,资源数组间map
 		cudaGraphicsMapResources(1, &cudaResource.cudaResource, stream);
-		//map单个资源
+		//map单个资源 (dx11 bind cuda resource)->cuda
 		cudaGraphicsSubResourceGetMappedArray(&cudaResource.cuArray, cudaResource.cudaResource, 0, 0);
-		//从cuda显存里把数据复制给dx11注册的cuda显存里
 		cudaMemcpy2DFromArray(frame.ptr(), frame.step, cudaResource.cuArray, 0, 0, frame.cols * sizeof(int32_t), frame.rows, cudaMemcpyDeviceToDevice);
 		//cuda unmap dx11
 		cudaGraphicsUnmapResources(1, &cudaResource.cudaResource, stream);
@@ -70,7 +68,7 @@ inline bool registerCudaResource(Dx11CudaResource& cudaDx11, std::shared_ptr<Dx1
 	bool bInit = sharedResource->restart(device, width, height);
 	if (bInit) {
 		cudaDx11.texture = sharedResource->texture->texture;
-		auto result = cudaGraphicsD3D11RegisterResource(&cudaDx11.cudaResource, cudaDx11.texture, cudaGraphicsRegisterFlagsNone);
+		cudaError_t result = cudaGraphicsD3D11RegisterResource(&cudaDx11.cudaResource, cudaDx11.texture, cudaGraphicsRegisterFlagsNone);
 		if (result != cudaSuccess) {
 			logMessage(OEIP_INFO, "cudaGraphicsD3D11RegisterResource fails.");
 		}

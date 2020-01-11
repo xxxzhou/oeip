@@ -6,7 +6,7 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 	outCount = outSize;
 	forwardNames.resize(inSize);
 	forwardOutIndexs.resize(inSize);
-	forwardLayerIndexs.resize(inSize);
+	forwardLayerIndexs.resize(inSize, -1);
 	selfConnects.resize(inSize);
 	outConnects.resize(outSize);
 	//默认用OEIP_CV_8UC4来传递各层数据
@@ -20,7 +20,7 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 
 bool BaseLayer::initLayer() {
 	std::string inputMeg = layerType == OEIP_INPUT_LAYER ? " input layer " : " forward layer ";
-	std::string layerMeg = "check " + layerName + " in:" + std::to_string(layerIndex) + " " + getLayerName(layerType) + inputMeg;
+	std::string layerMeg = "check layer:" + layerName + "-in:" + std::to_string(layerIndex) + " " + inputMeg;
 	for (uint32_t i = 0; i < inCount; i++) {
 		LayerConnect lc = selfConnects[i];
 		if (layerType <= 0) {
@@ -30,7 +30,8 @@ bool BaseLayer::initLayer() {
 		}
 		if (layerType != OEIP_INPUT_LAYER) {
 			if (forwardNames[i].empty()) {
-				forwardLayerIndexs[i] = layerIndex - 1;
+				if (forwardLayerIndexs[i] < 0)
+					forwardLayerIndexs[i] = layerIndex - 1;
 			}
 			else {
 				forwardLayerIndexs[i] = imageProcess->findLayer(forwardNames[i]);

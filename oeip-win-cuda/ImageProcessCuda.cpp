@@ -3,6 +3,7 @@
 #include "InputLayerCuda.h"
 #include "OutputLayerCuda.h"
 #include "CudaComputeLayer.h"
+#include "DarknetLayer.h"
 
 ImageProcessCuda::ImageProcessCuda() {
 	stream = {};
@@ -13,7 +14,7 @@ ImageProcessCuda::~ImageProcessCuda() {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 }
 
-BaseLayer * ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
+BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
 	BaseLayer* layer = nullptr;
 	switch (layerType)
 	{
@@ -43,6 +44,9 @@ BaseLayer * ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
 	case OEIP_BLEND_LAYER:
 		layer = new BlendLayerCuda();
 		break;
+	case OEIP_DARKNET_LAYER:
+		layer = new DarknetLayerCuda();
+		break;
 	case OEIP_MAX_LAYER:
 		break;
 	default:
@@ -66,7 +70,7 @@ void ImageProcessCuda::onRunLayers() {
 	}
 }
 
-void ImageProcessCuda::getGpuMat(int32_t layerIndex, cv::cuda::GpuMat & gpuMat, int32_t inIndex) {
+void ImageProcessCuda::getGpuMat(int32_t layerIndex, cv::cuda::GpuMat& gpuMat, int32_t inIndex) {
 	auto layer = std::dynamic_pointer_cast<LayerCuda>(layers[layerIndex]);
 	gpuMat = layer->outMats[inIndex];
 }

@@ -80,6 +80,13 @@ void ImageProcess::connectLayer(int32_t layerIndex, const std::string& forwardNa
 	layer->forwardOutIndexs[selfIndex] = inputIndex;
 }
 
+void ImageProcess::connectLayer(int32_t layerIndex, int32_t forwardIndex, int32_t inputIndex, int32_t selfIndex) {
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXVOID;
+	layer->forwardLayerIndexs[selfIndex] = forwardIndex;
+	layer->forwardOutIndexs[selfIndex] = inputIndex;
+}
+
 void ImageProcess::updateInput(int32_t layerIndex, uint8_t* data, int32_t intputIndex) {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	OEIP_CHECKPIPEINDEXVOID;

@@ -37,6 +37,7 @@ public:
 	};
 	int32_t addLayer(const std::string& name, OeipLayerType layerType, const void* paramet = nullptr);
 	void connectLayer(int32_t layerIndex, const std::string& forwardName, int32_t inputIndex = 0, int32_t selfIndex = 0);
+	void connectLayer(int32_t layerIndex, int32_t forwardIndex, int32_t inputIndex = 0, int32_t selfIndex = 0);
 	template<typename T>
 	bool updateLayer(int32_t layerIndex, const T& t);
 	bool updateLayer(int32_t layerIndex, const void* paramet);

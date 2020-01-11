@@ -1,5 +1,15 @@
 #include "OutputLayerCuda.h"
 
+//void gpuMat2D3dTexture(cv::cuda::GpuMat frame, Dx11CudaResource& cudaResource, cudaStream_t stream) {
+//	if (cudaResource.texture != nullptr) {
+//		//cuda map dx11,资源数组间map
+//		cudaError_t cerror = cudaGraphicsMapResources(1, &cudaResource.cudaResource, stream);		
+//		cerror = cudaGraphicsSubResourceGetMappedArray(&cudaResource.cuArray, cudaResource.cudaResource, 0, 0);		
+//		cerror = cudaMemcpy2DToArray(cudaResource.cuArray, 0, 0, frame.ptr(), frame.step, frame.cols * sizeof(int32_t), frame.rows, cudaMemcpyDeviceToDevice);		
+//		cerror = cudaGraphicsUnmapResources(1, &cudaResource.cudaResource, stream);
+//	}
+//};
+
 OutputLayerCuda::OutputLayerCuda() {
 	shardTexs.resize(inCount);
 	cudaResoures.resize(inCount);

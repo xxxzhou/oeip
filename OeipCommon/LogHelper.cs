@@ -9,10 +9,10 @@ namespace OeipCommon
 {
     public enum OeipLogLevel
     {
-        Info,
-        Warn,
-        Error,
-        Alart,
+        OEIP_INFO,
+        OEIP_WARN,
+        OEIP_ERROR,
+        OEIP_ALORT,
     }
 
     public static class LogHelper
@@ -39,16 +39,16 @@ namespace OeipCommon
             LogLevel level = LogLevel.Info;
             switch (logLevel)
             {
-                case OeipLogLevel.Info:
+                case OeipLogLevel.OEIP_INFO:
                     level = LogLevel.Info;
                     break;
-                case OeipLogLevel.Warn:
+                case OeipLogLevel.OEIP_WARN:
                     level = LogLevel.Warn;
                     break;
-                case OeipLogLevel.Error:
+                case OeipLogLevel.OEIP_ERROR:
                     level = LogLevel.Error;
                     break;
-                case OeipLogLevel.Alart:
+                case OeipLogLevel.OEIP_ALORT:
                     level = LogLevel.Fatal;
                     break;
             }
