@@ -96,12 +96,34 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\oeip-win-cuda\colorconvert.h" />
+    <ClInclude Include="..\oeip-win-cuda\common_help.h" />
+    <ClInclude Include="..\oeip-win-cuda\cuda_help.h" />
+    <ClInclude Include="..\oeip-win-cuda\fastguidedfilter.h" />
+    <ClInclude Include="..\oeip-win-cuda\GMMCuda.h" />
+    <ClInclude Include="..\oeip-win-cuda\GrabcutCuda.h" />
+    <ClInclude Include="..\oeip-win-cuda\GraphCuda.h" />
+    <ClInclude Include="..\oeip-win-cuda\helper_math.h" />
+    <ClInclude Include="..\oeip-win-cuda\KmeansCuda.h" />
+    <ClInclude Include="..\oeip-win-cuda\matting_cuda.h" />
+    <ClInclude Include="..\oeip-win-cuda\matting_help.h" />
+    <ClInclude Include="..\oeip-win-cuda\opencvcuda.h" />
     <ClInclude Include="testdarknet.h" />
+    <ClInclude Include="testgrabcut.h" />
     <ClInclude Include="trainDarknet.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\oeip-win-cuda\GMMCuda.cpp" />
+    <ClCompile Include="..\oeip-win-cuda\GrabcutCuda.cpp" />
+    <ClCompile Include="..\oeip-win-cuda\GraphCuda.cpp" />
+    <ClCompile Include="..\oeip-win-cuda\KmeansCuda.cpp" />
     <ClCompile Include="oeip-cude-test.cpp" />
     <ClCompile Include="trainDarknet.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\oeip-win-cuda\CudaWrapper.cu" />
+    <CudaCompile Include="..\oeip-win-cuda\matting_cuda.cu" />
+    <CudaCompile Include="..\oeip-win-cuda\OpencvWrapper.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -22,11 +22,12 @@ public:
 	int32_t getFormat() {
 		return selectIndex;
 	};
+	int32_t findFormatIndex(int32_t width, int32_t height, int32_t fps = 30);
 public:
 	virtual bool setFormat(uint32_t index);
 	virtual wchar_t* getDeviceName() { return nullptr; };
 	virtual wchar_t* getDeviceID() { return nullptr; };
-	
+
 	virtual void getFormat(uint32_t index, VideoFormat& format);
 	virtual bool openDevice() { return false; };
 	virtual bool closeDevice() { return false; };

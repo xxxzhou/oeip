@@ -23,8 +23,7 @@ namespace OeipEncoderVideo
 	//template<int32_t inSize, int32_t outSize>
 	cv::Mat* show = nullptr;
 	int32_t devicdIndex = 0;
-	int32_t formatIndex = 0;
-	int32_t inputLayerIndex = 0;
+	int32_t formatIndex = 0;	
 	int32_t width = 1920;
 	int32_t height = 1080;
 	OeipVideoType videoType = OEIP_VIDEO_OTHER;

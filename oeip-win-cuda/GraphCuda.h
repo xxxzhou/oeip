@@ -1,5 +1,7 @@
-﻿#pragma once
+#pragma once
+
 #include "matting_cuda.h"
+
 class GraphCuda
 {
 public:

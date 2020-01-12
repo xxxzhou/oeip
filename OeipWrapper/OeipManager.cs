@@ -38,6 +38,7 @@ namespace OeipWrapper
                 });
             OeipDevices = devices.ToList();
         }
+
         //得到OeipCamera类型或是对应子类
         public T GetCamera<T>(int cameraId) where T : OeipCamera, new()
         {

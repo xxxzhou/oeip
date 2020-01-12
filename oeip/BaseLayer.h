@@ -78,7 +78,8 @@ public:
 protected:
 	//当前层buffer有没初始化
 	bool bBufferInit = false;
-
+	//当前层只是在层绘制内容，并不需要申请输出,如果为true,请不要在当前层使用outGPU显存
+	bool bOnlyDraw = false;
 	class ImageProcess* imageProcess = nullptr;
 protected:
 	int32_t inCount = 1;
@@ -91,7 +92,7 @@ protected:
 	virtual void onInitLayer() {};
 	//和每层输入有关的初始化
 	virtual void onInitLayer(int32_t index) {};
-	//相应的GPU显存申请
+	//相应的GPU显存申请(连接上层的输出,申请当前层的输出)
 	virtual bool onInitBuffer() { return true; }
 	virtual void onRunLayer() {};
 public:
@@ -106,6 +107,7 @@ public:
 	bool initBuffer();
 	void runLayer();
 	void updateParamet(const void* paramet);
+	bool onlyDraw() { return bOnlyDraw; };
 public:
 	int32_t getForwardIndex(int32_t inputIndex) {
 		return forwardLayerIndexs[inputIndex];

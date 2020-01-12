@@ -23,11 +23,12 @@ public:
 	virtual ~LayerCuda();
 public:
 	std::vector<cv::cuda::GpuMat> outMats;
-protected:
 	std::vector<cv::cuda::GpuMat> inMats;
+protected:	
 	ImageProcessCuda* ipCuda = nullptr;
 protected:
 	virtual void setImageProcess(ImageProcess* process) override;
+	//子类如果要改变实现，没有特殊处理,一定要调用LayerCuda::onInitBuffer,用来连接上层输出
 	virtual bool onInitBuffer() override;
 };
 

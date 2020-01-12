@@ -10,7 +10,7 @@ void LayerCuda::setImageProcess(ImageProcess * process) {
 
 bool LayerCuda::onInitBuffer() {
 	bool bInit = true;
-	if (layerType != OEIP_OUTPUT_LAYER) {
+	if (layerType != OEIP_OUTPUT_LAYER && !bOnlyDraw) {
 		for (int32_t i = 0; i < outCount; i++) {
 			outMats[i].create(outConnects[i].height, outConnects[i].width, outConnects[i].dataType);
 		}

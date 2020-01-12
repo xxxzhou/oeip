@@ -19,7 +19,8 @@
 3 完成一个CUDA初步模块,提供Grabcut算法,darknet集成。
 4 多媒体直播(推流，拉流等)
 5 完善C#封装层,C# WinForm相关DEMO代码
-5 完善UE4/Unity3D 相关DEMO代码
+6 完善UE4/Unity3D 相关DEMO代码
+7 传入DX11纹理的测试
 
 
 

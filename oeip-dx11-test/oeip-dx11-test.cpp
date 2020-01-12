@@ -1,6 +1,6 @@
 // oeip-dx11-test.cpp : 定义应用程序的入口点。
 //
-
+//DX11自身的简单例子改下拿来测试直接传出DX11纹理效果
 
 #include "oeip-dx11-test.h"
 #include <windows.h>
@@ -25,8 +25,7 @@ ID3D11Device* g_pd3dDevice = NULL;
 ID3D11DeviceContext* g_pImmediateContext = NULL;
 IDXGISwapChain* g_pSwapChain = NULL;
 ID3D11RenderTargetView* g_pRenderTargetView = NULL;
-Dx11Texture* dx11Tex = nullptr;
-
+ID3D11Texture2D* pBackBuffer = nullptr;
 //--------------------------------------------------------------------------------------
 // Forward declarations
 //--------------------------------------------------------------------------------------
@@ -42,21 +41,18 @@ int32_t formatIndex = 0;
 int32_t inputLayerIndex = 0;
 int32_t width = 1920;
 int32_t height = 1080;
-std::vector<uint8_t> data;
+//std::vector<uint8_t> data;
 std::mutex mtx;
 OeipVideoType videoType = OEIP_VIDEO_OTHER;
 VideoPipe* vpipe = nullptr;
 
 void dataRecive(uint8_t* ddata, int32_t width, int32_t height) {
-	std::lock_guard<std::mutex> mtx_locker(mtx);
-	//data = ddata;
-	if (videoType == OEIP_VIDEO_NV12)
-		memcpy(data.data(), ddata, width * height * 3 / 2);
-	else
-		memcpy(data.data(), ddata, width * height * 2);
-	//std::cout << width << height << std::endl;
-	//updatePipeInput(pipeId, inputLayerIndex, data);
-	//runPipe(pipeId);
+	std::lock_guard<std::mutex> mtx_locker(mtx);	
+	//if (videoType == OEIP_VIDEO_NV12)
+	//	memcpy(data.data(), ddata, width * height * 3 / 2);
+	//else
+	//	memcpy(data.data(), ddata, width * height * 2);
+	vpipe->runVideoPipe(0, ddata);
 }
 
 void onPipeData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex) {
@@ -92,18 +88,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		std::vector<VideoFormat> formats;
 		formats.resize(formatCount);
 		getFormatList(devicdIndex, formats.data(), formatCount);
+		formatIndex = findFormatIndex(devicdIndex, width, height);
 
 		setFormat(devicdIndex, formatIndex);
 		openDevice(devicdIndex);
 
 		videoType = formats[formatIndex].videoType;
-		vpipe->setVideoFormat(videoType, width, height);
-
-		data.resize(width * height * 2);
-		dx11Tex = new Dx11Texture();
-		dx11Tex->setNoView(true);
-		dx11Tex->setTextureSize(width, height);
-		dx11Tex->initResource(g_pd3dDevice);
+		width = formats[formatIndex].width;
+		height = formats[formatIndex].height;
+		vpipe->setVideoFormat(videoType, width, height);		
 	}
 
 	// Main message loop
@@ -194,8 +187,8 @@ HRESULT InitDevice()
 
 	RECT rc;
 	GetClientRect(g_hWnd, &rc);
-	UINT width = rc.right - rc.left;
-	UINT height = rc.bottom - rc.top;
+	//UINT width = rc.right - rc.left;
+	//UINT height = rc.bottom - rc.top;
 
 	UINT createDeviceFlags = 0;
 #ifdef _DEBUG
@@ -223,7 +216,7 @@ HRESULT InitDevice()
 	sd.BufferCount = 1;
 	sd.BufferDesc.Width = width;
 	sd.BufferDesc.Height = height;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;//DXGI_FORMAT_B8G8R8A8_UNORM,DXGI_FORMAT_R8G8B8A8_UNORM
 	sd.BufferDesc.RefreshRate.Numerator = 60;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -244,13 +237,13 @@ HRESULT InitDevice()
 		return hr;
 
 	// Create a render target view
-	ID3D11Texture2D* pBackBuffer = NULL;
+	//ID3D11Texture2D* pBackBuffer = NULL;
 	hr = g_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 	if (FAILED(hr))
 		return hr;
 
 	hr = g_pd3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &g_pRenderTargetView);
-	pBackBuffer->Release();
+	//pBackBuffer->Release();
 	if (FAILED(hr))
 		return hr;
 
@@ -274,13 +267,8 @@ HRESULT InitDevice()
 //--------------------------------------------------------------------------------------
 void Render()
 {
-	std::lock_guard<std::mutex> mtx_locker(mtx);
-
-	vpipe->runVideoPipe(0, data.data());
-	setPipeOutputGpuTex(vpipe->getPipeId(), vpipe->getOutputId(), g_pd3dDevice, dx11Tex->texture);
-	// Just clear the backbuffer
-	float ClearColor[4] = { 0.0f, 0.125f, 0.3f, 1.0f }; //red,green,blue,alpha
-	g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
+	setPipeOutputGpuTex(vpipe->getPipeId(), vpipe->getOutputId(), g_pd3dDevice, pBackBuffer);
+	//g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
 	g_pSwapChain->Present(0, 0);
 }
 
@@ -290,6 +278,7 @@ void Render()
 //--------------------------------------------------------------------------------------
 void CleanupDevice()
 {
+	if (pBackBuffer) pBackBuffer->Release();
 	if (g_pImmediateContext) g_pImmediateContext->ClearState();
 
 	if (g_pRenderTargetView) g_pRenderTargetView->Release();

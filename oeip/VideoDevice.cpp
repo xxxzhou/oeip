@@ -9,6 +9,40 @@ VideoDevice::VideoDevice() {
 VideoDevice::~VideoDevice() {
 }
 
+int32_t VideoDevice::findFormatIndex(int32_t width, int32_t height, int32_t fps) {
+	int32_t index = 0;
+	if (videoFormats.size() < 0)
+		return -1;
+	bool bFind = false;
+	int32_t first = -1;
+	int32_t second = -1;
+	int32_t three = 0;
+	VideoFormat preFormat = videoFormats[0];
+	for (const VideoFormat& format : videoFormats) {
+		if (format.width == width && format.height == height && format.fps == fps) {
+			bFind = true;
+			//尽量不选MJPG,多了解码的消耗
+			if (format.videoType != OEIP_VIDEO_MJPG)
+				first = index;
+			else
+				second = index;
+		}
+		//选一个分辨率最大的
+		if (format.height >= preFormat.height && format.width >= preFormat.height && format.fps >= 20 && format.fps <= 60) {
+			//桢优先然后是格式
+			if (format.fps > preFormat.fps || (format.fps == preFormat.fps && format.videoType != OEIP_VIDEO_MJPG)) {
+				three = index;
+				preFormat = format;
+			}
+		}
+		index++;
+	}
+	if (bFind) {
+		return first >= 0 ? first : second;
+	}
+	return three;
+}
+
 bool VideoDevice::setFormat(uint32_t index) {
 	if (index < 0 || index >= videoFormats.size())
 		index = 0;

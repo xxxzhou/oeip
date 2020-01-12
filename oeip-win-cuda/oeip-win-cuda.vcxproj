@@ -95,7 +95,8 @@
     <ClInclude Include="CudaComputeLayer.h" />
     <ClInclude Include="DarknetLayer.h" />
     <ClInclude Include="GMMCuda.h" />
-    <ClInclude Include="GrabCutCude.h" />
+    <ClInclude Include="GrabcutCuda.h" />
+    <ClInclude Include="GrabcutLayerCuda.h" />
     <ClInclude Include="GraphCuda.h" />
     <ClInclude Include="GuidedFilterLayer.h" />
     <ClInclude Include="ImageProcessCuda.h" />
@@ -124,7 +125,8 @@
     <ClCompile Include="CudaComputeLayer.cpp" />
     <ClCompile Include="DarknetLayer.cpp" />
     <ClCompile Include="GMMCuda.cpp" />
-    <ClCompile Include="GrabCutCude.cpp" />
+    <ClCompile Include="GrabcutCuda.cpp" />
+    <ClCompile Include="GrabcutLayerCuda.cpp" />
     <ClCompile Include="GraphCuda.cpp" />
     <ClCompile Include="GuidedFilterLayer.cpp" />
     <ClCompile Include="ImageProcessCuda.cpp" />

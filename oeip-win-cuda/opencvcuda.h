@@ -11,7 +11,7 @@ using namespace cv::cuda::device;
 
 //copy opencv resize实现，因为引入opencv_cudawarping太大
 template <typename T> __global__
-void resize_nearest(const PtrStep<T> src, PtrStepSz<T> dst, const float fy, const float fx) {
+void resize_nearest(const PtrStep<T> src, PtrStepSz<T> dst, const float fx, const float fy) {
 	const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;
 	const int dst_y = blockDim.y * blockIdx.y + threadIdx.y;
 
@@ -24,7 +24,7 @@ void resize_nearest(const PtrStep<T> src, PtrStepSz<T> dst, const float fy, cons
 }
 
 template <typename T> __global__
-void resize_linear(const PtrStepSz<T> src, PtrStepSz<T> dst, const float fy, const float fx) {
+void resize_linear(const PtrStepSz<T> src, PtrStepSz<T> dst, const float fx, const float fy) {
 	typedef typename TypeVec<float, VecTraits<T>::cn>::vec_type work_type;
 
 	const int dst_x = blockDim.x * blockIdx.x + threadIdx.x;

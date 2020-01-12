@@ -83,10 +83,11 @@ void GraphCuda::addTermWeights(GpuMat source, gmmI& gmmbg, gmmI& gmmfg, float we
 	addTermWeights_gpu(source, push, sink, gmmbg, gmmfg, weightOffset, cudaStream);
 }
 
-void GraphCuda::addEdges(GpuMat source, float gamma) {
+void GraphCuda::addEdges(GpuMat source, float gamma) {	
 	//边缘部分值很小,在0-1左右,而非边缘部分值在gamma-1左右
 	calcBeta_gpu(source, tempDiffs, edgeCount, *beta, cudaStream);
 	addEdges_gpu(source, rightEdge, leftEdge, upEdge, downEdge, beta, gamma, cudaStream);
+	//showMat(rightEdge, leftEdge, downEdge);
 }
 
 void GraphCuda::maxFlow(GpuMat mask, int maxCount) {
@@ -99,6 +100,7 @@ void GraphCuda::maxFlow(GpuMat mask, int maxCount) {
 			rightPull, leftPull, upPull, downPull, cudaStream);
 		count++;
 	}
+	//showMat(push, sink, graphHeight);
 	bfsInit_gpu(gmask, push, sink, graphHeight, cudaStream);
 	int cbOver = true;
 	count = 1;

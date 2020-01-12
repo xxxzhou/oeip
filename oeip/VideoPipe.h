@@ -33,6 +33,9 @@ public:
 	int32_t getOutYuvId() {
 		return outYuv2Index;
 	}
+	int32_t getResizeId() {
+		return resizeIndex;
+	}
 	void setVideoFormat(OeipVideoType videoType, int32_t width, int32_t height);
 	void runVideoPipe(int32_t layerIndex, uint8_t* data);
 };

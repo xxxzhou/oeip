@@ -30,6 +30,7 @@ void main(uint3 DTid : SV_DispatchThreadID) {
 	if (DTid.x >= width || DTid.y >= height)
 		return;
 	float4 color = texIn[DTid.xy];
+	//DTid 线程转化成对应UV坐标，需要分别加0.5
 	float2 uv = float2((DTid.x + 0.5) / width, (DTid.y + 0.5) / height);
 	if (uv.x >= left && uv.x < left + width2 && uv.y >= top && uv.y < top + height2) {
 		float2 uv2 = float2((uv.x - left) / width2, (uv.y - top) / height2);

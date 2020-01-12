@@ -16,8 +16,7 @@ ImageProcessCuda::~ImageProcessCuda() {
 
 BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
 	BaseLayer* layer = nullptr;
-	switch (layerType)
-	{
+	switch (layerType) {
 	case OEIP_NONE_LAYER:
 		break;
 	case OEIP_INPUT_LAYER:
@@ -72,7 +71,10 @@ void ImageProcessCuda::onRunLayers() {
 
 void ImageProcessCuda::getGpuMat(int32_t layerIndex, cv::cuda::GpuMat& gpuMat, int32_t inIndex) {
 	auto layer = std::dynamic_pointer_cast<LayerCuda>(layers[layerIndex]);
-	gpuMat = layer->outMats[inIndex];
+	if (layer->onlyDraw())
+		gpuMat = layer->inMats[inIndex];
+	else
+		gpuMat = layer->outMats[inIndex];
 }
 
 bool bCanLoad() {

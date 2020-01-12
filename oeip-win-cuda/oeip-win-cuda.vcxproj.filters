@@ -60,9 +60,6 @@
     <ClInclude Include="GMMCuda.h">
       <Filter>grabcut</Filter>
     </ClInclude>
-    <ClInclude Include="GrabCutCude.h">
-      <Filter>grabcut</Filter>
-    </ClInclude>
     <ClInclude Include="GraphCuda.h">
       <Filter>grabcut</Filter>
     </ClInclude>
@@ -77,6 +74,12 @@
     </ClInclude>
     <ClInclude Include="DarknetLayer.h">
       <Filter>darknet</Filter>
+    </ClInclude>
+    <ClInclude Include="GrabcutLayerCuda.h">
+      <Filter>grabcut</Filter>
+    </ClInclude>
+    <ClInclude Include="GrabcutCuda.h">
+      <Filter>grabcut</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,9 +104,6 @@
     <ClCompile Include="GMMCuda.cpp">
       <Filter>grabcut</Filter>
     </ClCompile>
-    <ClCompile Include="GrabCutCude.cpp">
-      <Filter>grabcut</Filter>
-    </ClCompile>
     <ClCompile Include="GraphCuda.cpp">
       <Filter>grabcut</Filter>
     </ClCompile>
@@ -112,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="DarknetLayer.cpp">
       <Filter>darknet</Filter>
+    </ClCompile>
+    <ClCompile Include="GrabcutLayerCuda.cpp">
+      <Filter>grabcut</Filter>
+    </ClCompile>
+    <ClCompile Include="GrabcutCuda.cpp">
+      <Filter>grabcut</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

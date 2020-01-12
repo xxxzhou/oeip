@@ -175,6 +175,12 @@ bool bOpen(int32_t deviceIndex) {
 	return device->bOpen();
 }
 
+int32_t findFormatIndex(int32_t deviceIndex, int32_t width, int32_t height, int32_t fps) {
+	OEIP_CHECKINSTANCEINT;
+	OEIP_CHECKDEVICEINT;
+	return device->findFormatIndex(width, height, fps);
+}
+
 void getDeviceParametrs(int32_t deviceIndex, CamParametrs* parametrs) {
 	OEIP_CHECKINSTANCEVOID;
 	OEIP_CHECKDEVICEVOID;

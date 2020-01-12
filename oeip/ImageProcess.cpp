@@ -153,6 +153,14 @@ bool ImageProcess::getEnableLayerList(int32_t layerIndex, bool& bDListChange) {
 	return !layer->bDisableList;
 }
 
+OeipLayerType ImageProcess::getLayerType(int32_t layerIndex) {
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	if (layerIndex<0 || layerIndex > layers.size())
+		return OEIP_NONE_LAYER;
+	auto layer = layers[layerIndex];
+	return layer->layerType;
+}
+
 int32_t ImageProcess::findLayer(const std::string& name) {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	int32_t index = 0;

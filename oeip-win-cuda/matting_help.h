@@ -63,13 +63,28 @@ inline __global__ void setMask(PtrStepSz<uchar> mask, int x, int y, int radius, 
 {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx == x && idy == y)
+	if (idx > max(0, x - radius) && idx < min(mask.cols, x + radius)
+		&& idy > max(0, y - radius) && idy < min(mask.rows, y + radius))
 	{
-		for (int j = max(0, idy - radius); j < min(mask.rows, idy + radius); j += 1)
-			for (int i = max(0, idx - radius); i < min(mask.cols, idx + radius); i += 1)
-			{
-				mask(j, i) = vmask;
-			}
+		mask(idy, idx) = vmask;
+	}
+}
+
+inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask)
+{
+	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+	if (idx < source.cols && idy < source.rows)
+	{
+		int vmask = mask(idy, idx);
+		if (vmask == 0)
+		{
+			source(idy, idx) = make_uchar4(0, 0, 0, 255);
+		}
+		else if (vmask == 1)
+		{
+			source(idy, idx) = make_uchar4(255, 255, 255, 255);
+		}
 	}
 }
 
@@ -442,6 +457,7 @@ inline __global__ void assignGMM(PtrStepSz<uchar4> source, PtrStepSz<uchar> clus
 	}
 }
 
+
 template<int blockx, int blocky>
 inline __global__ void calcBeta(PtrStepSz<uchar4> source, float* tempDiffs)
 {
@@ -600,7 +616,7 @@ inline __global__ void addTermWeights(PtrStepSz<uchar4> source, PtrStepSz<float>
 //前景区域 push大sink小 背景相反
 //经测试,如果显存块又写又读,会有问题
 template<int blockx, int blocky>
-__global__ void push_relabe(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
+__global__ void push_relabel(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
 	PtrStepSz<float> rightEdge, PtrStepSz<float> leftEdge, PtrStepSz<float> upEdge, PtrStepSz<float> downEdge,
 	PtrStepSz<float> rightPull, PtrStepSz<float> leftPull, PtrStepSz<float> upPull, PtrStepSz<float> downPull)
 {
@@ -733,8 +749,13 @@ __global__ void push_relabe(PtrStepSz<float> push, PtrStepSz<float> sink, PtrSte
 	}
 }
 
+//edge是自己向四边的值，pull是四边向自己的值
+//每次迭代，分三段。1-产生从push流向各边。2-加上各边push来的值。3-重新设置height值
+//重标记高度，如果当前点push>=sink,选择能流向的四周最小高度,根据这个高度加1,下次可以从当前节点流向这边
+//前景区域 push大sink小 背景相反
+//经测试,如果显存块又写又读,会有问题
 template<int blockx, int blocky>
-__global__ void push_relabel(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
+__global__ void push_relabel1(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<int> graphHeight,
 	PtrStepSz<float> rightEdge, PtrStepSz<float> leftEdge, PtrStepSz<float> upEdge, PtrStepSz<float> downEdge,
 	PtrStepSz<float> rightPull, PtrStepSz<float> leftPull, PtrStepSz<float> upPull, PtrStepSz<float> downPull)
 {
@@ -811,6 +832,14 @@ __global__ void push_relabel(PtrStepSz<float> push, PtrStepSz<float> sink, PtrSt
 		rightPull(idy, idx + 1) = rightFlow;
 		downPull(idy + 1, idx) = downFlow;
 		upPull(idy - 1, idx) = upFlow;
+
+		//记录对应各个数据的新值
+		push(idy, idx) = flowPush;
+		sink(idy, idx) = sinkPush;
+		leftEdge(idy, idx) = leftedge;
+		rightEdge(idy, idx) = rightedge;
+		downEdge(idy, idx) = downedge;
+		upEdge(idy, idx) = upedge;
 	}
 }
 

@@ -26,8 +26,8 @@ VideoPipe::VideoPipe(OeipGpgpuType gpuType) {
 	updatePipeParamet(pipeId, t1, &ry);
 	updatePipeParamet(pipeId, t2, &yr);
 	MapChannelParamet mp = {};
-	mp.red = 2;
-	mp.blue = 0;
+	mp.red = 0;
+	mp.blue = 2;
 	updatePipeParamet(pipeId, outMap, &mp);
 }
 

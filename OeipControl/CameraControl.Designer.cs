@@ -37,7 +37,9 @@ namespace OeipControl
             this.panel3 = new System.Windows.Forms.Panel();
             this.displayDx11 = new OeipControl.DisplayDx11();
             this.displayWF = new OeipControl.DisplayWF();
+            this.label3 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,6 +95,7 @@ namespace OeipControl
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.panel2.Controls.Add(this.label3);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 280);
             this.panel2.Name = "panel2";
@@ -126,6 +129,15 @@ namespace OeipControl
             this.displayWF.Size = new System.Drawing.Size(217, 220);
             this.displayWF.TabIndex = 0;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(21, 8);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "label3";
+            // 
             // CameraControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -137,6 +149,8 @@ namespace OeipControl
             this.Size = new System.Drawing.Size(477, 310);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -153,5 +167,6 @@ namespace OeipControl
         private System.Windows.Forms.ComboBox cbx_cameraList;
         private System.Windows.Forms.Label label1;
         private DisplayDx11 displayDx11;
+        private System.Windows.Forms.Label label3;
     }
 }

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <opencv2/core.hpp>
 #include <opencv2/core/cuda.hpp>
 #include <opencv2/highgui.hpp>
@@ -46,13 +46,12 @@ struct gmmI
 };
 
 template<typename T>
-void writerMat(GpuMat gpuMat)
-{
+void writerMat(GpuMat gpuMat) {
 	int width = gpuMat.cols;
 	int height = gpuMat.rows;
 	cv::Mat cpuresult;
 	gpuMat.download(cpuresult);
-	FILE *fp = fopen("result_sponge/a1.pgm", "w");
+	FILE* fp = fopen("result_sponge/a1.pgm", "w");
 	fprintf(fp, "%c", 'P');
 	fprintf(fp, "%c", '2');
 	fprintf(fp, "%c", '\n');
@@ -72,14 +71,12 @@ void writerMat(GpuMat gpuMat)
 	//exit(1);
 }
 
-inline void showMat(GpuMat gpuMat)
-{
+inline void showMat(GpuMat gpuMat) {
 	cv::Mat cpuresult;
 	gpuMat.download(cpuresult);
 }
 
-inline void showMat(GpuMat gpuMat, GpuMat gpuMat1, GpuMat gpuMat2)
-{
+inline void showMat(GpuMat gpuMat, GpuMat gpuMat1, GpuMat gpuMat2) {
 	cv::Mat cpuresult, cpuresult1, cpuresult2;
 	gpuMat.download(cpuresult);
 	gpuMat1.download(cpuresult1);

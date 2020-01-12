@@ -54,6 +54,13 @@ bool BaseLayer::initLayer() {
 				if (forwardLayerIndexs[i] < 0)
 					break;
 				bEnable = imageProcess->getEnableLayer(forwardLayerIndexs[i]);
+				//原则上,上层不能是输出层，输出层不会给下层数据,故自动向上一层
+				if (bEnable) {
+					OeipLayerType layerType = imageProcess->getLayerType(forwardLayerIndexs[i]);
+					bEnable = layerType != OEIP_OUTPUT_LAYER;
+					std::string message = layerMeg + "connect output layer,auto connect output previous layer.";
+					logMessage(OEIP_WARN, message.c_str());
+				}
 			}
 			if (forwardLayerIndexs[i] < 0) {
 				std::string message = layerMeg + "out of range.";

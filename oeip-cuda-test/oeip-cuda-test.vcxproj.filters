@@ -4,6 +4,9 @@
     <Filter Include="darknet">
       <UniqueIdentifier>{2abc9d07-2ce2-429e-8cda-7e57ae7d7027}</UniqueIdentifier>
     </Filter>
+    <Filter Include="cuda">
+      <UniqueIdentifier>{6567e8c4-d9f9-477b-9010-89a7f2afd511}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="trainDarknet.h">
@@ -12,11 +15,73 @@
     <ClInclude Include="testdarknet.h">
       <Filter>darknet</Filter>
     </ClInclude>
+    <ClInclude Include="testgrabcut.h">
+      <Filter>darknet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\cuda_help.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\fastguidedfilter.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\GMMCuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\GrabcutCuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\GraphCuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\helper_math.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\KmeansCuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\matting_cuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\matting_help.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\opencvcuda.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\colorconvert.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\oeip-win-cuda\common_help.h">
+      <Filter>cuda</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="trainDarknet.cpp">
       <Filter>darknet</Filter>
     </ClCompile>
     <ClCompile Include="oeip-cude-test.cpp" />
+    <ClCompile Include="..\oeip-win-cuda\GMMCuda.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\oeip-win-cuda\GrabcutCuda.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\oeip-win-cuda\GraphCuda.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
+    <ClCompile Include="..\oeip-win-cuda\KmeansCuda.cpp">
+      <Filter>cuda</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\oeip-win-cuda\CudaWrapper.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\oeip-win-cuda\matting_cuda.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\oeip-win-cuda\OpencvWrapper.cu">
+      <Filter>cuda</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

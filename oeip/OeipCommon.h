@@ -41,6 +41,8 @@ OEIPDLL_EXPORT std::string getLayerName(OeipLayerType layerType);
 
 OEIPDLL_EXPORT uint32_t divUp(int32_t x, int32_t y);
 
+OEIPDLL_EXPORT std::string getProgramPath();
+
 template <class T>
 void safeRelease(T*& ppT) {
 	if (ppT != nullptr) {

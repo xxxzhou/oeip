@@ -17,8 +17,7 @@ namespace OeipWrapper
     public class OeipPipe
     {
         private bool bSetInput = false;
-        public int PipeId
-        { get; private set; }
+        public int PipeId { get; private set; }
 
         protected OnProcessDelegate onProcessDelegate;
         public event OnProcessDelegate OnProcessEvent;
@@ -72,7 +71,7 @@ namespace OeipWrapper
         public unsafe bool UpdateParametStruct<T>(int layerIndex, T t) where T : struct
         {
             int length = Marshal.SizeOf(typeof(T));
-            ////auto recycle
+            //auto recycle
             byte* numbers = stackalloc byte[length];
             IntPtr ptr = new IntPtr(numbers);
             Marshal.StructureToPtr(t, ptr, false);

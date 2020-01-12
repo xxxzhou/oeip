@@ -58,6 +58,8 @@ namespace OeipControl
                 out deviceDx11, out swapChain);
             deviceCtx = deviceDx11.ImmediateContext;
             backBuffer = swapChain.GetBackBuffer<Texture2D>(0);
+            renderTargetView = new RenderTargetView(deviceDx11, backBuffer);
+            deviceCtx.OutputMerger.SetRenderTargets(renderTargetView);
             VideoPipe = videoPipe;
             this.timer.Interval = 1000 / videoFormat.fps;
             this.timer.Enabled = true;
@@ -67,9 +69,7 @@ namespace OeipControl
 
         private void Draw()
         {
-            VideoPipe.Pipe.setPipeOutputGpuTex(VideoPipe.OutIndex, deviceDx11.NativePointer, backBuffer.NativePointer);
-            renderTargetView = new RenderTargetView(deviceDx11, backBuffer);
-            deviceCtx.OutputMerger.SetRenderTargets(renderTargetView);
+            VideoPipe.Pipe.setPipeOutputGpuTex(VideoPipe.MattingOutIndex, deviceDx11.NativePointer, backBuffer.NativePointer);
             swapChain.Present(1, PresentFlags.None);
         }
     }

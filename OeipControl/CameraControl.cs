@@ -15,7 +15,8 @@ namespace OeipControl
     public partial class CameraControl : UserControl
     {
         private OeipCamera camera = null;
-        private OeipVideoPipe videoPipe = null;       
+        private OeipVideoPipe videoPipe = null;
+        private PersonBox[] personBox = null;
         public CameraControl()
         {
             InitializeComponent();
@@ -46,6 +47,25 @@ namespace OeipControl
             if (layerIndex == videoPipe.OutIndex)
             {
                 displayWF.UpdateImage(width, height, data);
+            }
+            else if (layerIndex == videoPipe.DarknetIndex)
+            {
+                personBox = PInvokeHelper.GetPInvokeArray<PersonBox>(width, data);
+                if (width > 0)
+                {
+                    Action action = () =>
+                    {
+                        if (personBox == null)
+                            return;
+                        string msg = string.Empty;
+                        foreach (var px in personBox)
+                        {
+                            msg += " " + px.prob;
+                        }
+                        this.label3.Text = $"人数:{width} {msg}";
+                    };
+                    this.BeginInvoke(action);
+                }
             }
         }
 

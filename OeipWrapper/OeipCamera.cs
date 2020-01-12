@@ -85,42 +85,9 @@ namespace OeipWrapper
 
         public int FindFormatIndex(int width, int height, int fps = 30)
         {
-            int index = 0;
-            if (VideoFormats.Count < 0)
+            if (!IsInit)
                 return -1;
-            bool bFind = false;
-            int first = -1;
-            int second = -1;
-            int three = 0;
-            VideoFormat preFormat = VideoFormats[0];
-            foreach (var format in VideoFormats)
-            {
-                if (format.width == width && format.height == height && format.fps == fps)
-                {
-                    bFind = true;
-                    //尽量不选MJPG,多了解码的消耗
-                    if (format.videoType != OeipVideoType.OEIP_VIDEO_MJPG)
-                        first = index;
-                    else
-                        second = index;
-                }
-                //选一个分辨率最大的
-                if (format.height >= preFormat.height && format.width >= preFormat.height && format.fps >= 20 && format.fps <= 60)
-                {
-                    //桢优先然后是格式
-                    if (format.fps > preFormat.fps || (format.fps == preFormat.fps && format.videoType != OeipVideoType.OEIP_VIDEO_MJPG))
-                    {
-                        three = index;
-                        preFormat = format;
-                    }
-                }
-                index++;
-            }
-            if (bFind)
-            {
-                return first >= 0 ? first : second;
-            }
-            return three;
+            return OeipHelper.findFormatIndex(Id, width, height, fps);
         }
 
         public void GetCameraFormatList(int index)

@@ -25,6 +25,11 @@ void setMask_gpu(PtrStepSz<uchar> mask, int x, int y, int radius, int vmask, cud
 	setMask << <grid, block, 0, stream >> > (mask, x, y, radius, vmask);
 }
 
+void showSeedMask_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask, cudaStream_t stream = nullptr) {	
+	dim3 grid(cv::divUp(source.cols, block.x), cv::divUp(source.rows, block.y));
+	showSeedMask << <grid, block, 0, stream >> > (source, mask);
+}
+
 void showSeedMask_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<uchar> mask, cudaStream_t stream = nullptr){
 	float fx = (float)source.cols / mask.cols;
 	float fy = (float)source.rows / mask.rows;
@@ -108,7 +113,13 @@ void push_relabel_gpu(PtrStepSz<float> push, PtrStepSz<float> sink, PtrStepSz<in
 	PtrStepSz<float> rightEdge, PtrStepSz<float> leftEdge, PtrStepSz<float> upEdge, PtrStepSz<float> downEdge,
 	PtrStepSz<float> rightPull, PtrStepSz<float> leftPull, PtrStepSz<float> upPull, PtrStepSz<float> downPull, cudaStream_t stream = nullptr){
 	dim3 grid(cv::divUp(push.cols, block.x), cv::divUp(push.rows, block.y));
-	push_relabel <BLOCK_X, BLOCK_Y> << <grid, block, 0, stream >> > (push, sink, graphHeight, rightEdge, leftEdge, upEdge, downEdge,
+	//push_relabel <BLOCK_X, BLOCK_Y> << <grid, block, 0, stream >> > (push, sink, graphHeight, rightEdge, leftEdge, upEdge, downEdge,
+	//	rightPull, leftPull, upPull, downPull);
+	//因Pull用来保存周边推送中间值，但是__syncthreads();并不能保存所有线程组同步，因为理论上中间值又写又读 边缘的值并不一定正确。
+	//因此分二步，一步先用来计算每点向四边推的值，二是计算每点得到的四周的推的值	
+	push_relabel1 <BLOCK_X, BLOCK_Y> << <grid, block, 0, stream >> > (push, sink, graphHeight, rightEdge, leftEdge, upEdge, downEdge,
+		rightPull, leftPull, upPull, downPull);
+	push_relabel2 <BLOCK_X, BLOCK_Y> << <grid, block, 0, stream >> > (push, sink, graphHeight, rightEdge, leftEdge, upEdge, downEdge,
 		rightPull, leftPull, upPull, downPull);
 }
 

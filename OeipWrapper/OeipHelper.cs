@@ -176,6 +176,7 @@ namespace OeipWrapper
         public uint drawColor;//255
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct PersonBox
     {
         //是人的概率
@@ -401,6 +402,9 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool bOpen(int deviceIndex);
+
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern int findFormatIndex(int deviceIndex, int width, int height, int fps = 30);
         /// <summary>
         /// 返回摄像机的内部参数设置
         /// </summary>

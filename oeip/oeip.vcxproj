@@ -115,6 +115,22 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>@echo ---------------------------------
+
+@echo [$(ProjectName)]生成完成..
+
+@echo 开始复制...
+
+COPY "$(OutDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
+
+COPY "$(OutDir)$(ProjectName).lib" "$(SolutionDir)install\bin\$(ProjectName).lib"
+
+COPY "$(SolutionDir)$(ProjectName)\Oeip.h" "$(SolutionDir)install\include\Oeip.h"
+COPY "$(SolutionDir)$(ProjectName)\OeipDefine.h" "$(SolutionDir)install\include\OeipDefine.h"
+COPY "$(SolutionDir)$(ProjectName)\OeipExport.h" "$(SolutionDir)install\include\OeipExport.h"
+@echo ---------------------------------</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AudioOutput.h" />

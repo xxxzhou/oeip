@@ -7,6 +7,7 @@ void image2netData_gpu(PtrStepSz<uchar4> source, float* outData, cudaStream_t st
 void drawRect_gpu(PtrStepSz<uchar4> source, cv::Rect rect, int radius, uchar4 drawColor, cudaStream_t stream = nullptr);
 
 DarknetLayerCuda::DarknetLayerCuda() {
+	bOnlyDraw = true;
 }
 
 DarknetLayerCuda::~DarknetLayerCuda() {
@@ -31,7 +32,7 @@ void DarknetLayerCuda::onParametChange(DarknetParamet oldT) {
 }
 
 bool DarknetLayerCuda::onInitBuffer() {
-	return true;
+	return LayerCuda::onInitBuffer();
 }
 
 void DarknetLayerCuda::onRunLayer() {
@@ -40,7 +41,7 @@ void DarknetLayerCuda::onRunLayer() {
 	resize_gpu(inMats[0], netFrame, true, nullptr);
 	image2netData_gpu(netFrame, netInput);
 	network_predict_gpudata(net, netInput);
-	int nboxes = 0;
+	int nboxes = 0; 
 	detection* dets = get_network_boxes(net, netWidth, netHeight, layerParamet.thresh, 0, 0, 1, &nboxes);
 	//排序,nms 合并框(满足条件的放前面,被合并的放后面并置0)
 	if (layerParamet.nms)
@@ -48,7 +49,8 @@ void DarknetLayerCuda::onRunLayer() {
 	int objectIndex = 0;//objectIndex 0 person 39 bottle，自己训练的模型只有人物
 	std::vector<PersonBox> personDets;
 	for (int i = 0; i < nboxes; i++) {
-		if (dets[i].objectness > layerParamet.thresh) {
+		//nms过小会导致只要人物重合度小也会prob置0
+		if (dets[i].prob[0] > layerParamet.thresh) {
 			auto det = dets[i];
 			PersonBox box = {};
 			box.prob = det.prob[objectIndex];
@@ -63,10 +65,14 @@ void DarknetLayerCuda::onRunLayer() {
 				rectangle2.height = box.height * inMats[0].rows;
 				rectangle2.x = box.centerX * inMats[0].cols - rectangle2.width / 2;
 				rectangle2.y = box.centerY * inMats[0].rows - rectangle2.height / 2;
-				//drawRect_gpu(sourceOpFrame, rectangle2, 3, make_uchar4(255, 0, 0, 255), cudaStream);
+				uint8_t r = layerParamet.drawColor & 0xff;
+				uint8_t g = (layerParamet.drawColor >> 8) & 0xff;
+				uint8_t b = (layerParamet.drawColor >> 16) & 0xff;
+				uint8_t a = (layerParamet.drawColor >> 24) & 0xff;
+				drawRect_gpu(inMats[0], rectangle2, 3, make_uchar4(r, g, b, a), ipCuda->cudaStream);
 			}
 		}
 	}
 	//输出
-	ipCuda->outputData(layerIndex, (uint8_t*)personDets.data(), sizeof(PersonBox), personDets.size(), 0);
+	ipCuda->outputData(layerIndex, (uint8_t*)personDets.data(), personDets.size(), sizeof(PersonBox), 0);
 }

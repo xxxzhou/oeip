@@ -62,15 +62,15 @@ namespace OeipWrapper.FixPipe
 
             //神经网络层
             DarknetIndex = pipe.AddLayer("darknet", OeipLayerType.OEIP_DARKNET_LAYER);
-            pipe.ConnectLayer(Rgba2Yuv, ResizeIndex);
+            pipe.ConnectLayer(DarknetIndex, ResizeIndex);
             DarknetParamet darknetParamet = new DarknetParamet();
             darknetParamet.bLoad = 1;
             darknetParamet.confile = "../../ThirdParty/yolov3-tiny-test.cfg";
             darknetParamet.weightfile = "../../ThirdParty/yolov3-tiny_745000.weights";
-            darknetParamet.thresh = 0.3f;
-            darknetParamet.nms = 0.4f;
+            darknetParamet.thresh = 0.4f;
+            darknetParamet.nms = 0.3f;
             darknetParamet.bDraw = 1;
-            darknetParamet.drawColor = OeipHelper.getColor(1.0f, 0.1f, 0.1f, 0.5f);
+            darknetParamet.drawColor = OeipHelper.getColor(0.1f, 1.0f, 0.1f, 0.1f);
             Pipe.UpdateParametStruct(DarknetIndex, darknetParamet);
             //输出第三个流，网络处理层流
             MattingOutIndex = pipe.AddLayer("matting out put", OeipLayerType.OEIP_OUTPUT_LAYER);
