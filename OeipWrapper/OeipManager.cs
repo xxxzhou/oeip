@@ -1,4 +1,5 @@
 using OeipCommon;
+using OeipWrapper.Live;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,20 @@ namespace OeipWrapper
         private OnLogDelegate onLogDelegate;
         public event OnLogDelegate OnLogEvent;
 
+        private OeipLiveContext liveCtx = new OeipLiveContext();
+
+        /// <summary>
+        /// 高版本可以使用ref 局部变量结构来方便更新类里的结构
+        /// https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/ref?f1url=https%3A%2F%2Fmsdn.microsoft.com%2Fquery%2Fdev16.query%3FappId%3DDev16IDEF1%26l%3DZH-CN%26k%3Dk(ref_CSharpKeyword)%3Bk(SolutionItemsProject)%3Bk(TargetFrameworkMoniker-.NETFramework%2CVersion%3Dv4.6.1)%3Bk(DevLang-csharp)%26rd%3Dtrue
+        /// </summary>
+        public ref OeipLiveContext LiveCtx
+        {
+            get
+            {
+                return ref liveCtx;
+            }
+        }
+
         public List<OeipDeviceInfo> OeipDevices { get; private set; } = new List<OeipDeviceInfo>();
 
         protected override void Init()
@@ -22,6 +37,10 @@ namespace OeipWrapper
             OeipHelper.setLogAction(onLogDelegate);
             OeipHelper.initOeip();
             this.GetCameras();
+
+            LiveCtx.liveMode = OeipLiveMode.OIEP_FFMPEG;
+            LiveCtx.bLoopback = 0;
+            LiveCtx.liveServer = "http://localhost:6110";
         }
 
         private void GetCameras()

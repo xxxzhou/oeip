@@ -9,7 +9,7 @@
 
 static logEventHandle logHandle = nullptr;
 
-void logMessage(int level, const char* message) {
+void logMessage(int32_t level, const char* message) {
 	if (logHandle != nullptr) {
 		//GBK->UTF8 后面全改为带bom的utf8
 		//std::string str = message;
@@ -104,17 +104,17 @@ void splitString(const std::string& str, std::vector<std::string>& strarray, con
 		strarray.push_back(str.substr(pos1));
 }
 
-void copywcharstr(wchar_t* dest, const wchar_t* source, int maxlength) {
+void copywcharstr(wchar_t* dest, const wchar_t* source, int32_t maxlength) {
 	int length = sizeof(wchar_t) * (wcslen(source) + 1);
 	memcpy(dest, source, min(length, maxlength));
 }
 
-void copycharstr(char* dest, const char* source, int maxlength) {
+void copycharstr(char* dest, const char* source, int32_t maxlength) {
 	int length = sizeof(char) * (strlen(source) + 1);
 	memcpy(dest, source, min(length, maxlength));
 }
 
-bool loadFile(std::wstring path, std::vector<uint8_t>& data, int length) {
+bool loadFile(std::wstring path, std::vector<uint8_t>& data, int32_t length) {
 	bool bIn = std::tr2::sys::exists(path);
 	if (!bIn) {
 		std::string message = "path not exist:" + wstring2string(path);
@@ -137,7 +137,7 @@ bool loadFile(std::wstring path, std::vector<uint8_t>& data, int length) {
 	}
 }
 
-bool saveFile(std::wstring path, void* data, int length) {
+bool saveFile(std::wstring path, void* data, int32_t length) {
 	try {
 		//内存数据写入到文件
 		auto fileMask = (std::ios::binary | std::ios::out);

@@ -13,7 +13,7 @@
 #define SAFE_DELETE(p)      { if (p) { delete (p); (p)=nullptr; } } 
 #endif
 
-OEIPDLL_EXPORT void logMessage(int level, const char* message);
+OEIPDLL_EXPORT void logMessage(int32_t level, const char* message);
 
 OEIPDLL_EXPORT void setLogEvent(logEventHandle logEvent);
 
@@ -25,13 +25,13 @@ OEIPDLL_EXPORT bool readResouce(std::string modelName, int32_t rcId, std::string
 
 OEIPDLL_EXPORT void splitString(const std::string& str, std::vector<std::string>& strarray, const std::string& split);
 
-OEIPDLL_EXPORT void copywcharstr(wchar_t* dest, const wchar_t* source, int maxlength);
+OEIPDLL_EXPORT void copywcharstr(wchar_t* dest, const wchar_t* source, int32_t maxlength);
 
-OEIPDLL_EXPORT void copycharstr(char* dest, const char* source, int maxlength);
+OEIPDLL_EXPORT void copycharstr(char* dest, const char* source, int32_t maxlength);
 
-OEIPDLL_EXPORT bool loadFile(std::wstring path, std::vector<uint8_t>& data, int length);
+OEIPDLL_EXPORT bool loadFile(std::wstring path, std::vector<uint8_t>& data, int32_t length);
 
-OEIPDLL_EXPORT bool saveFile(std::wstring path, void* data, int length);
+OEIPDLL_EXPORT bool saveFile(std::wstring path, void* data, int32_t length);
 
 OEIPDLL_EXPORT int64_t getNowTimestamp();
 
@@ -42,6 +42,10 @@ OEIPDLL_EXPORT std::string getLayerName(OeipLayerType layerType);
 OEIPDLL_EXPORT uint32_t divUp(int32_t x, int32_t y);
 
 OEIPDLL_EXPORT std::string getProgramPath();
+
+OEIPDLL_EXPORT void loadDll(std::wstring dllName, std::wstring subDirt);
+
+OEIPDLL_EXPORT void loadDllArray(std::vector<std::wstring> dllNames);
 
 template <class T>
 void safeRelease(T*& ppT) {

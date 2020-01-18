@@ -1,6 +1,6 @@
 #pragma once
 #include <mutex>
-#include "FRtmpOutput.h"
+#include "FNetCommon.h"
 #include "FEncoder.h"
 
 //用于封装各种推流编码，暂时只支持RTMP
@@ -31,8 +31,6 @@ private:
 	int32_t videoWidth = -1;
 
 	std::mutex mtx;
-
-	onOperateResult onOperateEvent;
 public:
 	int32_t open(const char* url);
 	void close();
@@ -46,5 +44,7 @@ public:
 	void setFps(int32_t fps);
 	void enableVideo(bool bVideo);
 	void enableAudio(bool bAudio);
+
+	void setOperateEvent(onOperateHandle onHandle);
 };
 

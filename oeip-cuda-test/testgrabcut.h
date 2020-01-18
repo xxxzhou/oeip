@@ -96,7 +96,7 @@ namespace Grabcut
 
 			cap >> frame;
 			cv::resize(frame, reframe, cv::Size(width, height));
-			cv::Rect rectangle(220, 116, 88, 207);
+			cv::Rect rectangle(120, 26, 150, 207);
 			if (bCpu) {
 				cv::grabCut(reframe, result, rectangle, bgModel, fgModel, iterCount, cv::GC_INIT_WITH_RECT);
 			}

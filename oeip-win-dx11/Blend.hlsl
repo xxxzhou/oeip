@@ -6,10 +6,14 @@ cbuffer texSize : register(b0)
 	uint height;
 	uint elementCount;
 	uint elementByte;
-	float left;
-	float top;
-	float width2;
-	float height2;
+	//float left;
+	//float top;
+	//float width2;
+	//float height2;
+	float centerX = 0.f;
+	float centerY = 0.f;
+	float width2 = 0.f;
+	float height2 = 0.f;
 	//不透明度
 	float opacity;
 };
@@ -32,8 +36,9 @@ void main(uint3 DTid : SV_DispatchThreadID) {
 	float4 color = texIn[DTid.xy];
 	//DTid 线程转化成对应UV坐标，需要分别加0.5
 	float2 uv = float2((DTid.x + 0.5) / width, (DTid.y + 0.5) / height);
-	if (uv.x >= left && uv.x < left + width2 && uv.y >= top && uv.y < top + height2) {
-		float2 uv2 = float2((uv.x - left) / width2, (uv.y - top) / height2);
+	float4 rect = float4(centerX - width2 / 2.f, centerY - height2 / 2.f, centerX + width2 / 2.f, centerY + height2 / 2.f);
+	if (uv.x >= rect.x && uv.x < rect.z && uv.y >= rect.y && uv.y < rect.w) {
+		float2 uv2 = float2((uv.x - rect.x) / width2, (uv.y - rect.y) / height2);
 		float4 color2 = texIn2.SampleLevel(lineSampler, uv2, 0);
 		color = color2 * (1.f - opacity) + color * opacity;
 	}

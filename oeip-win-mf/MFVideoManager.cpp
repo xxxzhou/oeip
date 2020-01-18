@@ -36,7 +36,7 @@ MFVideoManager::MFVideoManager() {
 
 
 MFVideoManager::~MFVideoManager() {
-	HRESULT hr = MFShutdown();
+	//HRESULT hr = MFShutdown();
 	CoUninitialize();
 }
 

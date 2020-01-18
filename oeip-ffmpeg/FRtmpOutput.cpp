@@ -56,14 +56,14 @@ int32_t FRtmpOutput::startPush() {
 		temp->pb = videoIOC.get();
 		ret = avformat_open_input(&temp, "", nullptr, nullptr);
 		if (ret < 0) {
-			logRetffmpeg("could not open input video info.", ret);
+			checkRet("could not open input video info.", ret);
 			return ret;
 		}
 		//正确打开后保存AVFormatContext指针
 		videoFmtCtx = getUniquePtr(temp);
 		ret = avformat_find_stream_info(videoFmtCtx.get(), 0);
 		if (ret < 0) {
-			logRetffmpeg("failed to retrieve input video stream information.", ret);
+			checkRet("failed to retrieve input video stream information.", ret);
 			return ret;
 		}
 	}
@@ -76,14 +76,14 @@ int32_t FRtmpOutput::startPush() {
 		temp->pb = audioIOC.get();
 		ret = avformat_open_input(&temp, "", nullptr, nullptr);
 		if (ret < 0) {
-			logRetffmpeg("could not open input audio info.", ret);
+			checkRet("could not open input audio info.", ret);
 			return ret;
 		}
 		//打开后保存AVFormatContext指针
 		audioFmtCtx = getUniquePtr(temp);
 		ret = avformat_find_stream_info(audioFmtCtx.get(), 0);
 		if (ret < 0) {
-			logRetffmpeg("failed to retrieve input audio stream information.", ret);
+			checkRet("failed to retrieve input audio stream information.", ret);
 			return ret;
 		}
 	}
@@ -92,7 +92,7 @@ int32_t FRtmpOutput::startPush() {
 	ret = avformat_alloc_output_context2(&tempOut, nullptr, format_name.c_str(), url.c_str());
 	if (ret < 0) {
 		std::string msg = "url:" + url + "could not open";
-		logRetffmpeg(msg, ret);
+		checkRet(msg, ret);
 		return ret;
 	}
 	fmtCtx = getUniquePtr(tempOut);
@@ -104,7 +104,7 @@ int32_t FRtmpOutput::startPush() {
 			if (instream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
 				ret = avcodec_parameters_copy(outstream->codecpar, instream->codecpar);
 				if (ret < 0) {
-					logRetffmpeg("failed to copy context from video input to output stream codec context", ret);
+					checkRet("failed to copy context from video input to output stream codec context", ret);
 					return ret;
 				}
 				videoIndex = outstream->index;
@@ -121,7 +121,7 @@ int32_t FRtmpOutput::startPush() {
 			if (instream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
 				ret = avcodec_parameters_copy(outstream->codecpar, instream->codecpar);
 				if (ret < 0) {
-					logRetffmpeg("failed to copy context from audio input to output stream codec context", ret);
+					checkRet("failed to copy context from audio input to output stream codec context", ret);
 					return ret;
 				}
 				if (outstream->codecpar->extradata_size == 0) {
@@ -139,7 +139,7 @@ int32_t FRtmpOutput::startPush() {
 	if (!(fmtCtx->oformat->flags & AVFMT_NOFILE)) {
 		ret = avio_open(&fmtCtx->pb, url.c_str(), AVIO_FLAG_WRITE);
 		if (ret < 0) {
-			logRetffmpeg("open output url error.", ret);
+			checkRet("open output url error.", ret);
 			return ret;
 		}
 	}
@@ -147,7 +147,7 @@ int32_t FRtmpOutput::startPush() {
 	av_dict_set(&dict, "muxdelay", "0.0", 0);
 	ret = avformat_write_header(fmtCtx.get(), &dict);
 	if (ret != 0) {
-		logRetffmpeg("could not write header", ret);
+		checkRet("could not write header", ret);
 		return ret;
 	}
 	bOpenPush = true;
@@ -201,6 +201,7 @@ void FRtmpOutput::close() {
 	bAACFirst = false;
 	audioPack.clear();
 	videoPack.clear();
+	onOperateAction(OEIP_LIVE_OPERATE_CLOSE, 0);
 }
 
 int32_t FRtmpOutput::pushVideo(uint8_t* data, int32_t size, uint64_t timestamp) {
@@ -220,8 +221,9 @@ int32_t FRtmpOutput::pushVideo(uint8_t* data, int32_t size, uint64_t timestamp) 
 	if (!bOpenPush && bKeyFrame) {
 		if ((bAudio && bAACFirst) || (!bAudio && bVideo)) {
 			ret = startPush();
+			onOperateAction(OEIP_LIVE_OPERATE_OPEN, ret);
 			if (ret < 0)
-				return ret;
+				return ret;			
 		}
 	}
 	//缓存还没打开推流的那段时间,存入最新的一个GOP数据,GOP(M=3, N=12,IBBPBBPBBPBBI)
@@ -273,7 +275,7 @@ int32_t FRtmpOutput::pushVideo(uint8_t* data, int32_t size, uint64_t timestamp) 
 	pkt.flags = bKeyFrame ? AV_PKT_FLAG_KEY : 0;
 	ret = av_interleaved_write_frame(fmtCtx.get(), &pkt);
 	if (ret < 0) {
-		logRetffmpeg("error write video frame", ret);
+		checkRet("error write video frame", ret);
 	}
 	av_packet_unref(&pkt);
 	return ret;
@@ -290,8 +292,9 @@ int32_t FRtmpOutput::pushAudio(uint8_t* data, int32_t size, uint64_t timestamp) 
 		//如果需要推视频，保证已经有视频信息，则开始推流，否则等视频那边开始推
 		if ((bVideo && bIFrameFirst) || (!bVideo && bAudio)) {
 			ret = startPush();
+			onOperateAction(OEIP_LIVE_OPERATE_OPEN, ret);
 			if (ret < 0)
-				return ret;
+				return ret;			
 		}
 	}
 	//音频数据不缓存
@@ -319,7 +322,7 @@ int32_t FRtmpOutput::pushAudio(uint8_t* data, int32_t size, uint64_t timestamp) 
 	pkt.stream_index = outstream->index;
 	ret = av_interleaved_write_frame(fmtCtx.get(), &pkt);
 	if (ret < 0) {
-		logRetffmpeg("error write audio frame", ret);
+		checkRet("error write audio frame", ret);
 	}
 	av_packet_unref(&pkt);
 	return ret;

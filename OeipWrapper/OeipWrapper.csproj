@@ -48,7 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FixPipe\ISharpDXViewPipe.cs" />
+    <Compile Include="FixPipe\OeipLivePipe.cs" />
+    <Compile Include="FixPipe\OeipVideoParamet.cs" />
     <Compile Include="FixPipe\OeipVideoPipe.cs" />
+    <Compile Include="Live\OeipLiveHelper.cs" />
+    <Compile Include="Live\OeipLiveManager.cs" />
     <Compile Include="OeipCamera.cs" />
     <Compile Include="OeipHelper.cs" />
     <Compile Include="OeipHelperUnity3D.cs" />

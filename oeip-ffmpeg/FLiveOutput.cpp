@@ -7,15 +7,14 @@ FLiveOutput::FLiveOutput() {
 	output = std::unique_ptr<FRtmpOutput>(new FRtmpOutput());
 }
 
-
 FLiveOutput::~FLiveOutput() {
 }
 
 int32_t FLiveOutput::open(const char* url) {
-	std::unique_lock <std::mutex> lck(mtx);
+	std::unique_lock<std::mutex> lck(mtx);
 	int32_t ret = 0;
 	if (bOpen)
-		return -1;
+		return 1;
 	ret = output->openURL(url, bVideo, bAudio);
 	if (ret == 0)
 		bOpen = true;
@@ -55,7 +54,7 @@ int32_t FLiveOutput::pushVideo(const OeipVideoFrame& videoFrame) {
 		videoWidth = videoFrame.width;
 		videoHeight = videoFrame.height;
 	}
-	int32_t ret = videoEncoder->encoder(videoFrame.data, videoFrame.dataSize, videoFrame.timestamp);
+	int32_t ret = videoEncoder->encoder((uint8_t**)videoFrame.data, videoFrame.dataSize, videoFrame.timestamp);
 	if (ret < 0) {
 		return ret;
 	}
@@ -88,8 +87,8 @@ int32_t FLiveOutput::pushAudio(const OeipAudioFrame& audioFrame) {
 
 		audioEncoder = std::unique_ptr<FAACEncoder>(new FAACEncoder(audioDesc));
 		audioBuffer.resize(OEIP_AAC_BUFFER_MAX_SIZE);
-	}
-	int32_t ret = audioEncoder->encoder((uint8_t*)audioFrame.data, audioFrame.dataSize, audioFrame.timestamp);
+	}	
+	int32_t ret = audioEncoder->encoder((uint8_t**)&audioFrame.data, audioFrame.dataSize, audioFrame.timestamp);
 	if (ret < 0) {
 		return ret;
 	}
@@ -106,6 +105,7 @@ int32_t FLiveOutput::pushAudio(const OeipAudioFrame& audioFrame) {
 			output->openURL(liveUrl.c_str(), bVideo, bAudio);
 		}
 	}
+	return 0;
 }
 
 void FLiveOutput::setVideoBitrate(int32_t bitrate) {
@@ -126,5 +126,9 @@ void FLiveOutput::enableVideo(bool bVideo) {
 
 void FLiveOutput::enableAudio(bool bAudio) {
 	this->bAudio = bAudio;
+}
+
+void FLiveOutput::setOperateEvent(onOperateHandle onHandle) {
+	output->setOperateEvent(onHandle);
 }
 

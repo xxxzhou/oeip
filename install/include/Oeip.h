@@ -106,6 +106,14 @@ enum OeipAudioDataType : int32_t
 	OEIP_Audio_WavHeader,
 };
 
+struct OeipRect
+{
+	float centerX = 0.f;
+	float centerY = 0.f;
+	float width = 0.f;
+	float height = 0.f;
+};
+
 //Paramet结构里不用一字节类型数据，一是memcmp后面会用，
 //二是C#/C++里bool都只有一字节，但是可能因为不同对齐方式导致差异，故与C#交互的结构bool全使用int32
 //默认从CPU输入,如果要支持GPU输入,bGpu=true
@@ -158,11 +166,8 @@ struct OperateParamet
 //二图混合，第二图显示在第一图中下面前四个参数组成的RECT中
 struct BlendParamet
 {
-	//所有值范围在0.1
-	float left = 0.f;
-	float top = 0.f;
-	float width = 0.f;
-	float height = 0.f;
+	//所有值范围在0-1
+	OeipRect rect = {};
 	//不透明度
 	float opacity = 0.f;
 };
@@ -178,10 +183,16 @@ struct GuidedFilterParamet
 
 struct GrabcutParamet
 {
+	//画背景点或是grabcut扣像
+	int32_t bDrawSeed = false;
+	//是否使用GPU来计算一桢的高斯混合模型
+	int32_t bGpuSeed = false;
 	int32_t iterCount = 1;
+	int32_t seedCount = 1000;
+	int32_t count = 250;
 	float gamma = 90.f;
 	float lambda = 450.f;
-	int32_t count = 250;
+	OeipRect rect = {};
 };
 
 struct DarknetParamet
@@ -202,10 +213,7 @@ struct PersonBox
 {
 	//是人的概率
 	float prob = 0.f;
-	float centerX = 0.f;
-	float centerY = 0.f;
-	float width = 0.f;
-	float height = 0.f;
+	OeipRect rect = {};
 };
 
 struct VideoFormat

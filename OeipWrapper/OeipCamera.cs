@@ -16,7 +16,7 @@ namespace OeipWrapper
         {
             get
             {
-                return this.Id >= 0;
+                return Id >= 0;
             }
         }
 

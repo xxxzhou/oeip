@@ -9,47 +9,39 @@
 //const int CUDA_GRABCUT_K = 5;
 
 //是否前景
-inline __host__ __device__ bool checkFg(uchar mask)
-{
+inline __host__ __device__ bool checkFg(uchar mask) {
 	if (mask == 0 || mask == 2)
 		return false;
 	return true;
 }
 
 //是否是确定的值,如确定前景与背景
-inline __host__ __device__ bool checkObvious(uchar mask)
-{
+inline __host__ __device__ bool checkObvious(uchar mask) {
 	if (mask == 0 || mask == 1)
 		return true;
 	return false;
 }
 
-inline __global__ void setMask(PtrStepSz<uchar> mask, cv::Rect rect)
-{
+inline __global__ void setMask(PtrStepSz<uchar> mask, cv::Rect rect) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < mask.cols && idy < mask.rows)
-	{
+	if (idx < mask.cols && idy < mask.rows) {
 		int mmask = 3;
 		//前景为255
-		if (idx < rect.x || idx > rect.x + rect.width || idy < rect.y || idy > rect.y + rect.height)
-		{
+		if (idx < rect.x || idx >= rect.x + rect.width || idy < rect.y || idy >= rect.y + rect.height) {
 			mmask = 0;
 		}
 		mask(idy, idx) = mmask;
 	}
 }
 
-inline __global__ void setMask(PtrStepSz<uchar> source, PtrStepSz<uchar> mask, int radius, cv::Rect rect)
-{
+inline __global__ void setMask(PtrStepSz<uchar> source, PtrStepSz<uchar> mask, int radius, cv::Rect rect) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		int mmask = 0;
 		//前景为255
-		if (idx > rect.x&& idx < rect.x + rect.width && idy > rect.y&& idy < rect.y + rect.height)
-		{
+		if (idx > rect.x&& idx < rect.x + rect.width && idy > rect.y&& idy < rect.y + rect.height) {
 			mmask = mask(idy, idx);
 			int smask = source(idy, idx);
 			if (smask == 3)
@@ -59,67 +51,54 @@ inline __global__ void setMask(PtrStepSz<uchar> source, PtrStepSz<uchar> mask, i
 	}
 }
 
-inline __global__ void setMask(PtrStepSz<uchar> mask, int x, int y, int radius, int vmask)
-{
+inline __global__ void setMask(PtrStepSz<uchar> mask, int x, int y, int radius, int vmask) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
 	if (idx > max(0, x - radius) && idx < min(mask.cols, x + radius)
-		&& idy > max(0, y - radius) && idy < min(mask.rows, y + radius))
-	{
+		&& idy > max(0, y - radius) && idy < min(mask.rows, y + radius)) {
 		mask(idy, idx) = vmask;
 	}
 }
 
-inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask)
-{
+inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		int vmask = mask(idy, idx);
-		if (vmask == 0)
-		{
+		if (vmask == 0) {
 			source(idy, idx) = make_uchar4(0, 0, 0, 255);
 		}
-		else if (vmask == 1)
-		{
+		else if (vmask == 1) {
 			source(idy, idx) = make_uchar4(255, 255, 255, 255);
 		}
 	}
 }
 
-inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<uchar> mask, float fx, float fy)
-{
+inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<uchar> mask, float fx, float fy) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		int vmask = mask(idy, idx);
 		float4 color = rgbauchar42float4(source(idy, idx));
 		color.w = 0.2f;
-		if (vmask == 0)
-		{
-			color = color / 2.f;
-			color.w = 0.8f;
-		}
-		else if (vmask == 1)
-		{
+		if (checkFg(vmask)) {
 			color = color * 2.f;
 			color.w = 1.f;
+		}
+		else {
+			color = color / 2.f;
+			color.w = 0.8f;
 		}
 		dest(idy, idx) = rgbafloat42uchar4(color);
 	}
 }
 
-inline __global__ void showMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask)
-{
+inline __global__ void showMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		int vmask = mask(idy, idx);
-		if (!checkFg(vmask))
-		{
+		if (!checkFg(vmask)) {
 			source(idy, idx) = make_uchar4(0, 0, 0, 255);
 		}
 	}
@@ -129,8 +108,7 @@ inline __global__ void showMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask)
 //findNearestCluster 更新clusterIndex对应每点的索引
 //updateCluster 更新kcenters的值
 //setNewCluster 重新设置cluster的值
-inline __global__ void initKmeans(kmeansI& meansbg, kmeansI& meansfg)
-{
+inline __global__ void initKmeans(kmeansI& meansbg, kmeansI& meansfg) {
 	const int idx = threadIdx.x;
 
 	meansbg.kcenters[idx] = make_float4(0.f);
@@ -151,28 +129,23 @@ inline __global__ void initKmeans(kmeansI& meansbg, kmeansI& meansfg)
 
 template<bool bSeed>
 inline __global__ void findNearestCluster(PtrStepSz<uchar4> source, PtrStepSz<uchar> clusterIndex, PtrStepSz<uchar> mask,
-	kmeansI& meansbg, kmeansI& meansfg)
-{
+	kmeansI& meansbg, kmeansI& meansfg) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		float4 color = rgbauchar42float4(source(idy, idx));
 		uchar umask = mask(idy, idx);
-		if (!bSeed || (bSeed && checkObvious(umask)))
-		{
+		if (!bSeed || (bSeed && checkObvious(umask))) {
 			bool bFg = checkFg(umask);
 			//背景块,使用kcentersbg,否则使用kcentersfg
 			kmeansI& kmeans = bFg ? meansfg : meansbg;
 			float min_dist = 10000000.f;
 			//找到最近的那个点索引
 			uchar index = 0;
-			for (int i = 0; i < CUDA_GRABCUT_K; i++)
-			{
+			for (int i = 0; i < CUDA_GRABCUT_K; i++) {
 				float4 distance = kmeans.cluster[i] - color;
 				float dist = dot(distance, distance);
-				if (dist < min_dist)
-				{
+				if (dist < min_dist) {
 					min_dist = dist;
 					index = i;
 				}
@@ -184,22 +157,19 @@ inline __global__ void findNearestCluster(PtrStepSz<uchar4> source, PtrStepSz<uc
 
 //把source所有收集到一块gridDim.x*gridDim.y块数据上。
 template<int blockx, int blocky, bool bSeed>
-__global__ void updateCluster(PtrStepSz<uchar4> source, PtrStepSz<uchar> clusterIndex, PtrStepSz<uchar> mask, float4* kencter, int* kindexs)
-{
+__global__ void updateCluster(PtrStepSz<uchar4> source, PtrStepSz<uchar> clusterIndex, PtrStepSz<uchar> mask, float4* kencter, int* kindexs) {
 	__shared__ float3 centers[blockx * blocky][CUDA_GRABCUT_K2];
 	__shared__ int indexs[blockx * blocky][CUDA_GRABCUT_K2];
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
 	const int threadId = threadIdx.x + threadIdx.y * blockDim.x;
 #pragma unroll CUDA_GRABCUT_K2
-	for (int i = 0; i < CUDA_GRABCUT_K2; i++)
-	{
+	for (int i = 0; i < CUDA_GRABCUT_K2; i++) {
 		centers[threadId][i] = make_float3(0.f);
 		indexs[threadId][i] = 0;
 	}
 	__syncthreads();
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		//所有值都放入共享centers
 		int index = clusterIndex(idy, idx);
 		uchar umask = mask(idy, idx);
@@ -213,11 +183,9 @@ __global__ void updateCluster(PtrStepSz<uchar4> source, PtrStepSz<uchar> cluster
 		}
 		__syncthreads();
 		//每个线程块进行二分聚合,每次操作都保存到前一半数组里，直到最后保存在线程块里第一个线程上(这块比较费时,0.1ms)
-		for (uint stride = blockDim.x * blockDim.y / 2; stride > 0; stride >>= 1)
-		{
+		for (uint stride = blockDim.x * blockDim.y / 2; stride > 0; stride >>= 1) {
 			//int tid = (threadId&(stride - 1));
-			if (threadId < stride)//stride 2^n
-			{
+			if (threadId < stride) {//stride 2^n			
 #pragma unroll CUDA_GRABCUT_K2
 				for (int i = 0; i < CUDA_GRABCUT_K2; i++)
 				{
@@ -229,12 +197,10 @@ __global__ void updateCluster(PtrStepSz<uchar4> source, PtrStepSz<uchar> cluster
 			__syncthreads();
 		}
 		//每块的第一个线程集合，把共享centers存入临时显存块上kencter
-		if (threadIdx.x == 0 && threadIdx.y == 0)
-		{
+		if (threadIdx.x == 0 && threadIdx.y == 0) {
 			int blockId = blockIdx.x + blockIdx.y * gridDim.x;
 #pragma unroll CUDA_GRABCUT_K2
-			for (int i = 0; i < CUDA_GRABCUT_K2; i++)
-			{
+			for (int i = 0; i < CUDA_GRABCUT_K2; i++) {
 				int id = blockId * 2 * CUDA_GRABCUT_K + i;
 				kencter[id] = make_float4(centers[0][i], 0.f);
 				kindexs[id] = indexs[0][i];
@@ -245,14 +211,12 @@ __global__ void updateCluster(PtrStepSz<uchar4> source, PtrStepSz<uchar> cluster
 
 //block 1*1,threads(暂时选32*4),对如上gridDim.x*gridDim.y的数据用blockx*blocky个线程来处理
 template<int blockx, int blocky>
-__global__ void updateCluster(float4* kencter, int* kindexs, kmeansI& meansbg, kmeansI& meansfg, int& delta, int gridcount)
-{
+__global__ void updateCluster(float4* kencter, int* kindexs, kmeansI& meansbg, kmeansI& meansfg, int& delta, int gridcount) {
 	__shared__ float3 centers[blockx * blocky][CUDA_GRABCUT_K2];
 	__shared__ int indexs[blockx * blocky][CUDA_GRABCUT_K2];
 	const int threadId = threadIdx.x + threadIdx.y * blockDim.x;
 #pragma unroll CUDA_GRABCUT_K2
-	for (int i = 0; i < CUDA_GRABCUT_K2; i++)
-	{
+	for (int i = 0; i < CUDA_GRABCUT_K2; i++) {
 		centers[threadId][i] = make_float3(0.f);
 		indexs[threadId][i] = 0;
 	}
@@ -261,11 +225,9 @@ __global__ void updateCluster(float4* kencter, int* kindexs, kmeansI& meansbg, k
 	int blockcount = blockDim.x * blockDim.y;
 	int count = gridcount / blockcount + 1;
 	//每块共享变量，每个线程操纵自己对应那块地址，不需要同步,用线程块操作一个大内存
-	for (int i = 0; i < count; i++)
-	{
+	for (int i = 0; i < count; i++) {
 		int id = i * blockcount + threadId;
-		if (id < gridcount)
-		{
+		if (id < gridcount) {
 #pragma unroll CUDA_GRABCUT_K2
 			for (int j = 0; j < CUDA_GRABCUT_K2; j++)
 			{
@@ -276,10 +238,8 @@ __global__ void updateCluster(float4* kencter, int* kindexs, kmeansI& meansbg, k
 		}
 	}
 	__syncthreads();
-	for (uint stride = blockDim.x * blockDim.y / 2; stride > 0; stride >>= 1)
-	{
-		if (threadId < stride)
-		{
+	for (uint stride = blockDim.x * blockDim.y / 2; stride > 0; stride >>= 1) {
+		if (threadId < stride) {
 #pragma unroll CUDA_GRABCUT_K2
 			for (int i = 0; i < CUDA_GRABCUT_K2; i++)
 			{
@@ -290,20 +250,17 @@ __global__ void updateCluster(float4* kencter, int* kindexs, kmeansI& meansbg, k
 		//if (stride > 32)
 		__syncthreads();
 	}
-	if (threadIdx.x == 0 && threadIdx.y == 0)
-	{
+	if (threadIdx.x == 0 && threadIdx.y == 0) {
 		int count = 0;
 		//收集所有信息，并重新更新cluster，记录变更的大小
-		for (int i = 0; i < CUDA_GRABCUT_K; i++)
-		{
+		for (int i = 0; i < CUDA_GRABCUT_K; i++) {
 			meansfg.kcenters[i] = make_float4(centers[0][i], 0.f);
 			if (indexs[0][i] != 0)
 				meansfg.cluster[i] = meansfg.kcenters[i] / indexs[0][i];
 			count += abs(indexs[0][i] - meansfg.length[i]);
 			meansfg.length[i] = indexs[0][i];
 		}
-		for (int i = CUDA_GRABCUT_K; i < CUDA_GRABCUT_K2; i++)
-		{
+		for (int i = CUDA_GRABCUT_K; i < CUDA_GRABCUT_K2; i++) {
 			meansbg.kcenters[i - CUDA_GRABCUT_K] = make_float4(centers[0][i], 0.f);
 			if (indexs[0][i] != 0)
 				meansbg.cluster[i - CUDA_GRABCUT_K] = meansbg.kcenters[i - CUDA_GRABCUT_K] / indexs[0][i];
@@ -315,8 +272,7 @@ __global__ void updateCluster(float4* kencter, int* kindexs, kmeansI& meansbg, k
 }
 
 //block 1,threads k
-inline __global__ void setNewCluster(kmeansI& meansbg, kmeansI& meansfg)
-{
+inline __global__ void setNewCluster(kmeansI& meansbg, kmeansI& meansfg) {
 	int idx = threadIdx.x;
 	if (meansbg.length[idx] != 0)
 		meansbg.cluster[idx] = meansbg.kcenters[idx] / meansbg.length[idx];
@@ -329,8 +285,7 @@ inline __global__ void setNewCluster(kmeansI& meansbg, kmeansI& meansfg)
 	meansfg.length[idx] = 0;
 }
 
-inline __global__ void showKmeans(PtrStepSz<uchar4> source, PtrStepSz<uchar> clusterIndex)
-{
+inline __global__ void showKmeans(PtrStepSz<uchar4> source, PtrStepSz<uchar> clusterIndex) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
 
@@ -341,22 +296,19 @@ inline __global__ void showKmeans(PtrStepSz<uchar4> source, PtrStepSz<uchar> clu
 		make_float4(0.f,0.f,1.f,1.f),
 		make_float4(0.f,0.f,0.f,1.f) };
 
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		int index = clusterIndex(idy, idx);
 		source(idy, idx) = rgbafloat42uchar4(colorArray[index]);
 	}
 }
 
 inline __host__ __device__ void inverseMat3x3(float& covDeterm, float3& col0, float3& col1, float3& col2,
-	float3& invCol0, float3& invCol1, float3& invCol2)
-{
+	float3& invCol0, float3& invCol1, float3& invCol2) {
 	float det = col0.x * (col1.y * col2.z - col2.y * col1.z)
 		- col0.y * (col1.x * col2.z - col1.z * col2.x)
 		+ col0.z * (col1.x * col2.y - col1.y * col2.x);
 	float singularFix = 0.01f;
-	if (det <= 1e-6)
-	{
+	if (det <= 1e-6) {
 		col0.x += singularFix;
 		col1.y += singularFix;
 		col2.z += singularFix;
@@ -365,8 +317,7 @@ inline __host__ __device__ void inverseMat3x3(float& covDeterm, float3& col0, fl
 			+ col0.z * (col1.x * col2.y - col1.y * col2.x);
 	}
 	covDeterm = det;
-	if (det > 1e-6)
-	{
+	if (det > 1e-6) {
 		float invdet = 1.0f / det;
 		invCol0.x = (col1.y * col2.z - col2.y * col1.z) * invdet;
 		invCol0.y = (col0.z * col2.y - col0.y * col2.z) * invdet;
@@ -380,11 +331,9 @@ inline __host__ __device__ void inverseMat3x3(float& covDeterm, float3& col0, fl
 	}
 }
 
-inline __host__ __device__ float colorGmm(gmmI& gmm, int ci, float3& color)
-{
+inline __host__ __device__ float colorGmm(gmmI& gmm, int ci, float3& color) {
 	float res = 0.f;
-	if (gmm.coefs[ci] > 0)
-	{
+	if (gmm.coefs[ci] > 0) {
 		float3 diff = color - gmm.means[ci];
 		float3 dmul = mulMat(diff, gmm.inverseCovs[ci][0], gmm.inverseCovs[ci][1], gmm.inverseCovs[ci][2]);
 		float mult = dot(diff, dmul);
@@ -393,26 +342,21 @@ inline __host__ __device__ float colorGmm(gmmI& gmm, int ci, float3& color)
 	return res;
 }
 
-inline __host__ __device__ float colorGmm(gmmI& gmm, float3& color)
-{
+inline __host__ __device__ float colorGmm(gmmI& gmm, float3& color) {
 	float res = 0.f;
-	for (int i = 0; i < CUDA_GRABCUT_K; i++)
-	{
+	for (int i = 0; i < CUDA_GRABCUT_K; i++) {
 		res += gmm.coefs[i] * colorGmm(gmm, i, color);
 	}
 	return res;
 }
 
-inline __host__ __device__ int whichComponent(gmmI& gmm, float3& color)
-{
+inline __host__ __device__ int whichComponent(gmmI& gmm, float3& color) {
 	int k = 0;
 	float max = 0;
 
-	for (int i = 0; i < CUDA_GRABCUT_K; i++)
-	{
+	for (int i = 0; i < CUDA_GRABCUT_K; i++) {
 		float p = colorGmm(gmm, i, color);
-		if (p > max)
-		{
+		if (p > max) {
 			k = i;
 			max = p;
 		}
@@ -420,16 +364,13 @@ inline __host__ __device__ int whichComponent(gmmI& gmm, float3& color)
 	return k;
 }
 
-inline __global__ void learningGMM(gmmI& gmmbg, gmmI& gmmfg)
-{
+inline __global__ void learningGMM(gmmI& gmmbg, gmmI& gmmfg) {
 	const int idx = threadIdx.x;
-	if (idx < CUDA_GRABCUT_K2)
-	{
+	if (idx < CUDA_GRABCUT_K2) {
 		gmmI& gmm = idx < CUDA_GRABCUT_K ? gmmfg : gmmbg;
 		int id = idx < CUDA_GRABCUT_K ? (idx) : (idx - CUDA_GRABCUT_K);
 		int n = gmm.lenght[id];
-		if (n != 0)
-		{
+		if (n != 0) {
 			float in_v = 1.0f / n;
 			gmm.coefs[id] = (float)n / gmm.totalCount;
 			gmm.means[id] = gmm.sums[id] * in_v;
@@ -445,8 +386,7 @@ inline __global__ void assignGMM(PtrStepSz<uchar4> source, PtrStepSz<uchar> clus
 {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		float3 color = make_float3(source(idy, idx));
 
 		bool bFg = checkFg(mask(idy, idx));
@@ -593,8 +533,7 @@ inline __global__ void addTermWeights(PtrStepSz<uchar4> source, PtrStepSz<float>
 	gmmI& gmmbg, gmmI& gmmfg, float weightOffset) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		float3 color = make_float3(source(idy, idx));
 
 		float fromSource = 0;
@@ -983,15 +922,12 @@ inline __global__ void bfs(PtrStepSz<uchar> mask, PtrStepSz<int> graphHeight,
 	}
 }
 
-inline __global__ void maxflowMask(PtrStepSz<uchar> mask, PtrStepSz<int> graphHeight)
-{
+inline __global__ void maxflowMask(PtrStepSz<uchar> mask, PtrStepSz<int> graphHeight) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx > 0 && idx < mask.cols - 1 && idy > 0 && idy < mask.rows - 1)
-	{
+	if (idx > 0 && idx < mask.cols - 1 && idy > 0 && idy < mask.rows - 1) {
 		uchar bfmask = mask(idy, idx);
-		if (bfmask == 2 || bfmask == 3)
-		{
+		if (bfmask == 2 || bfmask == 3) {
 			if (graphHeight(idy, idx) > 0)
 				bfmask = 3;
 			else
@@ -1001,15 +937,18 @@ inline __global__ void maxflowMask(PtrStepSz<uchar> mask, PtrStepSz<int> graphHe
 	}
 }
 
-inline __global__ void combinGrabcutMask(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, PtrStepSz<uchar> mask, float fx, float fy)
+inline __global__ void combinGrabcutMask(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<uchar> mask, float fx, float fy)
 {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
-	if (idx < source.cols && idy < source.rows)
-	{
+	if (idx < source.cols && idy < source.rows) {
 		uchar vmask = mask(idy, idx);
-		float4 color = rgbauchar42float4(source(idy, idx));
-		color.w = checkFg(vmask) ? 1.f : 0.f;
+		uchar4 color = source(idy, idx);
+		color.w = checkFg(vmask) ? 255 : 0;
+		//用于非透明显示效果
+		//if (!checkFg(vmask)) {
+		//	color = color / 2;
+		//}
 		dest(idy, idx) = color;
 	}
 }

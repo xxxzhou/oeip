@@ -10,26 +10,32 @@ using namespace cv::cuda::device;
 
 const dim3 block = dim3(BLOCK_X, BLOCK_Y);
 
-void resize_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream) {
+template <typename T>
+void resize_gpu(PtrStepSz<T> source, PtrStepSz<T> dest, bool bLinear, cudaStream_t stream) {
 	float fx = static_cast<float>(source.cols) / dest.cols;
 	float fy = static_cast<float>(source.rows) / dest.rows;
 	dim3 grid(divUp(dest.cols, block.x), divUp(dest.rows, block.y));
 	if (bLinear) {
-		resize_linear<uchar4> << <grid, block, 0, stream >> > (source, dest, fx, fy);
+		resize_linear<T> << <grid, block, 0, stream >> > (source, dest, fx, fy);
 	}
 	else {
-		resize_nearest<uchar4> << <grid, block, 0, stream >> > (source, dest, fx, fy);
+		resize_nearest<T> << <grid, block, 0, stream >> > (source, dest, fx, fy);
 	}
 }
 
-void resize_gpuf(PtrStepSz<float4> source, PtrStepSz<float4> dest, bool bLinear, cudaStream_t stream) {
-	float fx = static_cast<float>(source.cols) / dest.cols;
-	float fy = static_cast<float>(source.rows) / dest.rows;
-	dim3 grid(divUp(dest.cols, block.x), divUp(dest.rows, block.y));
-	if (bLinear) {
-		resize_linear<float4> << <grid, block, 0, stream >> > (source, dest, fx, fy);
-	}
-	else {
-		resize_nearest<float4> << <grid, block, 0, stream >> > (source, dest, fx, fy);
-	}
-}
+//实例化几个
+template void resize_gpu<uchar4>(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream);
+template void resize_gpu<uchar>(PtrStepSz<uchar> source, PtrStepSz<uchar> dest, bool bLinear, cudaStream_t stream);
+template void resize_gpu<float4>(PtrStepSz<float4> source, PtrStepSz<float4> dest, bool bLinear, cudaStream_t stream);
+
+//void resize_gpuf(PtrStepSz<float4> source, PtrStepSz<float4> dest, bool bLinear, cudaStream_t stream) {
+//	float fx = static_cast<float>(source.cols) / dest.cols;
+//	float fy = static_cast<float>(source.rows) / dest.rows;
+//	dim3 grid(divUp(dest.cols, block.x), divUp(dest.rows, block.y));
+//	if (bLinear) {
+//		resize_linear<float4> << <grid, block, 0, stream >> > (source, dest, fx, fy);
+//	}
+//	else {
+//		resize_nearest<float4> << <grid, block, 0, stream >> > (source, dest, fx, fy);
+//	}
+//}

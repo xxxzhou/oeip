@@ -135,8 +135,9 @@
     <ClInclude Include="AudioResample.h" />
     <ClInclude Include="FEncoder.h" />
     <ClInclude Include="FH264Encoder.h" />
+    <ClInclude Include="FLiveInput.h" />
     <ClInclude Include="FLiveOutput.h" />
-    <ClInclude Include="FNetOutput.h" />
+    <ClInclude Include="FNetCommon.h" />
     <ClInclude Include="FRtmpInput.h" />
     <ClInclude Include="FRtmpOutput.h" />
     <ClInclude Include="Oeipffmpeg.h" />
@@ -148,6 +149,7 @@
     <ClCompile Include="FAudioOutput.cpp" />
     <ClCompile Include="AudioResample.cpp" />
     <ClCompile Include="FH264Encoder.cpp" />
+    <ClCompile Include="FLiveInput.cpp" />
     <ClCompile Include="FLiveOutput.cpp" />
     <ClCompile Include="FRtmpInput.cpp" />
     <ClCompile Include="FRtmpOutput.cpp" />

@@ -27,7 +27,7 @@ private:
 	int32_t openEncode();
 public:
 	// 通过 FEncoder 继承
-	virtual int encoder(const uint8_t* indata, int length, uint64_t timestamp) override;
+	virtual int encoder(uint8_t** indata, int length, uint64_t timestamp) override;
 	virtual int readPacket(uint8_t* outData, int& outLength, uint64_t& timestamp) override;
 };
 

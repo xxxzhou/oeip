@@ -55,6 +55,6 @@ void resize_linear(const PtrStepSz<T> src, PtrStepSz<T> dst, const float fx, con
 		src_reg = src(y2_read, x2_read);
 		out = out + src_reg * ((src_x - x1) * (src_y - y1));
 
-		dst(dst_y, dst_x) = saturate_cast<T>(out);
+		dst(dst_y, dst_x) = cv::cuda::device::saturate_cast<T>(out);
 	}
 }

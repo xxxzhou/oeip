@@ -28,6 +28,11 @@ void OeipManager::shutdown() {
 }
 
 OeipManager::~OeipManager() {
+	std::lock_guard<std::mutex> mtx_locker(mtx);
+	//通过PluginManager生成的对象,在这不删除,后面通过PluginManager自身来删除
+	for (auto& pipe : imagePipeList) {
+		pipe->closePipe();
+	}
 	for (auto& video : videoList) {
 		video->closeDevice();
 	}
@@ -53,6 +58,15 @@ void OeipManager::initVideoList() {
 }
 
 int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType) {
+	std::lock_guard<std::mutex> mtx_locker(mtx);
+	//先检查是否有已经不用的管线
+	std::vector<ImageProcess*> pipeList;
+	PluginManager<ImageProcess>::getInstance().getModelList(pipeList, gpgpuType);
+	for (int32_t i = 0; i < pipeList.size(); i++) {
+		if (pipeList[i]->emptyPipe())
+			return i;
+	}
+	//如果没有就申请个新的
 	auto vp = PluginManager<ImageProcess>::getInstance().createModel(gpgpuType);
 	if (vp == nullptr)
 		return -1;
@@ -61,7 +75,11 @@ int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType) {
 }
 
 bool OeipManager::closePipe(int32_t pipeId) {
-	return 0;
+	std::lock_guard<std::mutex> mtx_locker(mtx);
+	if (pipeId < 0 || pipeId >= imagePipeList.size())
+		return -1;
+	//关闭相应管线
+	imagePipeList[pipeId]->closePipe();
 }
 
 

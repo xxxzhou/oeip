@@ -92,7 +92,7 @@ extern "C"
 	OEIPDLL_EXPORT void setPipeInput(int32_t pipeId, int32_t layerIndex, int32_t width, int32_t height, int32_t dataType = OEIP_CV_8UC1, int32_t inputIndex = 0);
 	//更新计算管线的数据输入
 	OEIPDLL_EXPORT void updatePipeInput(int32_t pipeId, int32_t layerIndex, uint8_t* data, int32_t inputIndex = 0);
-	//运行管线
+	//运行管线,如果可能,尽量与updatePipeParamet在同一线程,最好是UE4/Unity3D的主线程(游戏线程),或是WinForm里的UI线程
 	OEIPDLL_EXPORT void runPipe(int32_t pipeId);
 	//把另一个DX11上下文中的纹理当做当前管线的输入源
 	OEIPDLL_EXPORT void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);

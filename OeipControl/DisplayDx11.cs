@@ -24,7 +24,7 @@ namespace OeipControl
         private SwapChain swapChain = null;
         private RenderTargetView renderTargetView = null;
         private Texture2D backBuffer = null;
-        private OeipVideoPipe VideoPipe = null;
+        private ISharpDXViewPipe viewPipe = null;
         public int TexWidth { get; private set; } = 1920;
         public int TexHeight { get; private set; } = 1080;
 
@@ -36,12 +36,12 @@ namespace OeipControl
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (!VideoPipe.IsGpu)
+            if (!viewPipe.IsGpu)
                 return;
             this.Draw();
         }
 
-        public void NativeLoad(OeipVideoPipe videoPipe, VideoFormat videoFormat)
+        public void NativeLoad(ISharpDXViewPipe videoPipe, VideoFormat videoFormat)
         {
             this.timer.Enabled = false;
             ModeDescription backBufferDesc = new ModeDescription(videoFormat.width, videoFormat.height, new Rational(videoFormat.fps, 1), Format.R8G8B8A8_UNorm);
@@ -60,7 +60,7 @@ namespace OeipControl
             backBuffer = swapChain.GetBackBuffer<Texture2D>(0);
             renderTargetView = new RenderTargetView(deviceDx11, backBuffer);
             deviceCtx.OutputMerger.SetRenderTargets(renderTargetView);
-            VideoPipe = videoPipe;
+            viewPipe = videoPipe;
             this.timer.Interval = 1000 / videoFormat.fps;
             this.timer.Enabled = true;
             //Action action = () => { RenderLoop.Run(this, Draw); };
@@ -69,7 +69,7 @@ namespace OeipControl
 
         private void Draw()
         {
-            VideoPipe.Pipe.setPipeOutputGpuTex(VideoPipe.MattingOutIndex, deviceDx11.NativePointer, backBuffer.NativePointer);
+            viewPipe.Pipe.setPipeOutputGpuTex(viewPipe.OutGpuIndex, deviceDx11.NativePointer, backBuffer.NativePointer);
             swapChain.Present(1, PresentFlags.None);
         }
     }

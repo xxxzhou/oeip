@@ -3,9 +3,10 @@
 #include "Oeipffmpeg.h"
 #include "OeipFree.h"
 #include <mutex>
+#include "FNetCommon.h"
 
 //拉流
-class OEIPFMDLL_EXPORT FRtmpInput
+class FRtmpInput :public FNetInput
 {
 public:
 	FRtmpInput();
@@ -35,14 +36,10 @@ private:
 	std::mutex mtx;
 	//信号量.
 	std::condition_variable signal;
-
-	onVideoDataHandle onVideoDataEvent;
 private:
 	void readPack();
 public:
-	int32_t openURL(const char* url, bool bVideo, bool bAudio);
-	void close();
-
-	void setVideoDataEvent(onVideoDataHandle onHandle);
+	virtual int32_t openURL(const char* url, bool bVideo, bool bAudio) override;
+	virtual void close() override;
 };
 

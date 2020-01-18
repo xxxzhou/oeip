@@ -46,6 +46,8 @@ public:
 	void setEnableLayerList(int32_t layerIndex, bool bEnable);
 	bool getEnableLayerList(int32_t layerIndex, bool& bDListChange);
 	OeipLayerType getLayerType(int32_t layerIndex);
+	void closePipe();
+	bool emptyPipe();
 public:
 	int32_t findLayer(const std::string& name);
 	void getLayerOutConnect(int32_t layerIndex, LayerConnect& outConnect, int32_t outIndex);

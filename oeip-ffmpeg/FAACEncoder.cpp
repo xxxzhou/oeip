@@ -88,7 +88,7 @@ int32_t FAACEncoder::openEncode() {
 	swrCtx = getUniquePtr(tempSwr);
 	int32_t ret = swr_init(swrCtx.get());
 	if (ret < 0) {
-		logRetffmpeg("failed to initialize the resampling context!", ret);
+		checkRet("failed to initialize the resampling context!", ret);
 		return ret;
 	}
 	bufferSize = av_samples_get_buffer_size(nullptr, cdeCtx->channels, cdeCtx->frame_size, cdeCtx->sample_fmt, 0);
@@ -99,18 +99,18 @@ int32_t FAACEncoder::openEncode() {
 	samples = static_cast<uint8_t*>(av_malloc(bufferSize));
 	ret = avcodec_fill_audio_frame(frame.get(), cdeCtx->channels, cdeCtx->sample_fmt, reinterpret_cast<const uint8_t*>(samples), bufferSize, 0);
 	if (ret < 0) {
-		logRetffmpeg("acc avcodec_fill_audio_frame failed!", ret);
+		checkRet("acc avcodec_fill_audio_frame failed!", ret);
 		return ret;
 	}
 	pcmBuffer.resize(OEIP_AAC_BUFFER_MAX_SIZE);
 	bInit = true;
 }
 
-int FAACEncoder::encoder(const uint8_t* indata, int length, uint64_t timestamp) {
+int FAACEncoder::encoder(uint8_t** indata, int length, uint64_t timestamp) {
 	if (!bInit)
 		return -1;
 	int ret = 0;
-	memcpy(pcmBuffer.data() + pcmBufferSize, indata, length);
+	memcpy(pcmBuffer.data() + pcmBufferSize, *indata, length);
 	pcmBufferSize += length;
 	//传入需要的数据，单位是byte(2表示AV_SAMPLE_FMT_S16)
 	int frameSize = cdeCtx->frame_size * cdeCtx->channels * 2;
@@ -125,7 +125,7 @@ int FAACEncoder::encoder(const uint8_t* indata, int length, uint64_t timestamp) 
 		cframe->sample_rate = cdeCtx->sample_rate;
 		int ret = av_frame_get_buffer(cframe.get(), 0);
 		if (ret < 0) {
-			logRetffmpeg("error allocating an audio buffer.", ret);
+			checkRet("error allocating an audio buffer.", ret);
 			return ret;
 		}
 		swr_convert(swrCtx.get(), (uint8_t**)cframe->data, cframe->nb_samples,
@@ -136,7 +136,7 @@ int FAACEncoder::encoder(const uint8_t* indata, int length, uint64_t timestamp) 
 		cframe->pts = timestamp;
 		ret = avcodec_send_frame(cdeCtx.get(), cframe.get());
 		if (ret < 0) {
-			logRetffmpeg("aac avcodec_send_frame error.", ret);
+			checkRet("aac avcodec_send_frame error.", ret);
 			return ret;
 		}
 		memmove(pcmBuffer.data(), pcmBuffer.data() + frameSize, pcmBufferSize);
@@ -155,7 +155,7 @@ int FAACEncoder::readPacket(uint8_t* outData, int& outLength, uint64_t& timestam
 		return -100;
 	}
 	else if (ret < 0) {
-		logRetffmpeg("acc avcodec_receive_packet error.", ret);
+		checkRet("acc avcodec_receive_packet error.", ret);
 		av_packet_unref(&packet);
 		return ret;
 	}

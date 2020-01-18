@@ -1,9 +1,9 @@
 #include "GuidedFilterLayer.h"
 
-void resize_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream);
-void resize_gpuf(PtrStepSz<float4> source, PtrStepSz<float4> dest, bool bLinear, cudaStream_t stream);
-void uchar2float_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, cudaStream_t stream);
+template <typename T>
+void resize_gpu(PtrStepSz<T> source, PtrStepSz<T> dest, bool bLinear, cudaStream_t stream);
 
+void uchar2float_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> dest, cudaStream_t stream);
 void findMatrix_gpu(PtrStepSz<float4> source, PtrStepSz<float3> dest,
 	PtrStepSz<float3> dest1, PtrStepSz<float3> dest2, cudaStream_t stream);
 void guidedFilter_gpu(PtrStepSz<float4> source, PtrStepSz<float3> col1,
@@ -54,7 +54,7 @@ void GuidedFilterLayerCuda::onRunLayer() {
 	NppiSize oMaskSize = { softness,softness };
 	NppiPoint oAnchor = { softness / 2,softness / 2 };
 	//缩放大小
-	resize_gpu(inMats[0], resizeMat, false, ipCuda->cudaStream);
+	resize_gpu<uchar4>(inMats[0], resizeMat, false, ipCuda->cudaStream);
 	uchar2float_gpu(resizeMat, resizeMatf, ipCuda->cudaStream);
 	findMatrix_gpu(resizeMatf, mean_Ipv, var_I_rxv, var_I_gbxfv, ipCuda->cudaStream);
 	//模糊原始值
@@ -66,7 +66,7 @@ void GuidedFilterLayerCuda::onRunLayer() {
 	//求导
 	guidedFilter_gpu(mean_I, mean_Ip, var_I_rx, var_I_gbxf, meanv, layerParamet.eps, ipCuda->cudaStream);
 	nppiFilterBoxBorder_32f_C4R((Npp32f*)meanv.ptr<float4>(), meanv.step, oSizeROI, oSrcOffset, (Npp32f*)means.ptr<float4>(), means.step, oSizeROI, oMaskSize, oAnchor, NPP_BORDER_REPLICATE);
-	resize_gpuf(means, mean, true, ipCuda->cudaStream);
+	resize_gpu<float4>(means, mean, true, ipCuda->cudaStream);
 	//结果
 	guidedFilterResult_gpu(inMats[0], mean, outMats[0], layerParamet.intensity, ipCuda->cudaStream);
 }

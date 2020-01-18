@@ -9,6 +9,7 @@ void freefobj(T* val) {
 	av_free(val);
 }
 
+//显式具体化 对应各个具体实现
 template<>
 inline void freefobj(AVCodecContext* val) {
 	avcodec_close(val);
@@ -17,10 +18,10 @@ inline void freefobj(AVCodecContext* val) {
 
 template<>
 inline void freefobj(AVFormatContext* val) {
-/*	if (val->flags & AVFMT_NOFILE) {
-		avio_close(val->pb);
-		avformat_free_context(val);
-	}*/	
+	/*	if (val->flags & AVFMT_NOFILE) {
+			avio_close(val->pb);
+			avformat_free_context(val);
+		}*/
 	avformat_close_input(&val);
 }
 

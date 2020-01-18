@@ -97,6 +97,10 @@ void ImageProcess::updateInput(int32_t layerIndex, uint8_t* data, int32_t intput
 
 void ImageProcess::outputData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t dataType) {
 	//这个回调会发给用户,如果加锁需要保证用户操作安全不会引起锁的问题
+	{
+		std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+		OEIP_CHECKPIPEINDEXVOID;
+	}
 	if (onProcessEvent) {
 		onProcessEvent(layerIndex, data, width, height, dataType);
 	}
@@ -159,6 +163,16 @@ OeipLayerType ImageProcess::getLayerType(int32_t layerIndex) {
 		return OEIP_NONE_LAYER;
 	auto layer = layers[layerIndex];
 	return layer->layerType;
+}
+
+void ImageProcess::closePipe() {
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	layers.clear();
+}
+
+bool ImageProcess::emptyPipe() {
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	return layers.size() <= 0;
 }
 
 int32_t ImageProcess::findLayer(const std::string& name) {

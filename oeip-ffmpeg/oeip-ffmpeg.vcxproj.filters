@@ -22,6 +22,9 @@
     <Filter Include="live">
       <UniqueIdentifier>{1445a012-c4d0-4bd2-bbae-c4eca6ea09e2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="live\rtmp">
+      <UniqueIdentifier>{c0432a0d-6c23-41b5-9d22-b4af4c500ca8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioResample.h">
@@ -51,16 +54,19 @@
     <ClInclude Include="FAACEncoder.h">
       <Filter>encoder</Filter>
     </ClInclude>
-    <ClInclude Include="FNetOutput.h">
-      <Filter>live</Filter>
-    </ClInclude>
-    <ClInclude Include="FRtmpOutput.h">
-      <Filter>live</Filter>
-    </ClInclude>
     <ClInclude Include="FLiveOutput.h">
       <Filter>live</Filter>
     </ClInclude>
     <ClInclude Include="FRtmpInput.h">
+      <Filter>live\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="FRtmpOutput.h">
+      <Filter>live\rtmp</Filter>
+    </ClInclude>
+    <ClInclude Include="FLiveInput.h">
+      <Filter>live</Filter>
+    </ClInclude>
+    <ClInclude Include="FNetCommon.h">
       <Filter>live</Filter>
     </ClInclude>
   </ItemGroup>
@@ -80,13 +86,16 @@
     <ClCompile Include="FAACEncoder.cpp">
       <Filter>encoder</Filter>
     </ClCompile>
-    <ClCompile Include="FRtmpOutput.cpp">
-      <Filter>live</Filter>
-    </ClCompile>
     <ClCompile Include="FLiveOutput.cpp">
       <Filter>live</Filter>
     </ClCompile>
     <ClCompile Include="FRtmpInput.cpp">
+      <Filter>live\rtmp</Filter>
+    </ClCompile>
+    <ClCompile Include="FRtmpOutput.cpp">
+      <Filter>live\rtmp</Filter>
+    </ClCompile>
+    <ClCompile Include="FLiveInput.cpp">
       <Filter>live</Filter>
     </ClCompile>
   </ItemGroup>

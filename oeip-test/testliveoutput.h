@@ -15,7 +15,7 @@
 #include <../oeip/VideoPipe.h>
 #include <../oeip/LivePipe.h>
 #include <../oeip-ffmpeg/FLiveOutput.h>
-#include <../oeip-ffmpeg/FRtmpInput.h>
+#include <../oeip-ffmpeg/FLiveInput.h>
 
 using namespace std;
 using namespace cv;
@@ -29,7 +29,7 @@ namespace OeipLiveOutput
 	int32_t formatIndex = 0;
 	int32_t inputLayerIndex = 0;
 	//VideoPipe* vpipe = nullptr;
-	std::unique_ptr<VideoPipe>  vpipe = nullptr;
+	std::unique_ptr<VideoPipe> vpipe = nullptr;
 	std::unique_ptr<LivePipe> lpipe = nullptr;
 	bool bPush = true;
 	bool bPull = true;
@@ -37,17 +37,30 @@ namespace OeipLiveOutput
 	bool bRecord = false;
 	VideoFormat videoFormat = {};
 	std::unique_ptr<FLiveOutput> liveOut = nullptr;
-	std::unique_ptr<FRtmpInput> liveIn = nullptr;
+	std::unique_ptr<FLiveInput> liveIn = nullptr;
 	OeipAudioDesc cdesc = {};
 	int32_t sampleRate = 8000;
 	OeipYUVFMT fmt = OEIP_YUVFMT_YUV420P;
+	std::vector<uint8_t> frameData;
 	void dataRecive(uint8_t* data, int32_t width, int32_t height) {
 		//std::cout << width << height << std::endl;
 		vpipe->runVideoPipe(0, data);
 	}
 
 	void onPullData(OeipVideoFrame frame) {
-		lpipe->runVideoPipe(0, frame.data);
+		int32_t width = frame.width;
+		int32_t height = frame.height;
+		if (fmt == OEIP_YUVFMT_YUY2P) {
+			memcpy(frameData.data(), frame.data[0], width * height);
+			memcpy(frameData.data() + width * height, frame.data[1], width * height / 2);
+			memcpy(frameData.data() + width * height * 3 / 2, frame.data[2], width * height / 2);
+		}
+		else if (fmt == OEIP_YUVFMT_YUV420P) {
+			memcpy(frameData.data(), frame.data[0], width * height);
+			memcpy(frameData.data() + width * height, frame.data[1], width * height / 4);
+			memcpy(frameData.data() + width * height * 5 / 4, frame.data[2], width * height / 4);
+		}
+		lpipe->runVideoPipe(0, frameData.data());
 	}
 
 	void onPipeData(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex) {
@@ -56,8 +69,19 @@ namespace OeipLiveOutput
 		}
 		if (vpipe->getOutYuvId() == layerIndex) {
 			if (bPush && bRecord && liveOut) {
+				int32_t width = videoFormat.width;
+				int32_t height = videoFormat.height;
 				OeipVideoFrame vf = {};
-				vf.data = (uint8_t*)data;
+				if (fmt == OEIP_YUVFMT_YUY2P) {
+					vf.data[0] = data;
+					vf.data[1] = data + width * height;
+					vf.data[2] = data + width * height * 3 / 2;
+				}
+				else if (fmt == OEIP_YUVFMT_YUV420P) {
+					vf.data[0] = data;
+					vf.data[1] = data + width * height;
+					vf.data[2] = data + width * height * 5 / 4;
+				}
 				vf.dataSize = width * height;
 				vf.fmt = fmt;
 				vf.height = videoFormat.height;
@@ -114,6 +138,13 @@ namespace OeipLiveOutput
 		vpipe->setVideoFormat(videoFormat.videoType, videoFormat.width, videoFormat.height);
 		show = new cv::Mat(videoFormat.height, videoFormat.width, CV_8UC4);
 		showLive = new cv::Mat(videoFormat.height, videoFormat.width, CV_8UC4);
+
+		if (fmt == OEIP_YUVFMT_YUV420P) {
+			frameData.resize(videoFormat.height * videoFormat.width * 3 / 2);
+		}
+		else if (fmt == OEIP_YUVFMT_YUY2P) {
+			frameData.resize(videoFormat.height * videoFormat.width * 2);
+		}
 		//const char* window_name = "vvvvvvvv";
 		while (int key = cv::waitKey(20)) {
 			cv::imshow("a", *show);
@@ -134,11 +165,10 @@ namespace OeipLiveOutput
 						lpipe->setVideoFormat(fmt, videoFormat.width, videoFormat.height);
 					}
 					if (bPull) {
-						liveIn = std::make_unique<FRtmpInput>();
+						liveIn = std::make_unique<FLiveInput>();
 						liveIn->setVideoDataEvent(onPullData);
-						liveIn->openURL(rtmpUrl, true, true);
+						liveIn->open(rtmpUrl);
 					}
-
 					logMessage(OEIP_INFO, "live start");
 				}
 				else {

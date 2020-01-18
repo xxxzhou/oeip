@@ -5,7 +5,7 @@
 #include <memory>
 
 //用来记录麦与声卡以特定格式输出，有必要的话会混合麦与声卡输出
-class FAudioOutput : public AudioOutput
+class OEIPFMDLL_EXPORT FAudioOutput : public AudioOutput
 {
 public:
 	FAudioOutput();

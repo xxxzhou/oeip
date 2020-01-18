@@ -7,7 +7,8 @@ void yuv2rgb_gpu(PtrStepSz<uchar> source, PtrStepSz<uchar4> dest, int32_t yuvtyp
 void yuv2rgb_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool ufront, bool yfront, cudaStream_t stream);
 void rgb2yuv_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> dest, int32_t yuvtype, cudaStream_t stream);
 void rgb2yuv_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool ufront, bool yfront, cudaStream_t stream);
-void resize_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream);
+template <typename T>
+void resize_gpu(PtrStepSz<T> source, PtrStepSz<T> dest, bool bLinear, cudaStream_t stream);
 void blend_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> blendTex, PtrStepSz<uchar4> dest,
 	int32_t left, int32_t top, float opacity, cudaStream_t stream);
 void operate_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, OperateParamet paramt, cudaStream_t stream);
@@ -76,7 +77,7 @@ void ResizeLayerCuda::onInitLayer() {
 }
 
 void ResizeLayerCuda::onRunLayer() {
-	resize_gpu(inMats[0], outMats[0], layerParamet.bLinear, ipCuda->cudaStream);
+	resize_gpu<uchar4>(inMats[0], outMats[0], layerParamet.bLinear, ipCuda->cudaStream);
 }
 
 RGBA2YUVLayerCuda::RGBA2YUVLayerCuda() {
@@ -130,23 +131,23 @@ void RGBA2YUVLayerCuda::onRunLayer() {
 }
 
 void BlendLayerCuda::onParametChange(BlendParamet oldT) {
-	if (layerParamet.width != oldT.width || layerParamet.height != oldT.height) {
+	if (layerParamet.rect.width != oldT.rect.width || layerParamet.rect.height != oldT.rect.height) {
 		ipCuda->resetLayers();
 	}
 }
 
 bool BlendLayerCuda::onInitBuffer() {
 	LayerCuda::onInitBuffer();
-	int32_t tempWidth = layerParamet.width * inMats[0].cols;
-	int32_t tempHeight = layerParamet.height * inMats[0].rows;
+	int32_t tempWidth = layerParamet.rect.width * inMats[0].cols;
+	int32_t tempHeight = layerParamet.rect.height * inMats[0].rows;
 	tempMat.create(tempHeight, tempWidth, OEIP_CV_8UC4);
 	return true;
 }
 
 void BlendLayerCuda::onRunLayer() {
-	top = layerParamet.top * inMats[0].rows;
-	left = layerParamet.left * inMats[0].cols;
-	resize_gpu(inMats[1], tempMat, true, ipCuda->cudaStream);
+	top = (layerParamet.rect.centerY - layerParamet.rect.height / 2) * inMats[0].rows;
+	left = (layerParamet.rect.centerX - layerParamet.rect.width / 2)* inMats[0].cols;
+	resize_gpu<uchar4>(inMats[1], tempMat, true, ipCuda->cudaStream);
 	blend_gpu(inMats[0], tempMat, outMats[0], left, top, layerParamet.opacity, ipCuda->cudaStream);
 }
 

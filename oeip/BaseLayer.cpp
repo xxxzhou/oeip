@@ -20,7 +20,7 @@ BaseLayer::BaseLayer(int32_t inSize, int32_t outSize) {
 
 bool BaseLayer::initLayer() {
 	std::string inputMeg = layerType == OEIP_INPUT_LAYER ? " input layer " : " forward layer ";
-	std::string layerMeg = "check layer:" + layerName + "-in:" + std::to_string(layerIndex) + " " + inputMeg;
+	std::string layerMeg = "check layer:(" + layerName + ")-in:" + std::to_string(layerIndex) + " " + inputMeg;
 	for (uint32_t i = 0; i < inCount; i++) {
 		LayerConnect lc = selfConnects[i];
 		if (layerType <= 0) {
@@ -58,8 +58,10 @@ bool BaseLayer::initLayer() {
 				if (bEnable) {
 					OeipLayerType layerType = imageProcess->getLayerType(forwardLayerIndexs[i]);
 					bEnable = layerType != OEIP_OUTPUT_LAYER;
-					std::string message = layerMeg + "connect output layer,auto connect output previous layer.";
-					logMessage(OEIP_WARN, message.c_str());
+					if (!bEnable) {
+						std::string message = layerMeg + "connect output layer,auto connect output previous layer.";
+						logMessage(OEIP_WARN, message.c_str());
+					}
 				}
 			}
 			if (forwardLayerIndexs[i] < 0) {

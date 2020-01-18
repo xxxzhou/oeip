@@ -1,6 +1,6 @@
 #pragma once
 
-#include "FNetOutput.h"
+#include "FNetCommon.h"
 
 //推流 (抓到RTMP网址打不开的错误码，这个要单独处理)
 //用FFmpeg IO模式，根据输入的视频与音频信息自动得到推流所需要的编码信息，断开推流与输入信息的联系

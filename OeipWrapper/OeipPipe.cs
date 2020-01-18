@@ -61,13 +61,13 @@ namespace OeipWrapper
             return OeipHelper.updatePipeParamet(PipeId, layerIndex, &t);
         }
 
-        public int AddLayerStruct<T>(string layerName, OeipLayerType layerType, T t) where T : struct
-        {
-            int layerIndex = OeipHelper.addPiepLayer(PipeId, layerName, layerType, IntPtr.Zero);
-            UpdateParametStruct(layerIndex, t);
-            return layerIndex;
-        }
-
+        /// <summary>
+        /// 有些结构用不了unmanaged,请用这个方法
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="layerIndex"></param>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public unsafe bool UpdateParametStruct<T>(int layerIndex, T t) where T : struct
         {
             int length = Marshal.SizeOf(typeof(T));
@@ -77,6 +77,13 @@ namespace OeipWrapper
             Marshal.StructureToPtr(t, ptr, false);
             bool bResult = OeipHelper.updatePipeParamet(PipeId, layerIndex, numbers);
             return bResult;
+        }
+
+        public int AddLayerStruct<T>(string layerName, OeipLayerType layerType, T t) where T : struct
+        {
+            int layerIndex = OeipHelper.addPiepLayer(PipeId, layerName, layerType, IntPtr.Zero);
+            UpdateParametStruct(layerIndex, t);
+            return layerIndex;
         }
 
         public void ConnectLayer(int layerIndex, string forwardName, int inputIndex = 0, int selfIndex = 0)

@@ -15,8 +15,11 @@ namespace OeipControl
     public partial class CameraControl : UserControl
     {
         private OeipCamera camera = null;
-        private OeipVideoPipe videoPipe = null;
         private PersonBox[] personBox = null;
+        private bool bDrawMode = false;
+
+        public OeipVideoPipe VideoPipe { get; private set; } = null;
+
         public CameraControl()
         {
             InitializeComponent();
@@ -25,9 +28,9 @@ namespace OeipControl
         public void NativeLoad(OeipGpgpuType gpuType, int index = 0, bool bCpu = false)
         {
             var pipe = OeipManager.Instance.CreatePipe<OeipPipe>(gpuType);
-            videoPipe = new OeipVideoPipe(pipe);
-            videoPipe.Pipe.OnProcessEvent += Pipe_OnProcessEvent;
-            videoPipe.SetOutput(bCpu, !bCpu);
+            VideoPipe = new OeipVideoPipe(pipe);
+            VideoPipe.Pipe.OnProcessEvent += Pipe_OnProcessEvent;
+            VideoPipe.SetOutput(bCpu, !bCpu);
 
             camera = OeipManager.Instance.GetCamera<OeipCamera>(index);
             camera.OnReviceEvent += Camera_OnReviceEvent;
@@ -44,17 +47,17 @@ namespace OeipControl
 
         private void Pipe_OnProcessEvent(int layerIndex, IntPtr data, int width, int height, int outputIndex)
         {
-            if (layerIndex == videoPipe.OutIndex)
+            if (layerIndex == VideoPipe.OutIndex)
             {
                 displayWF.UpdateImage(width, height, data);
             }
-            else if (layerIndex == videoPipe.DarknetIndex)
+            else if (layerIndex == VideoPipe.DarknetIndex)
             {
-                personBox = PInvokeHelper.GetPInvokeArray<PersonBox>(width, data);
                 if (width > 0)
                 {
+                    personBox = PInvokeHelper.GetPInvokeArray<PersonBox>(width, data);
                     Action action = () =>
-                    {
+                    {                        
                         if (personBox == null)
                             return;
                         string msg = string.Empty;
@@ -71,7 +74,7 @@ namespace OeipControl
 
         private void Camera_OnReviceEvent(IntPtr data, int width, int height)
         {
-            videoPipe.RunVideoPipe(data);
+            VideoPipe.RunVideoPipe(data);
         }
 
         private void cbx_cameraList_SelectedIndexChanged(object sender, EventArgs e)
@@ -99,17 +102,28 @@ namespace OeipControl
         public void SetFormat(int index)
         {
             var selectFormat = camera.VideoFormats[index];
-            videoPipe.SetVideoFormat(selectFormat.videoType, selectFormat.width, selectFormat.height);
+            VideoPipe.SetVideoFormat(selectFormat.videoType, selectFormat.width, selectFormat.height);
 
             cbx_formatList.SelectedIndex = index;
             camera.SetFormat(index);
             camera.Open();
 
-            displayDx11.Visible = videoPipe.IsGpu;
-            displayWF.Visible = !videoPipe.IsGpu;
+            displayDx11.Visible = VideoPipe.IsGpu;
+            displayWF.Visible = !VideoPipe.IsGpu;
             displayWF.Dock = DockStyle.Fill;
             displayDx11.Dock = DockStyle.Fill;
-            displayDx11.NativeLoad(videoPipe, selectFormat);
+            displayDx11.NativeLoad(VideoPipe, selectFormat);
+        }
+
+        private void btn_Grabcut_Click(object sender, EventArgs e)
+        {
+            bDrawMode = !bDrawMode;
+            OeipRect rect = new OeipRect();
+            if (personBox != null && personBox.Length > 0)
+            {
+                rect = personBox[0].rect;
+            }
+            VideoPipe.ChangeGrabcutMode(bDrawMode, ref rect);
         }
     }
 }

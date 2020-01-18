@@ -2,7 +2,8 @@
 #include <filesystem>
 #include <fstream>
 
-void resize_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, bool bLinear, cudaStream_t stream);
+template <typename T>
+void resize_gpu(PtrStepSz<T> source, PtrStepSz<T> dest, bool bLinear, cudaStream_t stream);
 void image2netData_gpu(PtrStepSz<uchar4> source, float* outData, cudaStream_t stream = nullptr);
 void drawRect_gpu(PtrStepSz<uchar4> source, cv::Rect rect, int radius, uchar4 drawColor, cudaStream_t stream = nullptr);
 
@@ -38,10 +39,10 @@ bool DarknetLayerCuda::onInitBuffer() {
 void DarknetLayerCuda::onRunLayer() {
 	if (!layerParamet.bLoad || !net)
 		return;
-	resize_gpu(inMats[0], netFrame, true, nullptr);
-	image2netData_gpu(netFrame, netInput);
+	resize_gpu<uchar4>(inMats[0], netFrame, true, ipCuda->cudaStream);
+	image2netData_gpu(netFrame, netInput, ipCuda->cudaStream);
 	network_predict_gpudata(net, netInput);
-	int nboxes = 0; 
+	int nboxes = 0;
 	detection* dets = get_network_boxes(net, netWidth, netHeight, layerParamet.thresh, 0, 0, 1, &nboxes);
 	//排序,nms 合并框(满足条件的放前面,被合并的放后面并置0)
 	if (layerParamet.nms)
@@ -54,17 +55,17 @@ void DarknetLayerCuda::onRunLayer() {
 			auto det = dets[i];
 			PersonBox box = {};
 			box.prob = det.prob[objectIndex];
-			box.centerX = det.bbox.x;
-			box.centerY = det.bbox.y;
-			box.width = det.bbox.w + 0.05;
-			box.height = det.bbox.h + 0.05;
+			box.rect.centerX = det.bbox.x;
+			box.rect.centerY = det.bbox.y;
+			box.rect.width = det.bbox.w + 0.05;
+			box.rect.height = det.bbox.h + 0.05;
 			personDets.push_back(box);
 			if (layerParamet.bDraw) {
 				cv::Rect rectangle2;
-				rectangle2.width = box.width * inMats[0].cols;
-				rectangle2.height = box.height * inMats[0].rows;
-				rectangle2.x = box.centerX * inMats[0].cols - rectangle2.width / 2;
-				rectangle2.y = box.centerY * inMats[0].rows - rectangle2.height / 2;
+				rectangle2.width = box.rect.width * inMats[0].cols;
+				rectangle2.height = box.rect.height * inMats[0].rows;
+				rectangle2.x = box.rect.centerX * inMats[0].cols - rectangle2.width / 2;
+				rectangle2.y = box.rect.centerY * inMats[0].rows - rectangle2.height / 2;
 				uint8_t r = layerParamet.drawColor & 0xff;
 				uint8_t g = (layerParamet.drawColor >> 8) & 0xff;
 				uint8_t b = (layerParamet.drawColor >> 16) & 0xff;

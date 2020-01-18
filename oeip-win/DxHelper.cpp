@@ -1,5 +1,6 @@
 #include "DxHelper.h"
 #include <exception>
+#include <comdef.h>
 
 int32_t sizeDxFormatElement(DXGI_FORMAT format) {
 	switch (format)
@@ -146,7 +147,9 @@ DXGI_FORMAT getDxFormat(int32_t dataType) {
 
 bool checkHR(HRESULT hr, const char* message) {
 	if (FAILED(hr)) {
-		std::string msg = std::string(message) + " hr:" + std::to_string(hr);
+		_com_error err(hr);
+		LPCTSTR errMsg = err.ErrorMessage();
+		std::string msg = std::string(message) + " hr:" + wstring2string(errMsg);
 		logMessage(OEIP_ERROR, msg.c_str());
 	}
 	return SUCCEEDED(hr);

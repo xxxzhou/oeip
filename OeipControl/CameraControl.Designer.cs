@@ -34,10 +34,11 @@ namespace OeipControl
             this.cbx_cameraList = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
             this.displayDx11 = new OeipControl.DisplayDx11();
             this.displayWF = new OeipControl.DisplayWF();
-            this.label3 = new System.Windows.Forms.Label();
+            this.btn_Grabcut = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
@@ -95,12 +96,22 @@ namespace OeipControl
             // panel2
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.panel2.Controls.Add(this.btn_Grabcut);
             this.panel2.Controls.Add(this.label3);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 280);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(477, 30);
             this.panel2.TabIndex = 1;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(21, 8);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "label3";
             // 
             // panel3
             // 
@@ -129,14 +140,15 @@ namespace OeipControl
             this.displayWF.Size = new System.Drawing.Size(217, 220);
             this.displayWF.TabIndex = 0;
             // 
-            // label3
+            // btn_Grabcut
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(21, 8);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "label3";
+            this.btn_Grabcut.Location = new System.Drawing.Point(334, 3);
+            this.btn_Grabcut.Name = "btn_Grabcut";
+            this.btn_Grabcut.Size = new System.Drawing.Size(75, 23);
+            this.btn_Grabcut.TabIndex = 1;
+            this.btn_Grabcut.Text = "Grabcut";
+            this.btn_Grabcut.UseVisualStyleBackColor = true;
+            this.btn_Grabcut.Click += new System.EventHandler(this.btn_Grabcut_Click);
             // 
             // CameraControl
             // 
@@ -168,5 +180,6 @@ namespace OeipControl
         private System.Windows.Forms.Label label1;
         private DisplayDx11 displayDx11;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button btn_Grabcut;
     }
 }

@@ -33,7 +33,7 @@ namespace OeipEncoderAudio
 		mixData.insert(mixData.end(), data, data + lenght);
 
 		int64_t timestamp = getNowTimestamp();
-		int ret = encoder->encoder(data, lenght, timestamp);
+		int ret = encoder->encoder(&data, lenght, timestamp);
 		if (ret != 0) {
 			return;
 		}

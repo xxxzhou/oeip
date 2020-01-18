@@ -5,6 +5,7 @@
 #include "ImageProcess.h"
 #include "AudioOutput.h"
 #include <memory>
+#include <mutex>
 
 void cleanPlugin(bool bFactory = false);
 
@@ -21,6 +22,7 @@ private:
 	std::vector<VideoDevice*> videoList;
 	std::vector<ImageProcess*> imagePipeList;
 	AudioOutput* audioOutput = nullptr;
+	std::mutex mtx;
 private:
 	void initVideoList();
 public:
@@ -38,6 +40,7 @@ public:
 		return videoList[index];
 	};
 	ImageProcess* getPipe(const int32_t index) {
+		std::lock_guard<std::mutex> mtx_locker(mtx);
 		if (index < 0 || index >= imagePipeList.size()) {
 			logMessage(OEIP_ERROR, "getPipe incorrect index");
 			return nullptr;

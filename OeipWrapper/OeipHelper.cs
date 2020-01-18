@@ -91,6 +91,14 @@ namespace OeipWrapper
         OEIP_Audio_WavHeader,
     }
 
+    public struct OeipRect
+    {
+        public float centerX;
+        public float centerY;
+        public float width;
+        public float height;
+    };
+
     public struct InputParamet
     {
         public int bCpu;// = true;
@@ -138,10 +146,7 @@ namespace OeipWrapper
     public struct BlendParamet
     {
         //所有值范围在0.1
-        public float left;// = 0.f;
-        public float top;// = 0.f;
-        public float width;// = 0.f;
-        public float height;// = 0.f;
+        public OeipRect rect;
         //不透明度
         public float opacity;// = 0.f;
     }
@@ -156,10 +161,16 @@ namespace OeipWrapper
 
     public struct GrabcutParamet
     {
+        //画背景点或是grabcut扣像
+        public int bDrawSeed;//= false;
+        //是否使用GPU来计算一桢的高斯混合模型
+        public int bGpuSeed;//= false;
         public int iterCount;// = 1;
+        public int seedCount;// = 1000; 
+        public int count;// = 250;
         public float gamma;// = 90.f;
         public float lambda;// = 450.f;
-        public int count;// = 250;
+        public OeipRect rect;// = { };
     };
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -181,10 +192,7 @@ namespace OeipWrapper
     {
         //是人的概率
         public float prob;//= 0.f;
-        public float centerX;// = 0.f;
-        public float centerY;// = 0.f;
-        public float width;// = 0.f;
-        public float height;// = 0.f;
+        public OeipRect rect;
     };
 
     public struct VideoFormat

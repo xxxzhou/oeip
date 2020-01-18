@@ -33,45 +33,4 @@ namespace OeipCommon
 
         public virtual void Close() { }
     }
-
-    public class SettingSingleton<T> : MSingleton<SettingSingleton<T>> where T : IXmlSerializable, new()
-    {
-        public T Setting = new T();
-
-        protected override void Init()
-        {
-
-        }
-
-        public void SaveSetting(string path)
-        {
-            using (var write = new StreamWriter(path, false, Encoding.UTF8))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                serializer.Serialize(write, Setting);
-            }
-        }
-
-        public void ReadSetting(string path)
-        {
-            if (!File.Exists(path))
-            {
-                var file = File.Create(path);
-                file.Close();
-                SaveSetting(path);
-            }
-            using (FileStream stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                try
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(T));
-                    Setting = (T)serializer.Deserialize(stream);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-        }
-    }
 }

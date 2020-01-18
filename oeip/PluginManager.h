@@ -7,7 +7,7 @@
 //在加载dll时打印输出信息，Unity3D/UE4可能会引起问题
 #define OEIP_LOADDLL_OUTPUT 1
 #if OEIP_LOADDLL_OUTPUT
-void loadMessage(int level, const char* message);
+OEIPDLL_EXPORT void loadMessage(int level, const char* message);
 #endif
 
 template<typename T>
@@ -109,10 +109,10 @@ public:
 	void release() {
 		for (auto& fi : factorys) {
 			for (auto& model : fi.models) {
-				//safeDelete(model);
+				safeDelete(model);
 			}
 			fi.models.clear();
-			//safeDelete(fi.factory);
+			safeDelete(fi.factory);
 		}
 	};
 	//在引用oeip进程关闭时调用

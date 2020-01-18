@@ -15,28 +15,24 @@ FRtmpInput::FRtmpInput() {
 }
 
 FRtmpInput::~FRtmpInput() {
-	videoData.clear();
+	//videoData.clear();
 }
 
 void FRtmpInput::readPack() {
 	//声明一桢数据
 	auto temp = av_frame_alloc();
 	frame = getUniquePtr(temp);
-	while (true) {
-		//std::unique_lock <std::mutex> lck(mtx);
-		if (!bOpenPull) {
-			break;
-		}
+	while (bOpenPull) {
 		int ret = 0;
 		AVPacket packet;
 		av_init_packet(&packet);
 		//av_read_frame本身会阻塞当前线程(可能以分钟记),故以等待加状态改变在这无用
-		if (bOpenPull && (ret = av_read_frame(fmtCtx.get(), &packet)) < 0)
+		if ((ret = av_read_frame(fmtCtx.get(), &packet)) < 0)
 			break;
 		if (packet.stream_index == videoIndex) {
 			ret = avcodec_send_packet(videoCtx.get(), &packet);
 			if (ret < 0) {
-				logRetffmpeg("input rtmp avcodec_send_packet fail", ret);
+				checkRet("input rtmp avcodec_send_packet fail", ret);
 				av_packet_unref(&packet);
 				break;
 			}
@@ -55,19 +51,18 @@ void FRtmpInput::readPack() {
 					int height = frame->height;
 					//frame
 					if (videoEncoder.yuvType == OEIP_YUVFMT_YUY2P) {
-						memcpy(videoData.data(), frame->data[0], width * height);
-						memcpy(videoData.data() + width * height, frame->data[1], width * height / 2);
-						memcpy(videoData.data() + width * height * 3 / 2, frame->data[2], width * height / 2);
+						videoFrame.dataSize = width * height * 2;
 					}
 					else if (videoEncoder.yuvType == OEIP_YUVFMT_YUV420P) {
-						memcpy(videoData.data(), frame->data[0], width * height);
-						memcpy(videoData.data() + width * height, frame->data[1], width * height / 4);
-						memcpy(videoData.data() + width * height * 5 / 4, frame->data[2], width * height / 4);
+						videoFrame.dataSize = width * height * 3 / 2;
+					}					
+					if (videoEncoder.yuvType == OEIP_YUVFMT_YUY2P || videoEncoder.yuvType == OEIP_YUVFMT_YUV420P) {
+						videoFrame.data[0] = frame->data[0];
+						videoFrame.data[1] = frame->data[1];
+						videoFrame.data[2] = frame->data[2];
 					}
 					videoFrame.width = width;
-					videoFrame.height = height;
-					videoFrame.data = &videoData[0];
-					videoFrame.dataSize = videoData.size();
+					videoFrame.height = height;					
 					videoFrame.fmt = videoEncoder.yuvType;
 					videoFrame.timestamp = frame->pts;
 					onVideoDataEvent(videoFrame);
@@ -81,7 +76,10 @@ void FRtmpInput::readPack() {
 }
 
 int32_t FRtmpInput::openURL(const char* curl, bool bVideo, bool bAudio) {
-	bOpenPull = false;
+	if (bOpenPull) {
+		logMessage(OEIP_INFO, "rtmp input is open.");
+		return 1;
+	}
 	this->url = curl;
 	this->bVideo = bVideo;
 	this->bAudio = bAudio;
@@ -99,13 +97,13 @@ int32_t FRtmpInput::openURL(const char* curl, bool bVideo, bool bAudio) {
 		temp->interrupt_callback.opaque = this;
 		if ((ret = avformat_open_input(&temp, url.c_str(), 0, nullptr)) < 0) {
 			std::string msg = "rtmp input not open " + url;
-			logRetffmpeg(msg, ret);
+			checkRet(msg, ret);
 			return ret;
 		}
 		fmtCtx = getUniquePtr(temp);
 		if ((ret = avformat_find_stream_info(fmtCtx.get(), nullptr)) < 0) {
 			std::string msg = "rtmp input find stream fail" + url;
-			logRetffmpeg(msg, ret);
+			checkRet(msg, ret);
 			return ret;
 		}
 		//找到第一个视频流与音频流
@@ -132,23 +130,23 @@ int32_t FRtmpInput::openURL(const char* curl, bool bVideo, bool bAudio) {
 			avcodec_parameters_to_context(videoCtx.get(), fmtCtx->streams[videoIndex]->codecpar);
 			if (videoCtx->pix_fmt == AV_PIX_FMT_YUV420P) {
 				videoEncoder.yuvType = OEIP_YUVFMT_YUV420P;
-				videoData.resize(videoEncoder.width * videoEncoder.height * 3 / 2);
+				//videoData.resize(videoEncoder.width * videoEncoder.height * 3 / 2);
 			}
 			else if (videoCtx->pix_fmt == AV_PIX_FMT_YUV422P) {
 				videoEncoder.yuvType = OEIP_YUVFMT_YUY2P;
-				videoData.resize(videoEncoder.width * videoEncoder.height * 2);
+				//videoData.resize(videoEncoder.width * videoEncoder.height * 2);
 			}
 			if ((ret = avcodec_open2(videoCtx.get(), codec, nullptr)) < 0) {
-				logRetffmpeg("rtmp input cannot open video decoder", ret);
+				checkRet("rtmp input cannot open video decoder", ret);
 				return ret;
 			}
 		}
 		bOpenPull = true;
-		return 1;
-	});
-	//openUrl.wait_for(std::chrono::milliseconds(3000));
+		return 0;
+	});	
 	int32_t ret = openUrl.get();
-	if (ret > 0) {
+	onOperateAction(OEIP_LIVE_OPERATE_OPEN, ret);
+	if (ret == 0) {
 		logMessage(OEIP_INFO, "rtmp input open sucess.");
 		std::thread ted = std::thread([&]() {
 			readPack();
@@ -165,18 +163,16 @@ void FRtmpInput::close() {
 	bOpenPull = false;
 	videoIndex = -1;
 	audioIndex = -1;
-	fmtCtx->max_delay = 10;
+	//fmtCtx->max_delay = 10;
 	std::unique_lock <std::mutex> lck(mtx);
 	//等待信号回传	
-	auto status = signal.wait_for(lck, std::chrono::seconds(5));
+	auto status = signal.wait_for(lck, std::chrono::seconds(2));
 	if (status == std::cv_status::timeout) {
 		logMessage(OEIP_WARN, "rtmp input is not closed properly.");
 	}
 	fmtCtx.reset();
 	audioCtx.reset();
 	videoCtx.reset();
+	onOperateAction(OEIP_LIVE_OPERATE_CLOSE, 0);
 }
 
-void FRtmpInput::setVideoDataEvent(onVideoDataHandle onHandle) {
-	onVideoDataEvent = onHandle;
-}

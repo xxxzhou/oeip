@@ -100,26 +100,29 @@ int32_t FH264Encoder::openEncode(AVCodec* codec) {
 	return ret;
 }
 
-int FH264Encoder::encoder(const uint8_t* indata, int length, uint64_t timestamp) {
+int FH264Encoder::encoder(uint8_t** indata, int length, uint64_t timestamp) {
 	if (!bInit)
 		return -1;
 	int ret = 0;
-	uint8_t* yuv_buf = const_cast<uint8_t*>(indata);
-	if (encoderDesc.yuvType == OEIP_YUVFMT_YUV420P) {
-		frame->data[0] = yuv_buf;
-		frame->data[1] = yuv_buf + ysize;
-		frame->data[2] = yuv_buf + ysize * 5 / 4;
-	}
-	else if (encoderDesc.yuvType == OEIP_YUVFMT_YUY2P) {
-		frame->data[0] = yuv_buf;
-		frame->data[1] = yuv_buf + ysize;
-		frame->data[2] = yuv_buf + ysize * 3 / 2;
-	}
+	//uint8_t* yuv_buf = const_cast<uint8_t*>(indata);
+	//if (encoderDesc.yuvType == OEIP_YUVFMT_YUV420P) {
+	//	frame->data[0] = yuv_buf;
+	//	frame->data[1] = yuv_buf + ysize;
+	//	frame->data[2] = yuv_buf + ysize * 5 / 4;
+	//}
+	//else if (encoderDesc.yuvType == OEIP_YUVFMT_YUY2P) {
+	//	frame->data[0] = yuv_buf;
+	//	frame->data[1] = yuv_buf + ysize;
+	//	frame->data[2] = yuv_buf + ysize * 3 / 2;
+	//}
+	frame->data[0] = indata[0];
+	frame->data[1] = indata[1];
+	frame->data[2] = indata[2];
 	frame->pts = timestamp;
 	frame->pkt_dts = timestamp;
 	ret = avcodec_send_frame(cdeCtx.get(), frame.get());
 	if (ret < 0) {
-		logRetffmpeg("h264 avcodec_send_frame error", ret);
+		checkRet("h264 avcodec_send_frame error", ret);
 	}
 	return ret;
 }
@@ -135,7 +138,7 @@ int FH264Encoder::readPacket(uint8_t* outData, int& outLength, uint64_t& timesta
 		return -100;
 	}
 	else if (ret < 0) {
-		logRetffmpeg("h264 avcodec_receive_packet error", ret);
+		checkRet("h264 avcodec_receive_packet error", ret);
 		av_packet_unref(&packet);
 		return ret;
 	}

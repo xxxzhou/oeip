@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 #include "../oeip/OeipCommon.h"
+#include "../oeip-live/OeipLive.h"
 #include <string>
 #include <memory>
 
@@ -31,41 +32,6 @@ enum OeipFAVFormat : int32_t
 	OEIP_AVFORMAT_RTMP,
 	OEIP_AVFORMAT_HTTP,
 	OEIP_AVFORMAT_RTSP,
-};
-
-struct OeipVideoEncoder
-{
-	int32_t width = 1920;
-	int32_t height = 1080;
-	int32_t fps = 30;
-	int32_t bitrate = 4000000;
-	OeipYUVFMT yuvType = OEIP_YUVFMT_YUY2P;
-};
-
-struct OeipAudioEncoder
-{
-	int32_t frequency = 32000;
-	int32_t channel = 1;
-	int32_t bitrate = 48000;
-};
-
-struct OeipVideoFrame
-{
-	uint8_t* data;
-	uint32_t dataSize;
-	uint64_t timestamp;
-	uint32_t width;
-	uint32_t height;
-	OeipYUVFMT fmt = OEIP_YUVFMT_YUY2P;
-};
-
-struct OeipAudioFrame
-{
-	uint8_t* data;
-	uint32_t dataSize;
-	uint64_t timestamp;
-	uint32_t sampleRate;
-	uint32_t channels;
 };
 
 class StreamFrame
@@ -123,7 +89,7 @@ inline std::string getAvformatName(OeipFAVFormat format) {
 	return name;
 }
 
-inline void logRetffmpeg(std::string meg, int32_t ret) {
+inline void checkRet(std::string meg, int32_t ret) {
 	char error_char[AV_ERROR_MAX_STRING_SIZE];
 	std::string message = meg + " ret: " + av_make_error_string(error_char, AV_ERROR_MAX_STRING_SIZE, ret);
 	logMessage(OEIP_ERROR, message.c_str());
@@ -150,7 +116,7 @@ inline int get_sr_index(unsigned int sampling_frequency)
 	return 0;
 }
 
-typedef std::function<void(int32_t operate, int32_t code)> onOperateResult;
+typedef std::function<void(int32_t operate, int32_t code)> onOperateHandle;
 typedef std::function<void(OeipVideoFrame)> onVideoDataHandle;
 //inline int enumVideoCodec() {
 //	AVCodec* codec = NULL;

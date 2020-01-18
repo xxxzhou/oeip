@@ -69,6 +69,34 @@
     <Compile Include="CameraParametr.designer.cs">
       <DependentUpon>CameraParametr.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\BaseControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DropdownControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DropdownControl.Designer.cs">
+      <DependentUpon>DropdownControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\InputControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\InputControl.Designer.cs">
+      <DependentUpon>InputControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ObjectBindWF.cs" />
+    <Compile Include="Controls\SliderInputControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SliderInputControl.Designer.cs">
+      <DependentUpon>SliderInputControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToggleControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ToggleControl.Designer.cs">
+      <DependentUpon>ToggleControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="DisplayDx11.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -80,6 +108,12 @@
     </Compile>
     <Compile Include="DisplayWF.Designer.cs">
       <DependentUpon>DisplayWF.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LiveControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="LiveControl.Designer.cs">
+      <DependentUpon>LiveControl.cs</DependentUpon>
     </Compile>
     <Compile Include="ParametrControl.cs">
       <SubType>UserControl</SubType>
@@ -107,11 +141,29 @@
     <EmbeddedResource Include="CameraParametr.resx">
       <DependentUpon>CameraParametr.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\BaseControl.resx">
+      <DependentUpon>BaseControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DropdownControl.resx">
+      <DependentUpon>DropdownControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\InputControl.resx">
+      <DependentUpon>InputControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SliderInputControl.resx">
+      <DependentUpon>SliderInputControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ToggleControl.resx">
+      <DependentUpon>ToggleControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="DisplayDx11.resx">
       <DependentUpon>DisplayDx11.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="DisplayWF.resx">
       <DependentUpon>DisplayWF.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LiveControl.resx">
+      <DependentUpon>LiveControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,7 @@
 #include "OutputLayerCuda.h"
 #include "CudaComputeLayer.h"
 #include "DarknetLayer.h"
+#include "GrabcutLayerCuda.h"
 
 ImageProcessCuda::ImageProcessCuda() {
 	stream = {};
@@ -45,6 +46,9 @@ BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
 		break;
 	case OEIP_DARKNET_LAYER:
 		layer = new DarknetLayerCuda();
+		break;
+	case OEIP_GRABCUT_LAYER:
+		layer = new GrabcutLayerCuda();
 		break;
 	case OEIP_MAX_LAYER:
 		break;

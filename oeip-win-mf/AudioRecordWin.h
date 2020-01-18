@@ -46,4 +46,7 @@ public:
 
 OEIP_DEFINE_PLUGIN_CLASS(AudioRecord, AudioRecordWin)
 
+extern "C" __declspec(dllexport) bool bCanLoad();
+extern "C" __declspec(dllexport) void registerFactory();
+
 

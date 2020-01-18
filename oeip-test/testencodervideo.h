@@ -23,10 +23,11 @@ namespace OeipEncoderVideo
 	//template<int32_t inSize, int32_t outSize>
 	cv::Mat* show = nullptr;
 	int32_t devicdIndex = 0;
-	int32_t formatIndex = 0;	
+	int32_t formatIndex = 0;
 	int32_t width = 1920;
 	int32_t height = 1080;
 	OeipVideoType videoType = OEIP_VIDEO_OTHER;
+	OeipYUVFMT yuvFmt = OEIP_YUVFMT_YUV420P;
 	VideoPipe* vpipe = nullptr;
 	std::unique_ptr< FH264Encoder> encoder;
 	void dataRecive(uint8_t* data, int32_t width, int32_t height) {
@@ -40,7 +41,19 @@ namespace OeipEncoderVideo
 		}
 		if (vpipe->getOutYuvId() == layerIndex) {
 			int64_t timestamp = getNowTimestamp();
-			int ret = encoder->encoder(data, width * height, timestamp);
+			int ysize = width * height;
+			uint8_t* yuvdata[4];
+			if (yuvFmt == OEIP_YUVFMT_YUV420P) {
+				yuvdata[0] = data;
+				yuvdata[1] = data + ysize;
+				yuvdata[2] = data + ysize * 5 / 4;
+			}
+			else if (yuvFmt == OEIP_YUVFMT_YUY2P) {
+				yuvdata[0] = data;
+				yuvdata[1] = data + ysize;
+				yuvdata[2] = data + ysize * 3 / 2;
+			}
+			int ret = encoder->encoder(&yuvdata[0], width * height, timestamp);
 			if (ret != 0) {
 				return;
 			}
@@ -85,7 +98,7 @@ namespace OeipEncoderVideo
 		vencoder.height = height;
 		vencoder.fps = 30;
 		vencoder.bitrate = 4000000;
-		vencoder.yuvType = OEIP_YUVFMT_YUV420P;
+		vencoder.yuvType = yuvFmt;
 		encoder = std::make_unique< FH264Encoder>(vencoder);
 
 		setFormat(devicdIndex, formatIndex);

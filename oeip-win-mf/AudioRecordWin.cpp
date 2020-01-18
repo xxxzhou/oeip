@@ -1,5 +1,6 @@
 #include "AudioRecordWin.h"
 #include <OeipCommon.h>
+#include "../oeip-win/DxHelper.h"
 
 #define BUFFER_TIME_100NS (5 * 10000000)
 #define RECONNECT_INTERVAL 400
@@ -122,16 +123,16 @@ void AudioRecordWin::recordAudio() {
 				hr = capture->GetNextPacketSize(&captureSize);
 				if (FAILED(hr)) {
 					std::string audioName = bMic ? "mic" : "loopback";
-					std::string msg = audioName + " audio record netx packet faild." + std::to_string(hr);
-					logMessage(OEIP_ERROR, msg.c_str());
+					std::string msg = audioName + " audio record netx packet faild.";
+					checkHR(hr, msg.c_str());
 					internalClose();
 					return;
 				}
 				hr = capture->GetBuffer(&buffer, &frames, &flags, &pos, &ts);
 				if (FAILED(hr)) {
 					std::string audioName = bMic ? "mic" : "loopback";
-					std::string msg = audioName + " audio record GetBuffer faild." + std::to_string(hr);
-					logMessage(OEIP_ERROR, msg.c_str());
+					std::string msg = audioName + " audio record get buffer faild.";
+					checkHR(hr, msg.c_str());
 					internalClose();
 					return;
 				}
