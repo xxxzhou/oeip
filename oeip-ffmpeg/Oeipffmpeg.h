@@ -70,8 +70,7 @@ inline OeipFAVFormat getAvformat(std::string uri) {
 
 inline std::string getAvformatName(OeipFAVFormat format) {
 	std::string name = "";
-	switch (format)
-	{
+	switch (format) {
 	case OEIP_AVFORMAT_OTHER:
 		break;
 	case OEIP_AVFORMAT_RTMP:

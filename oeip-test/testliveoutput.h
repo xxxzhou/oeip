@@ -16,6 +16,7 @@
 #include <../oeip/LivePipe.h>
 #include <../oeip-ffmpeg/FLiveOutput.h>
 #include <../oeip-ffmpeg/FLiveInput.h>
+#include <../oeip-live/OeipLiveExport.h>
 
 using namespace std;
 using namespace cv;
@@ -42,24 +43,14 @@ namespace OeipLiveOutput
 	int32_t sampleRate = 8000;
 	OeipYUVFMT fmt = OEIP_YUVFMT_YUV420P;
 	std::vector<uint8_t> frameData;
+	const char* rtmpUrl = "rtmp://192.168.0.140:8011/live/ivroom1_2_0";
 	void dataRecive(uint8_t* data, int32_t width, int32_t height) {
 		//std::cout << width << height << std::endl;
 		vpipe->runVideoPipe(0, data);
 	}
 
 	void onPullData(OeipVideoFrame frame) {
-		int32_t width = frame.width;
-		int32_t height = frame.height;
-		if (fmt == OEIP_YUVFMT_YUY2P) {
-			memcpy(frameData.data(), frame.data[0], width * height);
-			memcpy(frameData.data() + width * height, frame.data[1], width * height / 2);
-			memcpy(frameData.data() + width * height * 3 / 2, frame.data[2], width * height / 2);
-		}
-		else if (fmt == OEIP_YUVFMT_YUV420P) {
-			memcpy(frameData.data(), frame.data[0], width * height);
-			memcpy(frameData.data() + width * height, frame.data[1], width * height / 4);
-			memcpy(frameData.data() + width * height * 5 / 4, frame.data[2], width * height / 4);
-		}
+		getVideoFrameData(frameData.data(), frame);
 		lpipe->runVideoPipe(0, frameData.data());
 	}
 
@@ -68,25 +59,9 @@ namespace OeipLiveOutput
 			memcpy(show->ptr<char>(0), data, width * height * 4);
 		}
 		if (vpipe->getOutYuvId() == layerIndex) {
-			if (bPush && bRecord && liveOut) {
-				int32_t width = videoFormat.width;
-				int32_t height = videoFormat.height;
-				OeipVideoFrame vf = {};
-				if (fmt == OEIP_YUVFMT_YUY2P) {
-					vf.data[0] = data;
-					vf.data[1] = data + width * height;
-					vf.data[2] = data + width * height * 3 / 2;
-				}
-				else if (fmt == OEIP_YUVFMT_YUV420P) {
-					vf.data[0] = data;
-					vf.data[1] = data + width * height;
-					vf.data[2] = data + width * height * 5 / 4;
-				}
-				vf.dataSize = width * height;
-				vf.fmt = fmt;
-				vf.height = videoFormat.height;
-				vf.width = videoFormat.width;
-				vf.timestamp = (uint32_t)getNowTimestamp();//av_gettime
+			if (bPush && bRecord && liveOut) {		
+				OeipVideoFrame vf = {};	
+				getVideoFrame(data, width, height, fmt, vf);
 				liveOut->pushVideo(vf);
 			}
 		}
@@ -113,7 +88,7 @@ namespace OeipLiveOutput
 	void test() {
 		initOeip();
 
-		OeipGpgpuType runType = OEIP_CUDA;
+		OeipGpgpuType runType = OEIP_DX11;
 		vpipe = std::make_unique<VideoPipe>(runType);
 		lpipe = std::make_unique<LivePipe>(runType);
 		setPipeDataAction(vpipe->getPipeId(), onPipeData);
@@ -152,7 +127,6 @@ namespace OeipLiveOutput
 			if (key == 'q')
 				break;
 			if (key == 'r') {
-				const char* rtmpUrl = "rtmp://192.168.0.140:8011/live/ivroom1_2_0";
 				bRecord = !bRecord;
 				if (bRecord) {
 					cdesc.channel = 1;

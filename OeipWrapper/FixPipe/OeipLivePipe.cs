@@ -1,14 +1,13 @@
 using OeipWrapper.Live;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OeipWrapper.FixPipe
 {
-    public class OeipLivePipe : ISharpDXViewPipe, IDisposable
+    /// <summary>
+    /// 用于拉流数据处理,主要处理YUV420P/YUV422P格式,请手动调用Dispose
+    /// </summary>
+    public class OeipLivePipe : IDXViewPipe, IDisposable
     {
         public event Action<VideoFormat> OnLiveImageChange;
         public OeipPipe Pipe { get; private set; }
@@ -24,11 +23,17 @@ namespace OeipWrapper.FixPipe
                 return OutIndex;
             }
         }
-
-        private uint width = 0;
-        private uint height = 0;
-        private OeipYUVFMT fmt = OeipYUVFMT.OEIP_YUVFMT_YUV420P;
+        private VideoFormat videoFormat = new VideoFormat();
+        public ref VideoFormat VideoFormat
+        {
+            get
+            {
+                return ref videoFormat;
+            }
+        }
+        private OeipYUVFMT yuvfmt = OeipYUVFMT.OEIP_YUVFMT_YUV420P;
         private IntPtr yuvData = IntPtr.Zero;
+
         public OeipLivePipe(OeipPipe pipe)
         {
             this.Pipe = pipe;
@@ -54,35 +59,31 @@ namespace OeipWrapper.FixPipe
 
         private void ResetPipe()
         {
-            int inputWidth = (int)width;
-            int inputHeight = (int)height * 2;
+            int inputHeight = VideoFormat.height * 2;
             OeipDataType dataType = OeipDataType.OEIP_CU8C1;
-            if (fmt == OeipYUVFMT.OEIP_YUVFMT_YUV420P)
+            if (yuvfmt == OeipYUVFMT.OEIP_YUVFMT_YUV420P)
             {
-                inputHeight = (int)height * 3 / 2;
+                inputHeight = VideoFormat.height * 3 / 2;
             }
-            int size = inputWidth * inputHeight;
-            Pipe.SetInput(InputIndex, inputWidth, inputHeight, dataType);
+            YUV2RGBAParamet paramet = new YUV2RGBAParamet();
+            paramet.yuvType = yuvfmt;
+            Pipe.UpdateParamet(Yuv2Rgba, paramet);
+            Pipe.SetInput(InputIndex, VideoFormat.width, inputHeight, dataType);
             //重新申请复制当前视频桢数据空间
             FreeData();
+            int size = VideoFormat.width * inputHeight;
             yuvData = Marshal.AllocHGlobal(size);
-            if (OnLiveImageChange != null)
-            {
-                VideoFormat videoFormat = new VideoFormat();
-                videoFormat.fps = 30;
-                videoFormat.width = (int)width;
-                videoFormat.height = (int)height;
-                OnLiveImageChange(videoFormat);
-            }
+            OnLiveImageChange?.Invoke(videoFormat);
         }
 
         public void RunLivePipe(ref OeipVideoFrame videoFrame)
         {
-            if (width != videoFrame.width || height != videoFrame.heigh || fmt != videoFrame.fmt)
+            if (VideoFormat.width != videoFrame.width || VideoFormat.height != videoFrame.height || yuvfmt != videoFrame.fmt)
             {
-                width = videoFrame.width;
-                height = videoFrame.heigh;
-                fmt = videoFrame.fmt;
+                VideoFormat.fps = 30;
+                VideoFormat.width = (int)videoFrame.width;
+                VideoFormat.height = (int)videoFrame.height;
+                VideoFormat.videoType = OeipVideoType.OEIP_VIDEO_RGBA32;
                 ResetPipe();
             }
             OeipLiveHelper.getVideoFrameData(yuvData, ref videoFrame);

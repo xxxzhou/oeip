@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Setting>
+  <XmlSerializable>
+    <VideoParamet>
+      <OeipVideoParamet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <bGpuSeed>false</bGpuSeed>
+        <iterCount>1</iterCount>
+        <seedCount>1000</seedCount>
+        <count>250</count>
+        <gamma>90</gamma>
+        <lambda>450</lambda>
+      </OeipVideoParamet>
+    </VideoParamet>
+    <CameraSetting>
+      <CameraSetting xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <CameraIndex>0</CameraIndex>
+        <FormatIndex>0</FormatIndex>
+      </CameraSetting>
+    </CameraSetting>
+  </XmlSerializable>
+</Setting>

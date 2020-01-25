@@ -25,7 +25,7 @@ Texture2D<unorm float> texIn : register(t0);
 Texture2D<unorm float4> texIn : register(t0);
 #endif
 RWTexture2D<unorm float4> texOut : register(u0);
-
+//YUV2RGBA
 [numthreads(SIZE_X, SIZE_Y, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 

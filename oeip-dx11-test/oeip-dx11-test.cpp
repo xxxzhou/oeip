@@ -267,7 +267,7 @@ HRESULT InitDevice()
 //--------------------------------------------------------------------------------------
 void Render()
 {
-	setPipeOutputGpuTex(vpipe->getPipeId(), vpipe->getOutputId(), g_pd3dDevice, pBackBuffer);
+	updatePipeOutputGpuTex(vpipe->getPipeId(), vpipe->getOutputId(), g_pd3dDevice, pBackBuffer);
 	//g_pImmediateContext->ClearRenderTargetView(g_pRenderTargetView, ClearColor);
 	g_pSwapChain->Present(0, 0);
 }

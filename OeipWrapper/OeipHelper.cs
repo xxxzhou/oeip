@@ -108,7 +108,7 @@ namespace OeipWrapper
     public struct OutputParamet
     {
         public int bCpu;// = true;
-        public int bGpu;// = false;
+        public int bGpu;// = true;
     }
 
     public struct YUV2RGBAParamet
@@ -289,23 +289,43 @@ namespace OeipWrapper
     #endregion
 
     #region callback
-    //日志回调
+    /// <summary>
+    /// 日志回调
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="message"></param>
     [UnmanagedFunctionPointer(PInvokeHelper.funcall, CharSet = CharSet.Ansi)]
     public delegate void OnLogDelegate(int level, string message);
 
-    //type指定事件类型，如设备，code指定类型结果，如设备中断等
+    /// <summary>
+    /// type指定事件类型，如设备，code指定类型结果，如设备中断等
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="code"></param>
     [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
     public delegate void OnEventDelegate(int type, int code);
 
-    //摄像机的数据处理回调，dataType指明data数据类型
+    /// <summary>
+    /// 摄像机的数据处理回调，dataType指明data数据类型
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
     [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
     public delegate void OnReviceDelegate(IntPtr data, int width, int height);
 
-    //GPU运算管线返回
+    /// <summary>
+    /// GPU运算管线返回
+    /// </summary>
+    /// <param name="layerIndex"></param>
+    /// <param name="data"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="outputIndex"></param>
     [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
     public delegate void OnProcessDelegate(int layerIndex, IntPtr data, int width, int height, int outputIndex);
-
     #endregion
+
     public static class OeipHelper
     {
         public const string OeipDll = "oeip";
@@ -341,6 +361,9 @@ namespace OeipWrapper
         /// </summary>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern uint getColor(float r, float g, float b, float a);
+
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern bool bCuda();
         #endregion
 
         #region camera device
@@ -350,6 +373,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int getDeviceCount();
+
         /// <summary>
         /// 返回设备信息列表
         /// </summary>
@@ -359,6 +383,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int getDeviceList(IntPtr deviceList, int lenght, int index = 0);
+
         /// <summary>
         /// 捕获视频设备的图像格式数量
         /// </summary>
@@ -366,6 +391,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int getFormatCount(int deviceIndex);
+
         /// <summary>
         /// 得到捕获视频设备当前所用的图像格式索引
         /// </summary>
@@ -376,6 +402,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int getFormatList(int deviceIndex, IntPtr formatList, int lenght, int index = 0);
+
         /// <summary>
         /// 得到捕获视频设备当前所用的图像格式索引
         /// </summary>
@@ -383,6 +410,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int getFormat(int deviceIndex);
+
         /// <summary>
         /// 捕获视频设备设置对应格式
         /// </summary>
@@ -390,6 +418,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setFormat(int deviceIndex, int formatIndex);
+
         /// <summary>
         /// 打开设备
         /// </summary>
@@ -397,12 +426,14 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool openDevice(int deviceIndex);
+
         /// <summary>
         /// 关闭设备
         /// </summary>
         /// <param name="deviceIndex"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void closeDevice(int deviceIndex);
+
         /// <summary>
         /// 是否打开
         /// </summary>
@@ -411,8 +442,17 @@ namespace OeipWrapper
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool bOpen(int deviceIndex);
 
+        /// <summary>
+        /// 查找设备最适合选定的长宽的格式索引
+        /// </summary>
+        /// <param name="deviceIndex"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="fps"></param>
+        /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int findFormatIndex(int deviceIndex, int width, int height, int fps = 30);
+
         /// <summary>
         /// 返回摄像机的内部参数设置
         /// </summary>
@@ -420,6 +460,7 @@ namespace OeipWrapper
         /// <param name="parametrs"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void getDeviceParametrs(int deviceIndex, out CamParametrs parametrs);
+
         /// <summary>
         /// 更新摄像机的内部参数设置
         /// </summary>
@@ -428,6 +469,7 @@ namespace OeipWrapper
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setDeviceParametrs(int deviceIndex, ref CamParametrs parametrs);
 
+
         /// <summary>
         /// 设置捕获视频设备每桢处理完后的数据回调，回调包含长，宽，数据指针
         /// </summary>
@@ -435,6 +477,7 @@ namespace OeipWrapper
         /// <param name="onProcessData"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setDeviceDataAction(int deviceIndex, OnReviceDelegate onProcessData);
+
         /// <summary>
         /// 设置捕获视频设备事件回调，如没有正常打开,意外断掉等。
         /// </summary>
@@ -442,6 +485,7 @@ namespace OeipWrapper
         /// <param name="onProcessData"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setDeviceEventAction(int deviceIndex, OnEventDelegate onDeviceEvent);
+
         #endregion
 
         #region gpgpu pipe
@@ -452,6 +496,7 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern int initPipe(OeipGpgpuType gpgpuType);
+
         /// <summary>
         /// 释放一个GPU计算管线,相应pipeId在没有再次initPipe得到,不能调用下面运用管线的API
         /// </summary>
@@ -459,6 +504,13 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool closePipe(int pipeId);
+
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern bool emptyPipe(int pipeId);
+
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern OeipGpgpuType getPipeType(int pipeId);
+
         /// <summary>
         /// 管线添加一层,paramet表示管线对应的参数结构,请传递对应结构
         /// </summary>
@@ -469,8 +521,9 @@ namespace OeipWrapper
         /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall, CharSet = CharSet.Ansi)]
         public static extern int addPiepLayer(int pipeId, string layerName, OeipLayerType layerType, IntPtr paramet);
+
         /// <summary>
-        /// 
+        /// 连接二层数据处理层，注意上一层的输出格式要与下一层的输入格式对应，默认自动链接上一层，有分支时会使用
         /// </summary>
         /// <param name="pipeId"></param>
         /// <param name="layerIndex"></param>
@@ -479,8 +532,9 @@ namespace OeipWrapper
         /// <param name="selfIndex"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall, CharSet = CharSet.Ansi)]
         public static extern void connectLayerName(int pipeId, int layerIndex, string forwardName, int inputIndex = 0, int selfIndex = 0);
+
         /// <summary>
-        /// 
+        /// 同上，连接二层数据处理层，上一层数据用索引
         /// </summary>
         /// <param name="pipeId"></param>
         /// <param name="layerIndex"></param>
@@ -490,31 +544,86 @@ namespace OeipWrapper
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void connectLayerIndex(int pipeId, int layerIndex, int forwardIndex, int inputIndex = 0, int selfIndex = 0);
 
-        //设定当前层是否可用
+        /// <summary>
+        /// 设定当前层是否可用
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="bEnable"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setEnableLayer(int pipeId, int layerIndex, bool bEnable);
-        //设定当前层及关联这层的分支全部不可用
+
+        /// <summary>
+        /// 设定当前层及关联这层的分支全部不可用
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="bEnable"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setEnableLayerList(int pipeId, int layerIndex, bool bEnable);
-        //设置计算管线处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型,用于C/C#使用
+
+        /// <summary>
+        /// 设置计算管线处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型,用于C/C#使用
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="onProcessData"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setPipeDataAction(int pipeId, OnProcessDelegate onProcessData);
-        //设置计算管线的输入
+
+        /// <summary>
+        /// 设置计算管线的输入
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="dataType"></param>
+        /// <param name="inputIndex"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setPipeInput(int pipeId, int layerIndex, int width, int height, int dataType = 0, int inputIndex = 0);
-        //更新计算管线的数据输入
+        /// <summary>
+        /// 更新计算管线的数据输入
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="data"></param>
+        /// <param name="inputIndex"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void updatePipeInput(int pipeId, int layerIndex, IntPtr data, int inputIndex = 0);
-        //运行管线
+        /// <summary>
+        /// 运行管线，如果为false,则查找日志输出信息
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
-        public static extern void runPipe(int pipeId);
-        //把另一个DX11上下文中的纹理当做当前管线的输入源
+        public static extern bool runPipe(int pipeId);
+        /// <summary>
+        /// 把另一个DX11上下文中的纹理当做当前管线的输入源
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="device"></param>
+        /// <param name="tex"></param>
+        /// <param name="inputIndex"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
-        public static extern void setPipeInputGpuTex(int pipeId, int layerIndex, IntPtr device, IntPtr tex, int inputIndex = 0);
-        //把当前管线的输出结果直接放入另一个DX11上下文的纹理中
+        public static extern void updatePipeInputGpuTex(int pipeId, int layerIndex, IntPtr device, IntPtr tex, int inputIndex = 0);
+        /// <summary>
+        /// 把当前管线的输出结果直接放入另一个DX11上下文的纹理中
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="device"></param>
+        /// <param name="tex"></param>
+        /// <param name="outputIndex"></param>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
-        public static extern void setPipeOutputGpuTex(int pipeId, int layerIndex, IntPtr device, IntPtr tex, int outputIndex = 0);
-        //更新当前层的参数，需要注意paramet是当前层的参数结构，不同会引发想不到的问题
+        public static extern void updatePipeOutputGpuTex(int pipeId, int layerIndex, IntPtr device, IntPtr tex, int outputIndex = 0);
+        /// <summary>
+        /// 更新当前层的参数，需要注意paramet是当前层的参数结构，不同会引发想不到的问题
+        /// </summary>
+        /// <param name="pipeId"></param>
+        /// <param name="layerIndex"></param>
+        /// <param name="paramet"></param>
+        /// <returns></returns>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern unsafe bool updatePipeParamet(int pipeId, int layerIndex, void* paramet);
         #endregion

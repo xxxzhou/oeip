@@ -18,6 +18,8 @@ namespace OeipControl
         private PersonBox[] personBox = null;
         private bool bDrawMode = false;
 
+        public VideoFormat Format { get; private set; }
+
         public OeipVideoPipe VideoPipe { get; private set; } = null;
 
         public CameraControl()
@@ -57,7 +59,7 @@ namespace OeipControl
                 {
                     personBox = PInvokeHelper.GetPInvokeArray<PersonBox>(width, data);
                     Action action = () =>
-                    {                        
+                    {
                         if (personBox == null)
                             return;
                         string msg = string.Empty;
@@ -102,8 +104,9 @@ namespace OeipControl
         public void SetFormat(int index)
         {
             var selectFormat = camera.VideoFormats[index];
-            VideoPipe.SetVideoFormat(selectFormat.videoType, selectFormat.width, selectFormat.height);
 
+            Format = selectFormat;
+            VideoPipe.SetVideoFormat(selectFormat.videoType, selectFormat.width, selectFormat.height);
             cbx_formatList.SelectedIndex = index;
             camera.SetFormat(index);
             camera.Open();
@@ -124,6 +127,16 @@ namespace OeipControl
                 rect = personBox[0].rect;
             }
             VideoPipe.ChangeGrabcutMode(bDrawMode, ref rect);
+        }
+
+        public void Close()
+        {
+            camera.Close();
+        }
+
+        public void SetBlendTex(BlendViewPipe blend, bool bMain)
+        {
+            this.displayDx11.SetBlendTex(blend, bMain);
         }
     }
 }

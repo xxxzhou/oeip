@@ -8,6 +8,7 @@ FLiveOutput::FLiveOutput() {
 }
 
 FLiveOutput::~FLiveOutput() {
+	close();
 }
 
 int32_t FLiveOutput::open(const char* url) {

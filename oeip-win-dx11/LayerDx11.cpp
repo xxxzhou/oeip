@@ -59,7 +59,7 @@ void LayerDx11::onInitLayer() {
 	}
 	bInitHlsl = initHlsl();
 	if (!bInitHlsl) {
-		std::string message = "check " + layerName + " in:" + std::to_string(layerIndex) + " " + getLayerName(layerType) + "create hlsl fail.";
+		std::string message = "check " + layerName + " in:" + std::to_string(layerIndex) + " create hlsl fail.";
 		logMessage(OEIP_ERROR, message.c_str());
 	}
 }

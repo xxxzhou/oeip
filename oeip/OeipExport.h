@@ -24,6 +24,8 @@ extern "C"
 	OEIPDLL_EXPORT OeipYUVFMT getVideoYUV(OeipVideoType videoType);
 	//相应颜色参数一般用uint32_t来表示，用来给用户根据各个通道分量生成uint32_t颜色，通道分量范围0.f-1.f
 	OEIPDLL_EXPORT uint32_t getColor(float r, float g, float b, float a);
+	//CUDA是否加载
+	OEIPDLL_EXPORT bool bCuda();
 
 #pragma region camera device 
 	//得到支持的捕获视频设备数量(主要包含webCamera)
@@ -74,6 +76,10 @@ extern "C"
 	OEIPDLL_EXPORT int32_t initPipe(OeipGpgpuType gpgpuType);
 	//释放一个GPU计算管线,相应pipeId在没有再次initPipe得到,不能调用下面运用管线的API
 	OEIPDLL_EXPORT bool closePipe(int32_t pipeId);
+	//检查这个管线是否是空管线
+	OEIPDLL_EXPORT bool emptyPipe(int32_t pipeId);
+	//得到管线的GPGPU计算类型
+	OEIPDLL_EXPORT OeipGpgpuType getPipeType(int32_t pipeId);
 	//管线添加一层,paramet表示管线对应的参数结构,请传递对应结构
 	OEIPDLL_EXPORT int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet = nullptr);
 	//设定连接层级,一般跨级连接调用，默认下层连接上层
@@ -88,16 +94,16 @@ extern "C"
 	OEIPDLL_EXPORT void setPipeDataAction(int32_t pipeId, onProcessAction onProcessData);
 	//设置计算管线处理完后的数据回调，回调包含长，宽，数据指针，对应数据输出类型。用于C++使用。
 	OEIPDLL_EXPORT void setPipeDataHandle(int32_t pipeId, onProcessHandle onProcessData);
-	//设置计算管线的输入
+	//设置计算管线的输入信息
 	OEIPDLL_EXPORT void setPipeInput(int32_t pipeId, int32_t layerIndex, int32_t width, int32_t height, int32_t dataType = OEIP_CV_8UC1, int32_t inputIndex = 0);
 	//更新计算管线的数据输入
 	OEIPDLL_EXPORT void updatePipeInput(int32_t pipeId, int32_t layerIndex, uint8_t* data, int32_t inputIndex = 0);
 	//运行管线,如果可能,尽量与updatePipeParamet在同一线程,最好是UE4/Unity3D的主线程(游戏线程),或是WinForm里的UI线程
-	OEIPDLL_EXPORT void runPipe(int32_t pipeId);
+	OEIPDLL_EXPORT bool runPipe(int32_t pipeId);
 	//把另一个DX11上下文中的纹理当做当前管线的输入源
-	OEIPDLL_EXPORT void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);
+	OEIPDLL_EXPORT void updatePipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t inputIndex = 0);
 	//把当前管线的输出结果直接放入另一个DX11上下文的纹理中,因为相应的纹理一般在单独的渲染线程，回调需要切换线程，固让用户根据需要在对应渲染线程获取
-	OEIPDLL_EXPORT void setPipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t outputIndex = 0);
+	OEIPDLL_EXPORT void updatePipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* device, void* tex, int32_t outputIndex = 0);
 	//更新当前层的参数，需要注意paramet是当前层的参数结构，不同会引发想不到的问题
 	OEIPDLL_EXPORT bool updatePipeParamet(int32_t pipeId, int32_t layerIndex, const void* paramet);
 #pragma endregion

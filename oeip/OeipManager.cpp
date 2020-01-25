@@ -30,13 +30,14 @@ void OeipManager::shutdown() {
 OeipManager::~OeipManager() {
 	std::lock_guard<std::mutex> mtx_locker(mtx);
 	//通过PluginManager生成的对象,在这不删除,后面通过PluginManager自身来删除
-	for (auto& pipe : imagePipeList) {
-		pipe->closePipe();
-	}
 	for (auto& video : videoList) {
 		video->closeDevice();
 	}
+	for (auto& pipe : imagePipeList) {
+		pipe->closePipe();
+	}
 	videoList.clear();
+	imagePipeList.clear();
 }
 
 OeipManager::OeipManager() {
@@ -70,6 +71,7 @@ int32_t OeipManager::initPipe(OeipGpgpuType gpgpuType) {
 	auto vp = PluginManager<ImageProcess>::getInstance().createModel(gpgpuType);
 	if (vp == nullptr)
 		return -1;
+	vp->gpuType = gpgpuType;
 	imagePipeList.push_back(vp);
 	return imagePipeList.size() - 1;
 }

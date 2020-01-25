@@ -61,7 +61,7 @@ namespace OeipWrapper.Live
         public uint dataSize;
         public ulong timestamp;
         public uint width;
-        public uint heigh;
+        public uint height;
         public OeipYUVFMT fmt;//OEIP_YUVFMT_YUY2P
     };
 
@@ -83,7 +83,10 @@ namespace OeipWrapper.Live
         public OeipAudioEncoder audioEncoder;//
     }
     #endregion
-
+    /// <summary>
+    /// 是否成功初始化，coda少于0是异常情况，0是正常返回，>0正常情况附加信息
+    /// </summary>
+    /// <param name="code"></param>
     [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
     public delegate void OnInitRoomDelegate(int code);
     [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
@@ -148,18 +151,57 @@ namespace OeipWrapper.Live
         /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall, CharSet = CharSet.Ansi)]
         public static extern bool loginRoom(string roomName, int userId);
+        /// <summary>
+        /// 推流
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="setting"></param>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool pushStream(int index, ref OeipPushSetting setting);
+        /// <summary>
+        /// 推视频数据
+        /// </summary>
+        /// <param name="index">第几部流</param>
+        /// <param name="videoFrame"></param>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool pushVideoFrame(int index, ref OeipVideoFrame videoFrame);
+        /// <summary>
+        /// 推音频数据
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="audioFrame"></param>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool pushAudioFrame(int index, ref OeipAudioFrame audioFrame);
+        /// <summary>
+        /// 停止推流
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool stopPushStream(int index);
+        /// <summary>
+        /// 拉流
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool pullStream(int userId, int index);
+        /// <summary>
+        /// 停止拉流
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool stopPullStream(int userId, int index);
+        /// <summary>
+        /// 拿出房间
+        /// </summary>
+        /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool logoutRoom();
         /// <summary>
@@ -170,7 +212,7 @@ namespace OeipWrapper.Live
         /// <param name="height"></param>
         /// <param name="fmt"></param>
         /// <param name="videoFrame"></param>
-        [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]       
+        [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void getVideoFrame(IntPtr data, int width, int height, OeipYUVFMT fmt, ref OeipVideoFrame videoFrame);
         /// <summary>
         /// 复制OeipVideoFrame里数据到IntPtr

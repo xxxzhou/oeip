@@ -18,6 +18,15 @@ namespace OeipLiveServer
         {
         }
 
+        public static IHubContext Hub
+        {
+            get
+            {
+                return GlobalHost.ConnectionManager.GetHubContext<MediaHub>();
+            }
+        }
+
+        //通知直播服务器，添加相应媒体服务器数据
         public void OnServerAddRoom(string roomName, string server, int port)
         {
             LogHelper.LogMessage($"媒体服务器 分配房间 {roomName} {server}:{port} 添加成功");
@@ -26,8 +35,8 @@ namespace OeipLiveServer
 
         public void NginxClose(int port)
         {
-
         }
+
         /// <summary>
         /// 发送媒体服务器,添加或是删除一个组(就是一个房间)
         /// </summary>

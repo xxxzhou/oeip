@@ -1,0 +1,26 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "OeipPlugins",
+	"Description": "",
+	"Category": "Other",
+	"CreatedBy": "xin.zhou",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+    {
+      "Name": "OeipPlugins",
+      "Type": "Runtime",
+      "LoadingPhase": "PreDefault",
+      "WhitelistPlatforms": [
+        "Win64"
+      ]
+    }
+	]
+}

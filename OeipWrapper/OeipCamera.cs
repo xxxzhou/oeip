@@ -94,16 +94,7 @@ namespace OeipWrapper
         {
             if (!IsInit)
                 return;
-            int count = OeipHelper.getFormatCount(index);
-            if (count > 0)
-            {
-                var videoFormats = PInvokeHelper.GetPInvokeArray<VideoFormat>(count,
-                (IntPtr ptr, int pcount) =>
-                {
-                    OeipHelper.getFormatList(index, ptr, pcount);
-                });
-                VideoFormats = videoFormats.ToList();
-            }
+            VideoFormats = OeipManager.Instance.GetCameraFormats(index);
         }
 
         public override string ToString()

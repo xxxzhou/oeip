@@ -32,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
@@ -68,4 +69,15 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>@echo ---------------------------------
+
+@echo [$(ProjectName)]生成完成..
+
+@echo 开始复制...
+
+COPY "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
+
+@echo ---------------------------------</PostBuildEvent>
+  </PropertyGroup>
 </Project>

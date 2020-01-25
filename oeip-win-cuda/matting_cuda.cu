@@ -31,10 +31,10 @@ void showSeedMask_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask, cudaStrea
 }
 
 void showSeedMask_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<uchar> mask, cudaStream_t stream = nullptr) {
-	float fx = (float)source.cols / mask.cols;
-	float fy = (float)source.rows / mask.rows;
+	//float fx = (float)source.cols / mask.cols;
+	//float fy = (float)source.rows / mask.rows;
 	dim3 grid(cv::divUp(source.cols, block.x), cv::divUp(source.rows, block.y));
-	showSeedMask << <grid, block, 0, stream >> > (source, dest, mask, fx, fy);
+	showSeedMask << <grid, block, 0, stream >> > (source, dest, mask);//, fx, fy);
 }
 
 void showMask_gpu(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask, cudaStream_t stream = nullptr) {

@@ -22,17 +22,20 @@ namespace OeipLiveCom
         void OnStreamUpdate(int userId, int index, bool bAdd);
         [DispId(5)]
         void OnLogoutRoom();
-        [DispId(5)]
+        [DispId(6)]
         void OnOperateResult(int operate, int code, string message);
+        [DispId(7)]
+        void Dispose();
     }
 
     [Guid("F16C2C38-FF79-463F-BD8A-D9F2C799348B")]
     [ComVisible(true)]
     public interface IOeipLiveClient
     {
-        IOeipLiveCallBack liveBack { get; set; }
+        //IOeipLiveCallBack liveBack { get; set; }
         [DispId(1)]
-        int Add(int a, int b);
+        void SetLiveCallBack(ref IOeipLiveCallBack liveBack);
+        //int Add(int a, int b);
         [DispId(2)]
         bool InitRoom(string uri);
         [DispId(3)]
@@ -47,7 +50,7 @@ namespace OeipLiveCom
         int StopPullStream(int userId, int index);
         [DispId(8)]
         int LogoutRoom();
-        [DispId(8)]
+        [DispId(9)]
         void Shutdown();
     }
 }

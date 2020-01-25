@@ -24,10 +24,12 @@ namespace OeipControl
         private SwapChain swapChain = null;
         private RenderTargetView renderTargetView = null;
         private Texture2D backBuffer = null;
-        private ISharpDXViewPipe viewPipe = null;
+        private IDXViewPipe viewPipe = null;
         public int TexWidth { get; private set; } = 1920;
         public int TexHeight { get; private set; } = 1080;
-
+        //是否把当前输出作为合成输出的一部分
+        private BlendViewPipe blendPipe = null;
+        private bool bMain = false;
         public DisplayDx11()
         {
             InitializeComponent();
@@ -41,7 +43,7 @@ namespace OeipControl
             this.Draw();
         }
 
-        public void NativeLoad(ISharpDXViewPipe videoPipe, VideoFormat videoFormat)
+        public void NativeLoad(IDXViewPipe videoPipe, VideoFormat videoFormat)
         {
             this.timer.Enabled = false;
             ModeDescription backBufferDesc = new ModeDescription(videoFormat.width, videoFormat.height, new Rational(videoFormat.fps, 1), Format.R8G8B8A8_UNorm);
@@ -61,6 +63,7 @@ namespace OeipControl
             renderTargetView = new RenderTargetView(deviceDx11, backBuffer);
             deviceCtx.OutputMerger.SetRenderTargets(renderTargetView);
             viewPipe = videoPipe;
+            SetBlendInput();
             this.timer.Interval = 1000 / videoFormat.fps;
             this.timer.Enabled = true;
             //Action action = () => { RenderLoop.Run(this, Draw); };
@@ -69,8 +72,28 @@ namespace OeipControl
 
         private void Draw()
         {
-            viewPipe.Pipe.setPipeOutputGpuTex(viewPipe.OutGpuIndex, deviceDx11.NativePointer, backBuffer.NativePointer);
+            viewPipe.Pipe.UpdatePipeOutputGpuTex(viewPipe.OutGpuIndex, deviceDx11.NativePointer, backBuffer.NativePointer);
             swapChain.Present(1, PresentFlags.None);
+            if (blendPipe != null)
+            {
+                blendPipe.Pipe.UpdatePipeInputGpuTex(bMain ? blendPipe.InputMain : blendPipe.InputAux, deviceDx11.NativePointer, backBuffer.NativePointer);
+                blendPipe.Pipe.RunPipe();
+            }
+        }
+
+        public void SetBlendTex(BlendViewPipe blend, bool bMain)
+        {
+            blendPipe = blend;
+            this.bMain = bMain;
+            SetBlendInput();
+        }
+
+        private void SetBlendInput()
+        {
+            if (blendPipe != null && backBuffer != null)
+            {
+                blendPipe.Pipe.SetInput(bMain ? blendPipe.InputMain : blendPipe.InputAux, backBuffer.Description.Width, backBuffer.Description.Height, OeipDataType.OEIP_CU8C4);
+            }
         }
     }
 }

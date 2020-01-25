@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2349138319083679877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2349138319083679875}
+  - component: {fileID: 2349138319083679874}
+  m_Layer: 0
+  m_Name: UITemplate
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2349138319083679875
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2349138319083679877}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 536.1389, y: 229.1558, z: -5.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2349138319083679874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2349138319083679877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4801dc961b0f8c1469ecef5ff197babc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SliderInputTemplate: {fileID: 8729512435406678187, guid: babd77a4d883f264c82812ba7cf5e1b5,
+    type: 3}
+  InputComponent: {fileID: 114848321792873178, guid: 99a4b11571554c341ad4ce1711a33c01,
+    type: 3}
+  DropdownComponent: {fileID: 9196739418874535403, guid: 0afeb895c74038c40a774aa5b0cd0f33,
+    type: 3}
+  ToggleComponent: {fileID: 114319984250238526, guid: 9625a6e2565983d45858b9d673a9801b,
+    type: 3}

@@ -72,7 +72,7 @@ namespace OeipLiveServer
         //媒体服务器返回对应sever/port后
         internal event Action<Room> OnServerCreateEvent;
         //用户推流
-        public event Action<StreamDesc, bool> OnStreamChangeEvent;
+        internal event Action<StreamDesc, bool> OnStreamChangeEvent;
         protected RoomManager() { }
         protected static RoomManager instance = null;
         public static RoomManager Instance
@@ -126,6 +126,7 @@ namespace OeipLiveServer
                 //在这逻辑先固定选第一台，后期根据实际情况来看
                 MediaServer mediaServer = mediaServers[0];
                 room.Media = mediaServer;
+                //告诉媒体服务器端，需要添加一个房间供直播
                 OnMediaChange(mediaServer, name, true);
                 return room;
             }
@@ -308,15 +309,16 @@ namespace OeipLiveServer
                     LogHelper.LogMessage($"用户 {userCid} 已经在 {roomName}", OeipLogLevel.OEIP_WARN);
                     return -1;
                 }
-                userx.Id = userId;
-                bool bHaveId = users.Exists((p) => p.Id == userId);
-                if (bHaveId || userx.Id <= 0)
+                int autoUserId = userId;
+                bool bHaveId = roomx.Users.Exists((p) => p.Id == userId);
+                if (bHaveId || autoUserId <= 0)
                 {
-                    int maxId = users.Select((p) => p.Id).Max();
+                    int maxId = roomx.Users.Select((p) => p.Id).Max();
                     if (maxId == 0)
                         maxId = 1024;
-                    userx.Id = maxId;
+                    autoUserId = maxId + 1;
                 }
+                userx.Id = autoUserId;
                 roomx.Users.Add(userx);
                 userx.InRoom = roomx;
                 LogHelper.LogMessage($"房间 {roomx.Name} 给用户 {userCid} 分配ID {userx.Id}");
@@ -439,6 +441,24 @@ namespace OeipLiveServer
                 var user = users.Find(p => p.Id == userId);
                 return user;
             }
+        }
+
+        /// <summary>
+        /// 确认这个类调用同步之下
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public List<StreamDesc> GetStreams(User user)
+        {
+            List<StreamDesc> ustreams = new List<StreamDesc>();
+            foreach (var stream in streams)
+            {
+                if (user.InRoom.Users.Exists(p => { return p == stream.User; }))
+                {
+                    ustreams.Add(stream);
+                }
+            }
+            return ustreams;
         }
     }
 }

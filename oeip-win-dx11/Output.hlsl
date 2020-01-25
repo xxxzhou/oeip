@@ -20,7 +20,7 @@ Texture2D<unorm float4> texIn : register(t0);
 
 //RWStructuredBuffer可以读写数据,而RWTexture2D用于读的限制非常大,一般不用RWTexture2D用于读
 RWStructuredBuffer<uint> dataOut : register(u0);
-
+//Output
 //https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-per-component-math
 [numthreads(SIZE_X, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {// uint GI : SV_GroupIndex)	

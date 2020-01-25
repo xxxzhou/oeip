@@ -41,7 +41,7 @@ namespace OeipCamera
 	void testCamera() {
 		initOeip();
 
-		vpipe = new VideoPipe(OEIP_CUDA);
+		vpipe = new VideoPipe(OEIP_DX11);
 		setPipeDataAction(vpipe->getPipeId(), onPipeData);
 
 		int32_t deviceCount = getDeviceCount();

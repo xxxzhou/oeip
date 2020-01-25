@@ -59,7 +59,7 @@ BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
 		layer->setImageProcess(this);
 	}
 	else {
-		std::string message = "cuda not support layer: " + getLayerName(layerType);
+		std::string message = "cuda not support this layer.";
 		logMessage(OEIP_WARN, message.c_str());
 	}
 	return layer;

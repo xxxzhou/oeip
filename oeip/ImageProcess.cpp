@@ -39,28 +39,31 @@ bool ImageProcess::initLayers() {
 	return bInitLayers && bInitBuffers;
 }
 
-void ImageProcess::runLayers() {
+bool ImageProcess::runLayers() {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
-	if (!bInitLayers) {
+	if (!bInitLayers && bResetLayers) {
 		logMessage(OEIP_INFO, "init layers.");
 		initLayers();
+		bResetLayers = false;
 	}
 	if (bInitLayers && bInitBuffers) {
 		onRunLayers();
+		return true;
 	}
+	return false;
 }
 
 int32_t ImageProcess::addLayer(const std::string& name, OeipLayerType layerType, const void* paramet) {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	for (auto clayer : layers) {
 		if (clayer->layerName.compare(name) == 0) {
-			std::string message = "in:" + std::to_string(clayer->layerIndex) + " " + getLayerName(layerType) + " name same.";
+			std::string message = "in:" + std::to_string(clayer->layerIndex) + " " + name + " have name same.";
 			logMessage(OEIP_WARN, message.c_str());
 		}
 	}
 	std::shared_ptr<BaseLayer> layer(onAddLayer(layerType));
 	if (layer == nullptr) {
-		std::string message = getLayerName(layerType) + " no create.";
+		std::string message = name + " no create.";
 		logMessage(OEIP_ERROR, message.c_str());
 		return -1;
 	}
@@ -70,6 +73,7 @@ int32_t ImageProcess::addLayer(const std::string& name, OeipLayerType layerType,
 		layer->updateParamet(paramet);
 	}
 	layers.push_back(layer);
+	resetLayers();
 	return layer->layerIndex;
 }
 
@@ -142,6 +146,13 @@ bool ImageProcess::getEnableLayer(int32_t layerIndex) {
 	return !layer->bDisable;
 }
 
+bool ImageProcess::getConnecEnable(int32_t layerIndex) {
+	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	OEIP_CHECKPIPEINDEXBOOL;
+	//原则上,上层不能是输出层，输出层不会给下层数据,故自动向上一层
+	return !layer->bDisable && layer->layerType != OEIP_OUTPUT_LAYER;
+}
+
 void ImageProcess::setEnableLayerList(int32_t layerIndex, bool bEnable) {
 	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 	OEIP_CHECKPIPEINDEXVOID;
@@ -209,7 +220,7 @@ void ImageProcess::setInput(int32_t layerIndex, int32_t width, int32_t height, i
 	if (lc.width != width || lc.height != height || lc.dataType != lc.dataType) {
 		layer->setInputSize(width, height, dataType, intputIndex);
 		layer->setOutputSize(width, height, dataType, intputIndex);
-		bInitLayers = false;
+		resetLayers();
 	}
 }
 

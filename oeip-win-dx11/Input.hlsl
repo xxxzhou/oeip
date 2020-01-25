@@ -24,7 +24,7 @@ RWTexture2D<unorm float4> texOut : register(u0);
 //避免访问SB显存指针冲突，用共享显存来处理
 groupshared uint4 shared_datat[SIZE_X];
 #endif
-
+//Input
 //https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-per-component-math
 [numthreads(SIZE_X, 1, 1)]
 void main(uint3 DTid : SV_DispatchThreadID, uint GI : SV_GroupIndex) {

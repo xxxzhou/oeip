@@ -163,6 +163,9 @@
     <ProjectReference Include="..\oeip-ffmpeg\oeip-ffmpeg.vcxproj">
       <Project>{5b0cd88e-de8f-46f3-974c-3fb93651144d}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\oeip-live\oeip-live.vcxproj">
+      <Project>{6d307dda-a119-40b8-98cd-af7025b4ccb3}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\oeip-win\oeip-win.vcxproj">
       <Project>{10eaed99-a1a9-434f-a8ee-d40e6aae62e1}</Project>
     </ProjectReference>
@@ -177,6 +180,7 @@
     <ClInclude Include="testencoderaudio.h" />
     <ClInclude Include="testencodervideo.h" />
     <ClInclude Include="testliveoutput.h" />
+    <ClInclude Include="testliveroom.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

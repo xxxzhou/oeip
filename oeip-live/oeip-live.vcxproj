@@ -155,6 +155,22 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
+    <PostBuildEvent>
+      <Command>@echo ---------------------------------
+
+@echo [$(ProjectName)]生成完成..
+
+@echo 开始复制...
+
+COPY "$(OutDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
+
+COPY "$(OutDir)$(ProjectName).lib" "$(SolutionDir)install\lib\$(ProjectName).lib"
+
+COPY "$(SolutionDir)$(ProjectName)\OeipLive.h" "$(SolutionDir)install\include\OeipLive.h"
+COPY "$(SolutionDir)$(ProjectName)\OeipLiveBack.h" "$(SolutionDir)install\include\OeipLiveBack.h"
+COPY "$(SolutionDir)$(ProjectName)\OeipLiveExport.h" "$(SolutionDir)install\include\OeipLiveExport.h"
+@echo ---------------------------------</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

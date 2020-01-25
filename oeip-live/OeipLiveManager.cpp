@@ -22,6 +22,7 @@ void OeipLiveManager::shutdown() {
 }
 
 OeipLiveManager::~OeipLiveManager() {
+	//只置空，由PluginManager<OeipLiveRoom>管理
 	liveRoom = nullptr;
 }
 

@@ -31,6 +31,19 @@ namespace OeipCommon.OeipAttribute
                     field.SetValue(o, member);
                 }
             }
+            else if (Member is PropertyInfo)
+            {
+                var property = Member as PropertyInfo;
+                if (typeof(U) != property.PropertyType)
+                {
+                    object ov = OeipAttributeHelper.ChangeType(member, property.PropertyType);
+                    property.SetValue(o, ov);
+                }
+                else
+                {
+                    property.SetValue(o, member);
+                }
+            }
             obj = (T)o;
         }
 
@@ -42,6 +55,15 @@ namespace OeipCommon.OeipAttribute
                 var field = Member as FieldInfo;
                 var tv = field.GetValue(obj);
                 if (typeof(T) == field.FieldType)
+                    t = (T)tv;
+                else
+                    t = (T)OeipAttributeHelper.ChangeType(tv, typeof(T));
+            }
+            else if (Member is PropertyInfo)
+            {
+                var property = Member as PropertyInfo;
+                var tv = property.GetValue(obj);
+                if (typeof(T) == property.PropertyType)
                     t = (T)tv;
                 else
                     t = (T)OeipAttributeHelper.ChangeType(tv, typeof(T));

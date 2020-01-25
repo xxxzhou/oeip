@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace OeipCommon.OeipAttribute
 {
+    /// <summary>
+    /// 绑定一个对象与UI集合组件
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class ObjectBind<T>
     {
         private T obj;
@@ -22,9 +26,19 @@ namespace OeipCommon.OeipAttribute
         public event Action<ObjectBind<T>, string> OnChangeEvent;
 
         public T Obj => obj;
-
+        /// <summary>
+        /// 根据字段的ControlAttribute生成对应UI
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
         public abstract IOeipComponent CreateComponent(ControlAttribute attribute);
-
+        /// <summary>
+        /// 如何把IOeipComponent类型UI组件添加到集合控件panel里
+        /// </summary>
+        /// <typeparam name="P"></typeparam>
+        /// <param name="component"></param>
+        /// <param name="panel"></param>
+        /// <returns></returns>
         public abstract bool OnAddPanel<P>(IOeipComponent component, P panel);
 
         /// <summary>
@@ -109,6 +123,14 @@ namespace OeipCommon.OeipAttribute
                 }
             }
             return null;
+        }
+
+        public B GetComponent<B>(string memberName) where B : class, IOeipComponent
+        {
+            IOeipComponent oeipComponent = GetComponent(memberName);
+            if (oeipComponent == null)
+                return null;
+            return oeipComponent as B;
         }
 
         public virtual void OnBind()

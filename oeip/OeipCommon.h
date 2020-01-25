@@ -37,7 +37,7 @@ OEIPDLL_EXPORT int64_t getNowTimestamp();
 
 OEIPDLL_EXPORT int32_t getDataType(OeipVideoType videoType);
 
-OEIPDLL_EXPORT std::string getLayerName(OeipLayerType layerType);
+//OEIPDLL_EXPORT std::string getLayerName(OeipLayerType layerType);
 
 OEIPDLL_EXPORT uint32_t divUp(int32_t x, int32_t y);
 

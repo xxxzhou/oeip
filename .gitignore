@@ -22,6 +22,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 ThirdParty/
+Plugins/x86_64/
+OeipUnity3D/Library
+OeipUnity3D/Temp
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -260,3 +263,12 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/OeipUnity3D/Assets/Oeip/Plugins/x86_64
+
+*.dmp
+Binaries/Win64
+/OeipUE4/Binaries/Win64
+/OeipUE4/Intermediate
+/OeipUE4/Plugins/OeipPlugins/Binaries/Win64
+/OeipUE4/Plugins/OeipPlugins/Intermediate/Build/Win64/UE4Editor
+/OeipUE4/Saved/Config/CrashReportClient

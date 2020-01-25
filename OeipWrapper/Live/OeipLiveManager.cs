@@ -10,7 +10,7 @@ namespace OeipWrapper.Live
     public class OeipLiveManager : MSingleton<OeipLiveManager>
     {
         public bool IsInit { get; private set; }
-        public int UserId { get; set; } = 0;
+        public int UserId { get; private set; } = 0;
         private LiveBackWrapper liveBackWrapper = new LiveBackWrapper();
         private OeipVideoFrame mainVideoFrame = new OeipVideoFrame();
         private OeipVideoFrame auxVideoFrame = new OeipVideoFrame();
@@ -153,6 +153,7 @@ namespace OeipWrapper.Live
 
         internal void OnLoginRoom(int code, int userid)
         {
+            UserId = userid;
             OnLoginRoomEvent?.Invoke(code, userid);
         }
 

@@ -62,5 +62,10 @@ namespace OeipWrapperTest
             mattingParametForm.Show();
             mattingParametForm.SetBindObj(objectAttribute);
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            OeipManager.Instance.Close();
+        }
     }
 }

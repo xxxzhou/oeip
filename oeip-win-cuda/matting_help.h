@@ -93,6 +93,23 @@ inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar4> 
 	}
 }
 
+inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar4> dest, PtrStepSz<uchar> mask) {
+	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
+	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
+	if (idx < source.cols && idy < source.rows) {
+		int vmask = mask(idy, idx);
+		float4 color = rgbauchar42float4(source(idy, idx));
+		color.w = 0.2f;
+		if (checkFg(vmask)) {
+			color.w = 1.f;
+		}
+		else {
+			color = make_float4(0.0f, 0.0f, 0.0f, 0.0f);
+		}
+		dest(idy, idx) = rgbafloat42uchar4(color);
+	}
+}
+
 inline __global__ void showMask(PtrStepSz<uchar4> source, PtrStepSz<uchar> mask) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;

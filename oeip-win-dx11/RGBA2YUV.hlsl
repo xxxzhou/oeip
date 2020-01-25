@@ -27,19 +27,23 @@ RWTexture2D<unorm float> texOut : register(u0);
 RWTexture2D<unorm float4> texOut : register(u0);
 #endif
 
+//RGBA2YUV
 [numthreads(SIZE_X, SIZE_Y, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
-	//纹理本身会扩展32倍长度，这里不加这个，如果是(1920,1080),height会以1088执行导致结果出错
+	//纹理本身会扩展,有可能是32倍长宽，这里不加这个，如果是(1920,1080),height会以1088执行导致结果出错
 	if (DTid.x >= width || DTid.y >= height)
 		return;
 	//OEIP_YUVFMT_YUY2P	
 #if (OEIP_YUV_TYPE == 5)
+	//top Y 座标
 	uint2 uvt = uint2(DTid.x, DTid.y * 2);
+	//bottom Y座标
 	uint2 uvb = uint2(DTid.x, DTid.y * 2 + 1);
 	float4 rgbat = rgb2Yuv(texIn[uvt]);
 	float4 rgbab = rgb2Yuv(texIn[uvb]);
 	uint2 uIndex = uint2(0, height * 2) + uint2(DTid.x, DTid.y);
 	uint2 vIndex = uint2(0, height * 3) + uint2(DTid.x, DTid.y);
+	//以一半宽执行,一点对应二Y，一U一V
 	texOut[uvt] = rgbat.x;
 	texOut[uvb] = rgbab.x;
 	texOut[uIndex] = (rgbat.y + rgbab.y) / 2.0f;
@@ -47,6 +51,7 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 #endif
 	//OEIP_YUVFMT_YUV420SP || OEIP_YUVFMT_YUV420P
 #if (OEIP_YUV_TYPE == 1 || OEIP_YUV_TYPE == 6)
+	//left top Y UV
 	uint2 uvlt = uint2(DTid.x * 2, DTid.y * 2);
 	uint2 uvlb = uint2(DTid.x * 2, DTid.y * 2 + 1);
 	uint2 uvrt = uint2(DTid.x * 2 + 1, DTid.y * 2);
@@ -63,6 +68,7 @@ void main(uint3 DTid : SV_DispatchThreadID) {//uint GI : SV_GroupIndex
 	uint2 uIndex = uint2(0, height * 2) + nuv;
 	uint2 vIndex = uint2(0, height * 5 / 2) + nuv;
 #endif
+	//长宽各一半执行，一点对应四Y,一U一V
 	texOut[uvlt] = rgbalt.x;
 	texOut[uvlb] = rgbalb.x;
 	texOut[uvrt] = rgbart.x;

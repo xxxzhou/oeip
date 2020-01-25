@@ -112,7 +112,7 @@ public:
 				safeDelete(model);
 			}
 			fi.models.clear();
-			safeDelete(fi.factory);
+			//safeDelete(fi.factory);
 		}
 	};
 	//在引用oeip进程关闭时调用

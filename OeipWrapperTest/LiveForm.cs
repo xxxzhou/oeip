@@ -16,6 +16,8 @@ namespace OeipWrapperTest
     public partial class LiveForm : Form
     {
         private bool bPush = false;
+        //是否拉自己推的流,一般用来测试
+        public bool IsPullSelf { get; set; } = false;
         public LiveForm()
         {
             InitializeComponent();
@@ -24,12 +26,17 @@ namespace OeipWrapperTest
         private void LiveForm_Load(object sender, EventArgs e)
         {
             OeipManager.Instance.OnLogEvent += Instance_OnLogEvent;
-            this.cameraControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, 1, false);
-            this.cameraControl1.VideoPipe.Pipe.OnProcessEvent += Pipe_OnProcessEvent;
+            cameraControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, 1, false);
+            cameraControl1.VideoPipe.Pipe.OnProcessEvent += Pipe_OnProcessEvent;
             OeipLiveManager.Instance.OnLoginRoomEvent += Instance_OnLoginRoomEvent;
             OeipLiveManager.Instance.OnStreamUpdateEvent += Instance_OnStreamUpdateEvent;
             OeipLiveManager.Instance.OnVideoFrameEvent += Instance_OnVideoFrameEvent;
-            this.liveControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA);
+            liveControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA);
+
+            //新增加以纹理为输入的混合显示            
+            blendControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, cameraControl1.Format);
+            cameraControl1.SetBlendTex(blendControl1.BlendPipe, true);
+            liveControl1.SetBlendTex(blendControl1.BlendPipe, false);
         }
 
         private void Instance_OnVideoFrameEvent(int userId, int index, OeipVideoFrame videoFrame)
@@ -39,6 +46,8 @@ namespace OeipWrapperTest
 
         private void Instance_OnStreamUpdateEvent(int userId, int index, bool bAdd)
         {
+            if (!IsPullSelf && OeipLiveManager.Instance.UserId == userId)
+                return;
             if (bAdd)
             {
                 OeipLiveManager.Instance.PullStream(userId, index);
@@ -80,11 +89,13 @@ namespace OeipWrapperTest
 
         private void button1_Click(object sender, EventArgs e)
         {
-            OeipLiveManager.Instance.LoginRoom(this.textBox1.Text, 5);
+            int.TryParse(this.textBox2.Text, out int userId);
+            OeipLiveManager.Instance.LoginRoom(this.textBox1.Text, userId);
         }
 
         private void LiveForm_FormClosed(object sender, FormClosedEventArgs e)
         {
+            cameraControl1.Close();
             OeipLiveManager.Instance.Close();
             OeipManager.Instance.Close();
         }

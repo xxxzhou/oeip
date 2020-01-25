@@ -51,6 +51,7 @@
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -159,6 +160,17 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalDependencies>avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;libx264.lib;swresample.lib;swscale.lib;avcodec.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>@echo ---------------------------------
+
+@echo [$(ProjectName)]生成完成..
+
+@echo 开始复制...
+
+COPY "$(OutDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
+
+@echo ---------------------------------</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FFmpegLiveRoom.cpp" />

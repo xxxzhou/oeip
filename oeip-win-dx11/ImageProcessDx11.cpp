@@ -60,7 +60,7 @@ BaseLayer* ImageProcessDx11::onAddLayer(OeipLayerType layerType) {
 		layer->setImageProcess(this);
 	}
 	else {
-		std::string message = "dx11 not support layer: " + getLayerName(layerType);
+		std::string message = "dx11 not support this layer.";
 		logMessage(OEIP_WARN, message.c_str());
 	}
 	return layer;

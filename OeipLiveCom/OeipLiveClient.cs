@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 //计算机\HKEY_CLASSES_ROOT\WOW6432Node\CLSID\{3262E386-7B1D-4EF9-8818-8506357EA086}\Control
@@ -11,24 +12,27 @@ using System.Threading.Tasks;
 
 namespace OeipLiveCom
 {
-
     //[ComSourceInterfaces(typeof(IOeipLiveClient))]
     [ClassInterface(ClassInterfaceType.None)]
     [ProgId("OeipLiveCom.OeipLiveClient")]
     [Guid("3262E386-7B1D-4EF9-8818-8506357EA086")]
     [ComVisible(true)]//确定相应的liveBack属性对于C++程序可见
-    public class OeipLiveClient : IOeipLiveClient
+    public class OeipLiveClient : IOeipLiveClient, IDisposable
     {
         private HubConnection Connection { get; set; }
         private IHubProxy HubProxy { get; set; }
 
         private string roomName = string.Empty;
+        private bool disposed = false;
         #region IOeipLiveCallBack
-        public IOeipLiveCallBack liveBack { get; set; }
+        //IOeipLiveCallBack对应的是C++实现
+        private IOeipLiveCallBack liveBack = null;
+        private List<IDisposable> onActions = new List<IDisposable>();
 
-        public int Add(int a, int b)
+        public void SetLiveCallBack(ref IOeipLiveCallBack liveBack)
         {
-            return a + b;
+            //GC.KeepAlive(liveBack);
+            this.liveBack = liveBack;
         }
 
         public bool InitRoom(string uri)
@@ -41,30 +45,25 @@ namespace OeipLiveCom
                     return false;
                 }
                 Connection = new HubConnection(uri);
-                HubProxy = Connection.CreateHubProxy("OeipLive");
-                HubProxy.On(("OnConnect"), () =>
+                HubProxy = Connection.CreateHubProxy("OeipLive"); 
+                onActions.Add(HubProxy.On("OnLoginRoom", (int code, string server, int port) =>
                 {
-                    //发送服务器初始化成功消息
-                    HubProxy.Invoke("UserInit");
-                });
-                HubProxy.On("OnLoginRoom", (int code, string server, int port) =>
+                    liveBack?.OnLoginRoom(code, server, port);
+                }));
+                onActions.Add(HubProxy.On("OnUserChange", (int userId, bool bAdd) =>
                 {
-                    liveBack.OnLoginRoom(code, server, port);
-                });
-                HubProxy.On("OnUserChange", (int userId, bool bAdd) =>
+                    liveBack?.OnUserChange(userId, bAdd);
+                }));
+                onActions.Add(HubProxy.On("OnStreamUpdate", (int userId, int index, bool bAdd) =>
                 {
-                    liveBack.OnUserChange(userId, bAdd);
-                });
-                HubProxy.On("OnStreamUpdate", (int userId, int index, bool bAdd) =>
+                    liveBack?.OnStreamUpdate(userId, index, bAdd);
+                }));
+                onActions.Add(HubProxy.On("OnLogoutRoom", () =>
                 {
-                    liveBack.OnStreamUpdate(userId, index, bAdd);
-                });
-                HubProxy.On("OnLogoutRoom", () =>
-                {
-                    if (liveBack != null)
-                        liveBack.OnLogoutRoom();
-                });
-                bInit = ConnectServer().Result;
+                    liveBack?.OnLogoutRoom();
+                }));
+                Connection.Start().Wait();
+                bInit = true;
             }
             catch (Exception)
             {
@@ -73,39 +72,52 @@ namespace OeipLiveCom
             return bInit;
         }
 
+        //调用本方法的线程与执行异步
+        public async Task InvokeAsync(string serverMethod, params object[] objs)
+        {
+            try
+            {
+                if (Connection != null && Connection.State == ConnectionState.Connected)
+                    await HubProxy.Invoke(serverMethod, objs);
+            }
+            catch (Exception ex)
+            {
+                liveBack?.OnOperateResult(11, -1, ex.Message);
+            }
+        }
+
         public void Invoke(string serverMethod, params object[] objs)
         {
-            Task.Run(() =>
+            InvokeAsync(serverMethod, objs).Wait(3000);
+        }
+
+        //调用本方法的线程与执行同步
+        public void InvokeSync(string serverMethod, params object[] objs)
+        {
+            try
             {
-                try
-                {
-                    HubProxy.Invoke(serverMethod, objs);
-                }
-                catch (Exception ex)
-                {
-                    if (liveBack != null)
-                    {
-                        liveBack.OnOperateResult(11, -1, ex.Message);
-                    }
-                }
-            });
+                if (Connection != null && Connection.State == ConnectionState.Connected)
+                    HubProxy.Invoke(serverMethod, objs).Wait(3000);
+            }
+            catch (Exception ex)
+            {
+                liveBack?.OnOperateResult(11, -1, ex.Message);
+            }
         }
 
         public T Invoke<T>(string serverMethod, params object[] objs)
         {
             try
             {
-                //Task<T> task = HubProxy.Invoke<T>(serverMethod, objs);
-                //T result = task.Result;
-                T result = HubProxy.Invoke<T>(serverMethod, objs).Result;
-                return result;
+                if (Connection != null && Connection.State == ConnectionState.Connected)
+                {
+                    T result = HubProxy.Invoke<T>(serverMethod, objs).Result;
+                    return result;
+                }
             }
             catch (Exception ex)
             {
-                if (liveBack != null)
-                {
-                    liveBack.OnOperateResult(11, -1, ex.Message);
-                }
+                liveBack?.OnOperateResult(11, -1, ex.Message);
             }
             return default(T);
         }
@@ -113,18 +125,10 @@ namespace OeipLiveCom
         public int LoginRoom(string roomName, int userId)
         {
             this.roomName = roomName;
-            //发送服务器消息
-            int result = Invoke<int>("LoginRoom", roomName, userId);
+            //发送服务器消息 暂时来看,直接Task<int>.Result会卡住，原因不明
+            //int result = Invoke<int>("LoginRoom", roomName, userId);
+            Invoke("LoginRoom", roomName, userId);
             return userId;
-        }
-
-        private Task<bool> ConnectServer()
-        {
-            return Task.Run<bool>(() =>
-            {
-                Connection.Start();
-                return true;
-            });
         }
 
         public int PushStream(int index, bool bVideo, bool bAudio)
@@ -159,20 +163,52 @@ namespace OeipLiveCom
 
         public int LogoutRoom()
         {
-            Invoke("LogoutRoom");
+            InvokeSync("LogoutRoom");
             return 0;
         }
+        public virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;     
+            liveBack?.Dispose();
+            liveBack = null;
+            if (disposing)
+            {
+                foreach (var action in onActions)
+                {
+                    action.Dispose();
+                }
+                onActions.Clear();
+                Connection.Stop(new TimeSpan(1000));
+                Connection.Dispose();
+            }
+            disposed = true;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+            GC.Collect();
+            //挂起当前线程，直到处理终结器队列的线程清空该队列为止。
+            GC.WaitForPendingFinalizers();
+        }
+
         public void Shutdown()
         {
             try
             {
-                Connection.Stop(new TimeSpan(1000));
-                Connection.Dispose();
+                Dispose();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //liveBack.OnOperateResult(12, -1, ex.Message);
+                //liveBack?.OnOperateResult(12, -1, ex.Message);
             }
+        }
+
+        ~OeipLiveClient()
+        {
+            Dispose(false);
         }
         #endregion
         //VS请用管理员模式打开
@@ -187,7 +223,5 @@ namespace OeipLiveCom
         {
             ComRegisterHelper.Unregister(t);
         }
-
-
     }
 }

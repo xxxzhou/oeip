@@ -126,6 +126,17 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>avdevice.lib;avfilter.lib;avformat.lib;avutil.lib;libx264.lib;swresample.lib;swscale.lib;avcodec.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>@echo ---------------------------------
+
+@echo [$(ProjectName)]生成完成..
+
+@echo 开始复制...
+
+COPY "$(OutDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
+
+@echo ---------------------------------</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AudioMixer.h" />

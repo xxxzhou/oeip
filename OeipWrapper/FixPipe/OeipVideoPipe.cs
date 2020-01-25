@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace OeipWrapper.FixPipe
 {
-    public class OeipVideoPipe : ISharpDXViewPipe
+    /// <summary>
+    /// 主要处理从设备读取数据展示，包含CUDA模式下的Darknet显示
+    /// </summary>
+    public class OeipVideoPipe : IDXViewPipe
     {
         public OeipPipe Pipe { get; private set; }
         public int InputIndex { get; private set; }
@@ -25,6 +28,8 @@ namespace OeipWrapper.FixPipe
         {
             get
             {
+                if (Pipe.GpgpuType == OeipGpgpuType.OEIP_CUDA)
+                    return MattingOutIndex;
                 return MattingOutIndex;
             }
         }
@@ -73,33 +78,47 @@ namespace OeipWrapper.FixPipe
             outputParamet.bGpu = 0;
             outputParamet.bCpu = 1;
             Pipe.UpdateParamet(OutYuvIndex, outputParamet);
+            if (pipe.GpgpuType == OeipGpgpuType.OEIP_DX11)
+            {
+                int yuv2rgba2 = pipe.AddLayer("yuv2rgba 2", OeipLayerType.OEIP_YUV2RGBA_LAYER);
+                YUV2RGBAParamet yparamet = new YUV2RGBAParamet();
+                yparamet.yuvType = YUVFMT;
+                Pipe.UpdateParamet(yuv2rgba2, yparamet);
+                MattingOutIndex = pipe.AddLayer("matting out put", OeipLayerType.OEIP_OUTPUT_LAYER);
+                outputParamet.bGpu = 1;
+                outputParamet.bCpu = 0;
+                Pipe.UpdateParamet(MattingOutIndex, outputParamet);
+            }
 
-            //神经网络层
-            DarknetIndex = pipe.AddLayer("darknet", OeipLayerType.OEIP_DARKNET_LAYER);
-            pipe.ConnectLayer(DarknetIndex, ResizeIndex);
-            darknetParamet.bLoad = 1;
-            darknetParamet.confile = "../../ThirdParty/yolov3-tiny-test.cfg";
-            darknetParamet.weightfile = "../../ThirdParty/yolov3-tiny_745000.weights";
-            darknetParamet.thresh = 0.3f;
-            darknetParamet.nms = 0.3f;
-            darknetParamet.bDraw = 1;
-            darknetParamet.drawColor = OeipHelper.getColor(0.1f, 1.0f, 0.1f, 0.1f);
-            Pipe.UpdateParametStruct(DarknetIndex, darknetParamet);
-            //Grab cut扣像层
-            GrabcutIndex = pipe.AddLayer("grab cut", OeipLayerType.OEIP_GRABCUT_LAYER);
-            grabcutParamet.bDrawSeed = 0;
-            grabcutParamet.iterCount = 1;
-            grabcutParamet.seedCount = 1000;
-            grabcutParamet.count = 250;
-            grabcutParamet.gamma = 90.0f;
-            grabcutParamet.lambda = 450.0f;
-            grabcutParamet.rect = new OeipRect();
-            Pipe.UpdateParamet(GrabcutIndex, grabcutParamet);
-            //输出第三个流，网络处理层流
-            MattingOutIndex = pipe.AddLayer("matting out put", OeipLayerType.OEIP_OUTPUT_LAYER);
-            outputParamet.bGpu = 1;
-            outputParamet.bCpu = 0;
-            Pipe.UpdateParamet(MattingOutIndex, outputParamet);
+            if (pipe.GpgpuType == OeipGpgpuType.OEIP_CUDA)
+            {
+                //神经网络层
+                DarknetIndex = pipe.AddLayer("darknet", OeipLayerType.OEIP_DARKNET_LAYER);
+                pipe.ConnectLayer(DarknetIndex, ResizeIndex);
+                darknetParamet.bLoad = 1;
+                darknetParamet.confile = "../../ThirdParty/yolov3-tiny-test.cfg";
+                darknetParamet.weightfile = "../../ThirdParty/yolov3-tiny_745000.weights";
+                darknetParamet.thresh = 0.3f;
+                darknetParamet.nms = 0.3f;
+                darknetParamet.bDraw = 1;
+                darknetParamet.drawColor = OeipHelper.getColor(0.1f, 1.0f, 0.1f, 0.1f);
+                Pipe.UpdateParametStruct(DarknetIndex, darknetParamet);
+                //Grab cut扣像层
+                GrabcutIndex = pipe.AddLayer("grab cut", OeipLayerType.OEIP_GRABCUT_LAYER);
+                grabcutParamet.bDrawSeed = 0;
+                grabcutParamet.iterCount = 1;
+                grabcutParamet.seedCount = 1000;
+                grabcutParamet.count = 250;
+                grabcutParamet.gamma = 90.0f;
+                grabcutParamet.lambda = 450.0f;
+                grabcutParamet.rect = new OeipRect();
+                Pipe.UpdateParamet(GrabcutIndex, grabcutParamet);
+                //输出第三个流，网络处理层流
+                MattingOutIndex = pipe.AddLayer("matting out put", OeipLayerType.OEIP_OUTPUT_LAYER);
+                outputParamet.bGpu = 1;
+                outputParamet.bCpu = 0;
+                Pipe.UpdateParamet(MattingOutIndex, outputParamet);
+            }
         }
 
         public void SetOutput(bool bCpu = false, bool bGpu = true)
@@ -184,6 +203,12 @@ namespace OeipWrapper.FixPipe
             grabcutParamet.lambda = paramet.lambda;
             grabcutParamet.bGpuSeed = paramet.bGpuSeed ? 1 : 0;
             Pipe.UpdateParamet(GrabcutIndex, grabcutParamet);
+        }
+
+        public void UpdateDarknetParamet(ref DarknetParamet paramet)
+        {
+            darknetParamet = paramet;
+            Pipe.UpdateParametStruct(DarknetIndex, darknetParamet);
         }
     }
 }

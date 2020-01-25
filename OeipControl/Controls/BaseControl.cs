@@ -76,6 +76,8 @@ namespace OeipControl.Controls
 
         public virtual void UpdateControl(object obj)
         {
+            if (ControlAttribute == null)
+                return;
             T value = ControlAttribute.GetValue<T>(ref obj);
             OnSetValue(value);
         }
@@ -89,7 +91,6 @@ namespace OeipControl.Controls
             this.Name = "BaseControl";
             this.Size = new System.Drawing.Size(318, 24);
             this.ResumeLayout(false);
-
         }
     }
 }

@@ -2,7 +2,7 @@
 using namespace std::placeholders;
 
 FFmpegLiveRoom::FFmpegLiveRoom() {
-	liveCom = std::make_unique<OeipLiveBackCom>();
+	liveCom = new OeipLiveBackCom();
 	liveOuts.resize(LIVE_OUTPUT_MAX);
 	for (int32_t i = 0; i < LIVE_OUTPUT_MAX; i++) {
 		liveOuts[i] = std::make_unique< FLiveOutput>();
@@ -17,8 +17,13 @@ FFmpegLiveRoom::FFmpegLiveRoom() {
 }
 
 FFmpegLiveRoom::~FFmpegLiveRoom() {
-	logoutRoom();
 	shutdownRoom();
+}
+
+void FFmpegLiveRoom::onServerBack(std::string server, int32_t port, int32_t userId) {
+	mediaServer = "rtmp://" + server + ":" + std::to_string(port) + "/live/";
+	if (userId > 0)
+		this->userId = userId;
 }
 
 void FFmpegLiveRoom::onOperateAction(bool bPush, int32_t index, int32_t operate, int32_t code) {
@@ -69,11 +74,13 @@ bool FFmpegLiveRoom::initRoom() {
 	hr = CoCreateInstance(CLSID_OeipLiveClient, nullptr, CLSCTX_INPROC_SERVER, IID_IOeipLiveClient, (void**)&engine);
 	if (FAILED(hr))
 		return false;
-	liveCom->setLiveBack(liveBack);
-	engine->liveBack = liveCom.get();
-	liveCom->AddRef();
+	onServeBack serverbackEvent = std::bind(&FFmpegLiveRoom::onServerBack, this, _1, _2, _3);
+	liveCom->setLiveBack(liveBack, serverbackEvent);
+	IOeipLiveCallBack* tempLiveCom = liveCom;
+	engine->SetLiveCallBack(&tempLiveCom);
 	auto finit = engine->InitRoom(liveCtx.liveServer);
 	return finit != 0;
+	//return true;
 }
 
 bool FFmpegLiveRoom::loginRoom() {
@@ -81,25 +88,32 @@ bool FFmpegLiveRoom::loginRoom() {
 	if (code > 0) {
 		userId = code;
 	}
-	liveCom->userId = userId;
+	//liveCom->userId = userId;
+	bLogin = true;
 	return code >= 0;
 }
 
 bool FFmpegLiveRoom::pushStream(int32_t index, const OeipPushSetting& setting) {
-	if (liveCom->mediaServer.empty()) {
+	if (mediaServer.empty()) {
 		liveBack->onOperateResult(11, -1, "login no return media sever.");
 		return false;
 	}
 	if (index >= LIVE_OUTPUT_MAX) {
 		return false;
 	}
-	std::string uri = liveCom->mediaServer + roomName + "_" + std::to_string(userId) + "_" + std::to_string(index);
-	std::string message = "推流地址:" + uri;
+	std::string uri = mediaServer + roomName + "_" + std::to_string(userId) + "_" + std::to_string(index);
+	std::string message = "push url:" + uri;
 	logMessage(OEIP_INFO, message.c_str());
 	liveOuts[index]->enableAudio(setting.bAudio);
 	liveOuts[index]->enableVideo(setting.bVideo);
+	if (setting.videoEncoder.bitrate > 0) {
+		liveOuts[index]->setVideoBitrate(setting.videoEncoder.bitrate);
+	}
+	if (setting.audioEncoder.bitrate > 0) {
+		liveOuts[index]->setAudioBitrate(setting.audioEncoder.bitrate);
+	}
 	auto result = liveOuts[index]->open(uri.c_str());
-	//限定只有主流推音频
+	//限定只有主流推音频 音频也让外面自己推，在这不集成，更大的自由度,必要的话，在外面在包装一层 摄像头/麦与声卡
 	//if (result >= 0 && index == 0) {
 	//	onAudioDataHandle dataHandle = std::bind(&FFmpegLiveRoom::onAudioData, this, index, _1, _2);
 	//	audioOutput->onDataHandle = dataHandle;
@@ -133,7 +147,7 @@ bool FFmpegLiveRoom::pullStream(int32_t userId, int32_t index) {
 		liveIns.push_back(input);
 	}
 	engine->PullStream(userId, index);
-	std::string uri = liveCom->mediaServer + roomName + "_" + std::to_string(userId) + "_" + std::to_string(index);
+	std::string uri = mediaServer + roomName + "_" + std::to_string(userId) + "_" + std::to_string(index);
 	int32_t code = input.In->open(uri.c_str());
 	return code >= 0;
 }
@@ -150,18 +164,37 @@ bool FFmpegLiveRoom::stopPullStream(int32_t userId, int32_t index) {
 }
 
 bool FFmpegLiveRoom::logoutRoom() {
+	if (!bLogin)
+		return true;
 	for (auto& liveIn : liveIns) {
 		liveIn.In->close();
 	}
-	int32_t code = engine->LogoutRoom();
+	int32_t code = 0;
+	try {
+		code = engine->LogoutRoom();
+	}
+	catch (const _com_error&) {
+		code = -1;
+	}
 	liveIns.clear();
+	mediaServer = "";
+	userId = 0;
+	bLogin = false;
 	return code >= 0;
 }
 
 bool FFmpegLiveRoom::shutdownRoom() {
-	engine->Shutdown();
-	liveOuts.clear();
-	liveIns.clear();
+	if (!bShutDown) {
+		for (auto& liveOut : liveOuts) {
+			liveOut->setOperateEvent(nullptr);
+		}
+		logoutRoom();
+		engine->Shutdown();
+		engine->Release();
+		liveOuts.clear();
+		liveIns.clear();
+		bShutDown = true;
+	}
 	return true;
 }
 

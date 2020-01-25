@@ -3,17 +3,21 @@
 #include "../oeip-live/OeipLiveBack.h"
 using namespace OeipLiveCom;
 
+typedef std::function<void(std::string server, int32_t port, int32_t userId)> onServeBack;
+
 class OeipLiveBackCom : public IOeipLiveCallBack
 {
 public:
-	std::string mediaServer = "";
-	int32_t userId = 0;
+	OeipLiveBackCom() {};
+	~OeipLiveBackCom();
 private:
 	OeipLiveBack* liveBack = nullptr;
+	onServeBack onSeverFunc = nullptr;
 	long refCount = 0;
 public:
-	void setLiveBack(OeipLiveBack* callBack) {
+	void setLiveBack(OeipLiveBack* callBack, onServeBack serverBack) {
 		liveBack = callBack;
+		onSeverFunc = serverBack;
 	}
 public:
 	// 通过 IUnknown 继承
@@ -28,5 +32,6 @@ public:
 	virtual HRESULT __stdcall raw_OnStreamUpdate(long userId, long index, VARIANT_BOOL bAdd) override;
 	virtual HRESULT __stdcall raw_OnLogoutRoom() override;
 	virtual HRESULT __stdcall raw_OnOperateResult(long operate, long code, BSTR message) override;
+	virtual HRESULT __stdcall raw_Dispose() override;
 };
 

@@ -16,8 +16,9 @@ namespace OeipWrapper
 
     public class OeipPipe
     {
-        private bool bSetInput = false;
-        public int PipeId { get; private set; }
+        protected bool bSetInput = false;
+        public int PipeId { get; private set; } = -1;
+        public OeipGpgpuType GpgpuType { get; private set; }
 
         protected OnProcessDelegate onProcessDelegate;
         public event OnProcessDelegate OnProcessEvent;
@@ -31,12 +32,18 @@ namespace OeipWrapper
         {
             this.PipeId = id;
             OeipHelper.setPipeDataAction(PipeId, onProcessDelegate);
+            GpgpuType = OeipHelper.getPipeType(PipeId);
         }
 
         public void Close()
         {
             bSetInput = false;
             OeipHelper.closePipe(this.PipeId);
+        }
+
+        public bool IsEmpty()
+        {
+            return OeipHelper.emptyPipe(PipeId);
         }
 
         private void OnProcessHandle(int layerIndex, IntPtr data, int width, int height, int outputIndex)
@@ -112,14 +119,14 @@ namespace OeipWrapper
             bSetInput = true;
         }
 
-        public void setPipeInputGpuTex(int layerIndex, IntPtr device, IntPtr tex, int inputIndex = 0)
+        public void UpdatePipeInputGpuTex(int layerIndex, IntPtr device, IntPtr tex, int inputIndex = 0)
         {
-            OeipHelper.setPipeInputGpuTex(PipeId, layerIndex, device, tex, inputIndex);
+            OeipHelper.updatePipeInputGpuTex(PipeId, layerIndex, device, tex, inputIndex);
         }
 
-        public void setPipeOutputGpuTex(int layerIndex, IntPtr device, IntPtr tex, int outputIndex = 0)
+        public void UpdatePipeOutputGpuTex(int layerIndex, IntPtr device, IntPtr tex, int outputIndex = 0)
         {
-            OeipHelper.setPipeOutputGpuTex(PipeId, layerIndex, device, tex, outputIndex);
+            OeipHelper.updatePipeOutputGpuTex(PipeId, layerIndex, device, tex, outputIndex);
         }
 
         public void UpdateInput(int layerIndex, IntPtr data, int inputIndex = 0)
@@ -127,11 +134,11 @@ namespace OeipWrapper
             OeipHelper.updatePipeInput(PipeId, layerIndex, data, inputIndex);
         }
 
-        public virtual void RunPipe()
+        public virtual bool RunPipe()
         {
             if (!bSetInput)
-                return;
-            OeipHelper.runPipe(PipeId);
+                return false;
+            return OeipHelper.runPipe(PipeId);
         }
     }
 }

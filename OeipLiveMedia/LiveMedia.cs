@@ -28,16 +28,17 @@ namespace OeipLiveMedia
         private HubConnection Connection { get; set; }
         private IHubProxy HubProxy { get; set; }
         private string nginxpath = string.Empty;
-        private string localServer = "127.0.0.1";
+        private string liveServer = "127.0.0.1";
+        private string nginxServer = "127.0.0.1";
 
         public void Run()
         {
-            var server = ConfigurationManager.AppSettings["server"];
+            liveServer = ConfigurationManager.AppSettings["server"]; 
             var port = ConfigurationManager.AppSettings["port"];
+            nginxServer = ConfigurationManager.AppSettings["nginxserver"];           
             nginxpath = ConfigurationManager.AppSettings["nginxpath"];
             int nport = 1935;//
-            int.TryParse(ConfigurationManager.AppSettings["nginxport"], out nport);
-            localServer = server;
+            int.TryParse(ConfigurationManager.AppSettings["nginxport"], out nport);           
 
             string path = Path.Combine(nginxpath, "nginx.exe");
             if (!File.Exists(path))
@@ -46,7 +47,7 @@ namespace OeipLiveMedia
             }
             bool bStart = RunNginx(nport);
 
-            var xuri = $"http://{server}:{(port ?? "80")}";
+            var xuri = $"http://{liveServer}:{(port ?? "80")}";
             Connection = new HubConnection(xuri);
             HubProxy = Connection.CreateHubProxy("OeipMedia");
             HubProxy.On("OnConnect", (string liveServer) =>
@@ -58,11 +59,11 @@ namespace OeipLiveMedia
                 if (bStart)
                 {
                     //发送服务器初始化成功消息
-                    HubProxy.Invoke("OnServerAddRoom", roomName, localServer, nport);
+                    HubProxy.Invoke("OnServerAddRoom", roomName, nginxServer, nport);
                     Room room = new Room();
                     room.Name = roomName;
                     //room.NProcess = process;
-                    room.Server = localServer;
+                    room.Server = nginxServer;
                     room.Port = nport;
                     rooms.Add(room);
                     LogHelper.LogMessage($"添加房间 {roomName} 成功");

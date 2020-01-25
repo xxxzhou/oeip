@@ -1,6 +1,7 @@
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using OeipCommon;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 
@@ -9,37 +10,54 @@ namespace OeipLiveServer
     [HubName("OeipLive")]
     public class LiveHub : Hub
     {
+        //客户端每个请求都会生成一个Hub
         public LiveHub()
         {
         }
 
-        private void Instance_OnStreamChangeEvent(StreamDesc stream, bool bAdd)
+        public static IHubContext Hub
+        {
+            get
+            {
+                return GlobalHost.ConnectionManager.GetHubContext<LiveHub>();
+            }
+        }
+        /// <summary>        
+        /// 其直接在OnConnected/OnDisconnected的添加与删除事件还是会导致事件累加
+        /// 声明成静态方法可以解决
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="bAdd"></param>
+        private static void Instance_OnStreamChangeEvent(StreamDesc stream, bool bAdd)
         {
             //通知此房间所有用户都可以拉流了
-            Clients.Group(stream.User.InRoom.Name)?.OnStreamUpdate(stream.User.Id, stream.Index, bAdd);
+            Hub.Clients.Group(stream.User.InRoom.Name)?.OnStreamUpdate(stream.User.Id, stream.Index, bAdd);
         }
 
-        private void Instance_OnServerCreateEvent(Room room)
+        private static void Instance_OnServerCreateEvent(Room room)
         {
             if (room == null)
                 return;
             foreach (var user in room.Users)
             {
-                if (!user.IsSend)
-                {
-                    LogHelper.LogMessage($"用户 {Context.ConnectionId} 分配直播服务器 {room.Server}:{room.Port}");
-                    //返回当前用户的结果
-                    Clients.Client(user.ConnectId)?.OnLoginRoom(0, room.Server, room.Port);
-                    user.IsSend = true;
-                }
+                SetUserLogin(user);
             }
         }
 
-        public bool UserInit()
+        private static void SetUserLogin(User user)
         {
-            LogHelper.LogMessage($"用户 {Context.ConnectionId} 初始化成功");
-            RoomManager.Instance.AddUser(Context.ConnectionId);
-            return true;
+            if (user.IsSend)
+                return;
+            LogHelper.LogMessage($"用户 {user.ConnectId} 分配直播服务器 {user.InRoom.Server}:{user.InRoom.Port}");
+            //返回当前用户的结果
+            Hub.Clients.Client(user.ConnectId)?.OnLoginRoom(user.Id, user.InRoom.Server, user.InRoom.Port);
+            //查找房间里已经存在的流通知用户
+            List<StreamDesc> streams = RoomManager.Instance.GetStreams(user);
+            foreach (var stream in streams)
+            {
+                Hub.Clients.Client(user.ConnectId)?.OnStreamUpdate(stream.User.Id, stream.Index, true);
+            }
+            user.IsSend = true;
         }
 
         public int LoginRoom(string name, int userId)
@@ -67,13 +85,9 @@ namespace OeipLiveServer
                 //如果已经创建直播服务器
                 if (room.IsCreate)
                 {
+                    //返回给用户分配的直播服务器信息
                     User user = RoomManager.Instance.GetUser(Context.ConnectionId);
-                    if (user != null && !user.IsSend)
-                    {
-                        LogHelper.LogMessage($"用户 {Context.ConnectionId} 分配直播服务器 {room.Server}:{room.Port}");
-                        Clients.Client(Context.ConnectionId)?.OnLoginRoom(0, room.Server, room.Port);
-                        user.IsSend = true;
-                    }
+                    RoomManager.Instance.LockAction(() => { SetUserLogin(user); });
                 }
                 return uid;
             }
@@ -119,6 +133,8 @@ namespace OeipLiveServer
 
         public int LogoutRoom()
         {
+            var user = RoomManager.Instance.GetUser(Context.ConnectionId);
+            Groups.Remove(Context.ConnectionId, user.InRoom.Name);
             //取消绑定用户
             RoomManager.Instance.UnBindUser(Context.ConnectionId);
             //发给用户回调
@@ -131,12 +147,8 @@ namespace OeipLiveServer
             RoomManager.Instance.OnServerCreateEvent += Instance_OnServerCreateEvent;
             RoomManager.Instance.OnStreamChangeEvent += Instance_OnStreamChangeEvent;
             LogHelper.LogMessage($"用户 {Context.ConnectionId} 连接成功");
-            //注意,Clients.Caller的调用要在base.OnConnected()后面
-            return Task.Run(() =>
-            {
-                base.OnConnected();
-                Clients.Caller.OnConnect();
-            });
+            RoomManager.Instance.AddUser(Context.ConnectionId);
+            return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)

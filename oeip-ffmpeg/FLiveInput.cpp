@@ -5,6 +5,7 @@ FLiveInput::FLiveInput() {
 }
 
 FLiveInput::~FLiveInput() {
+	close();
 }
 
 int32_t FLiveInput::open(const char* url) {		

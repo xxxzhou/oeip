@@ -33,5 +33,10 @@ namespace OeipControl
             Action action = () => displayDx111.NativeLoad(LivePipe, obj);
             BeginInvoke(action);
         }
+
+        public void SetBlendTex(BlendViewPipe blend, bool bMain)
+        {
+            this.displayDx111.SetBlendTex(blend, bMain);
+        }
     }
 }

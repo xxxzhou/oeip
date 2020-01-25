@@ -124,7 +124,7 @@
 
 COPY "$(OutDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
 
-COPY "$(OutDir)$(ProjectName).lib" "$(SolutionDir)install\bin\$(ProjectName).lib"
+COPY "$(OutDir)$(ProjectName).lib" "$(SolutionDir)install\lib\$(ProjectName).lib"
 
 COPY "$(SolutionDir)$(ProjectName)\Oeip.h" "$(SolutionDir)install\include\Oeip.h"
 COPY "$(SolutionDir)$(ProjectName)\OeipDefine.h" "$(SolutionDir)install\include\OeipDefine.h"

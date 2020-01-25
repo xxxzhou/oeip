@@ -40,10 +40,10 @@ void setLogEvent(logEventHandle logEvent) {
 std::wstring string2wstring(std::string str) {
 	std::wstring result;
 	//获取缓冲区大小，并申请空间，缓冲区大小按字符计算  
-	int len = MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), NULL, 0);
+	int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), NULL, 0);
 	TCHAR* buffer = new TCHAR[len + 1];
 	//多字节编码转换成宽字节编码  
-	MultiByteToWideChar(CP_ACP, 0, str.c_str(), str.size(), buffer, len);
+	MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.size(), buffer, len);
 	buffer[len] = '\0';             //添加字符串结尾  
 	//删除缓冲区并返回值  
 	result.append(buffer);
@@ -55,10 +55,10 @@ std::wstring string2wstring(std::string str) {
 std::string wstring2string(std::wstring wstr) {
 	std::string result;
 	//获取缓冲区大小，并申请空间，缓冲区大小事按字节计算的  
-	int len = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
+	int len = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), NULL, 0, NULL, NULL);
 	char* buffer = new char[len + 1];
 	//宽字节编码转换成多字节编码  
-	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
+	WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.size(), buffer, len, NULL, NULL);
 	buffer[len] = '\0';
 	//删除缓冲区并返回值  
 	result.append(buffer);
@@ -198,31 +198,31 @@ int32_t getDataType(OeipVideoType videoType) {
 	return imageType;
 }
 
-std::string getLayerName(OeipLayerType layerType) {
-	std::string name = "no name layer";
-	switch (layerType) {
-	case OEIP_NONE_LAYER:
-		break;
-	case OEIP_INPUT_LAYER:
-		name = "input layer";
-		break;
-	case OEIP_YUV2RGBA_LAYER:
-		name = "yuv to rgba layer";
-		break;
-	case OEIP_MAPCHANNEL_LAYER:
-		break;
-	case OEIP_RGBA2YUV_LAYER:
-		break;
-	case OEIP_OUTPUT_LAYER:
-		name = "output layer";
-		break;
-	case OEIP_MAX_LAYER:
-		break;
-	default:
-		break;
-	}
-	return name;
-}
+//std::string getLayerName(OeipLayerType layerType) {
+//	std::string name = "no name layer";
+//	switch (layerType) {
+//	case OEIP_NONE_LAYER:
+//		break;
+//	case OEIP_INPUT_LAYER:
+//		name = "input layer";
+//		break;
+//	case OEIP_YUV2RGBA_LAYER:
+//		name = "yuv to rgba layer";
+//		break;
+//	case OEIP_MAPCHANNEL_LAYER:
+//		break;
+//	case OEIP_RGBA2YUV_LAYER:
+//		break;
+//	case OEIP_OUTPUT_LAYER:
+//		name = "output layer";
+//		break;
+//	case OEIP_MAX_LAYER:
+//		break;
+//	default:
+//		break;
+//	}
+//	return name;
+//}
 
 uint32_t divUp(int32_t x, int32_t y) {
 	return (x + y - 1) / y;

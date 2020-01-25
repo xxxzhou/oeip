@@ -24,13 +24,19 @@ public:
 	FFmpegLiveRoom();
 	virtual ~FFmpegLiveRoom();
 private:
-	IOeipLiveClientPtr engine = nullptr;
-	std::unique_ptr<OeipLiveBackCom> liveCom = nullptr;
+	//IOeipLiveClientPtr engine = nullptr;
+	//engine这个对象现在实际是C#/COM传递过来的托管对象
+	IOeipLiveClient* engine = nullptr;
+	OeipLiveBackCom* liveCom = nullptr;
 	std::vector<std::unique_ptr<FLiveOutput>> liveOuts;
 	std::vector<LiveInput> liveIns;
+	std::string mediaServer;
+	bool bShutDown = false;
+	bool bLogin = false;
 	//std::unique_ptr<FAudioOutput> audioOutput = nullptr;
 	//OeipAudioDesc audioDesc = {};
 private:
+	void onServerBack(std::string server, int32_t port, int32_t userId);
 	void onOperateAction(bool bPush, int32_t index, int32_t operate, int32_t code);
 	int32_t findLiveInput(int32_t userId, int32_t index, LiveInput& input);
 public:

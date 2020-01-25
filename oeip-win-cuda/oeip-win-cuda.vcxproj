@@ -85,6 +85,17 @@
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CodeGeneration>compute_75,sm_75;compute_70,sm_70;compute_50,sm_50;compute_60,sm_60</CodeGeneration>
     </CudaCompile>
+    <PostBuildEvent>
+      <Command>@echo ---------------------------------
+
+@echo [$(ProjectName)]生成完成..
+
+@echo 开始复制...
+
+COPY "$(OutDir)$(ProjectName).dll" "$(SolutionDir)install\bin\$(ProjectName).dll"
+
+@echo ---------------------------------</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="CudaWrapper.cu" />

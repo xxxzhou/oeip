@@ -21,6 +21,7 @@ void DarknetLayerCuda::onParametChange(DarknetParamet oldT) {
 		bool bInWgt = std::tr2::sys::exists(layerParamet.weightfile);
 		if (!bInCfg || !bInWgt) {
 			logMessage(OEIP_ERROR, "cfg or weights not find.");
+			layerParamet.bLoad = false;
 			return;
 		}
 		net = load_network(layerParamet.confile, layerParamet.weightfile, 0);

@@ -110,8 +110,8 @@ struct OeipRect
 {
 	float centerX = 0.f;
 	float centerY = 0.f;
-	float width = 0.f;
-	float height = 0.f;
+	float width = 0.2f;
+	float height = 0.2f;
 };
 
 //Paramet结构里不用一字节类型数据，一是memcmp后面会用，

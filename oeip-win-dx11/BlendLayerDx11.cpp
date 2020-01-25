@@ -1,10 +1,9 @@
 #include "BlendLayerDx11.h"
 
 
-BlendLayerDx11::~BlendLayerDx11() {
-	computeShader = std::make_unique<Dx11ComputeShader>();
-	computeShader->setCS(112, modeName, rctype);
-}
+//BlendLayerDx11::BlendLayerDx11() {
+//
+//}
 
 void BlendLayerDx11::onParametChange(BlendParamet oldT) {
 	if (!bBufferInit)

@@ -102,6 +102,10 @@ uint32_t getColor(float r, float g, float b, float a) {
 		((uint32_t)(r * 255.0f));
 }
 
+bool bCuda() {
+	return PluginManager<ImageProcess>::getInstance().bHaveType(OEIP_CUDA);
+}
+
 int getDeviceCount() {
 	OEIP_CHECKINSTANCEINT;
 	return oInstance->getVideoList().size();
@@ -237,11 +241,28 @@ int32_t initPipe(OeipGpgpuType gpgpuType) {
 	return oInstance->initPipe(gpgpuType);
 }
 
-bool closePipe(int32_t pipeId)
-{
+bool closePipe(int32_t pipeId) {
 	OEIP_CHECKINSTANCEBOOL;
 	OEIP_CHECKPIPEBOOL;
-	return oInstance->closePipe(pipeId);
+	pipe->closePipe();
+}
+
+bool emptyPipe(int32_t pipeId) {
+	if (!oInstance)
+		return true;
+	auto pipe = oInstance->getPipe(pipeId);
+	if (!pipe)
+		return true;
+	return pipe->emptyPipe();
+}
+
+OeipGpgpuType getPipeType(int32_t pipeId) {
+	if (!oInstance)
+		return OEIP_GPGPU_OTHER;
+	auto pipe = oInstance->getPipe(pipeId);
+	if (pipe == nullptr)
+		return OEIP_GPGPU_OTHER;
+	return pipe->gpuType;
 }
 
 int32_t addPiepLayer(int32_t pipeId, const char* layerName, OeipLayerType layerType, const void* paramet) {
@@ -296,19 +317,19 @@ void setPipeDataHandle(int32_t pipeId, onProcessHandle onProcessData) {
 	pipe->setDataProcess(onProcessData);
 }
 
-void runPipe(int32_t pipeId) {
-	OEIP_CHECKINSTANCEVOID;
-	OEIP_CHECKPIPEVOID;
-	pipe->runLayers();
+bool runPipe(int32_t pipeId) {
+	OEIP_CHECKINSTANCEBOOL;
+	OEIP_CHECKPIPEBOOL;
+	return pipe->runLayers();
 }
 
-void setPipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t inputIndex) {
+void updatePipeInputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t inputIndex) {
 	OEIP_CHECKINSTANCEVOID;
 	OEIP_CHECKPIPEVOID;
 	pipe->setInputGpuTex(layerIndex, ctx, tex, inputIndex);
 }
 
-void setPipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t outputIndex) {
+void updatePipeOutputGpuTex(int32_t pipeId, int32_t layerIndex, void* ctx, void* tex, int32_t outputIndex) {
 	OEIP_CHECKINSTANCEVOID;
 	OEIP_CHECKPIPEVOID;
 	pipe->setOutputGpuTex(layerIndex, ctx, tex, outputIndex);

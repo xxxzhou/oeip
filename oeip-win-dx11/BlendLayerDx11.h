@@ -10,8 +10,11 @@ struct BlendConstant
 class BlendLayerDx11 : public BlendLayer, public LayerDx11
 {
 public:
-	BlendLayerDx11() :LayerDx11(2, 1) {};
-	~BlendLayerDx11();
+	BlendLayerDx11() :LayerDx11(2, 1) {
+		computeShader = std::make_unique<Dx11ComputeShader>();
+		computeShader->setCS(112, modeName, rctype);
+	};
+	~BlendLayerDx11() {};
 private:
 	BlendConstant blendConstant = {};
 protected:

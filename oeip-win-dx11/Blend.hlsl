@@ -28,7 +28,7 @@ SamplerState lineSampler
 Texture2D<unorm float4> texIn : register(t0);
 Texture2D<unorm float4> texIn2 : register(t1);
 RWTexture2D<unorm float4> texOut : register(u0);
-
+//Blend
 [numthreads(SIZE_X, SIZE_Y, 1)]
 void main(uint3 DTid : SV_DispatchThreadID) {
 	if (DTid.x >= width || DTid.y >= height)

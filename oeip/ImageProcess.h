@@ -14,13 +14,19 @@ class OEIPDLL_EXPORT ImageProcess
 public:
 	ImageProcess() {};
 	virtual ~ImageProcess() {};
+public:
+	OeipGpgpuType gpuType = OeipGpgpuType::OEIP_GPGPU_OTHER;
 protected:
 	std::recursive_mutex mtx;
 	int32_t runInit = 0;
 	std::vector<std::shared_ptr<BaseLayer>> layers;
 	onProcessHandle onProcessEvent;
+	//是否初始化所有层
 	bool bInitLayers = false;
+	//是否初始化所有BUFFER
 	bool bInitBuffers = false;
+	//是否需要重置层
+	bool bResetLayers = false;
 	//bool bRunFirst = false;
 protected:
 	//链接各层
@@ -29,11 +35,12 @@ protected:
 	virtual BaseLayer* onAddLayer(OeipLayerType layerType) = 0;
 public:
 	bool initLayers();
-	void runLayers();
+	bool runLayers();
 	//updateLayer里根据参数决定是否需要重新初始化
 	void resetLayers() {
 		std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 		bInitLayers = false;
+		bResetLayers = true;
 	};
 	int32_t addLayer(const std::string& name, OeipLayerType layerType, const void* paramet = nullptr);
 	void connectLayer(int32_t layerIndex, const std::string& forwardName, int32_t inputIndex = 0, int32_t selfIndex = 0);
@@ -43,6 +50,7 @@ public:
 	bool updateLayer(int32_t layerIndex, const void* paramet);
 	void setEnableLayer(int32_t layerIndex, bool bEnable);
 	bool getEnableLayer(int32_t layerIndex);
+	bool getConnecEnable(int32_t layerIndex);
 	void setEnableLayerList(int32_t layerIndex, bool bEnable);
 	bool getEnableLayerList(int32_t layerIndex, bool& bDListChange);
 	OeipLayerType getLayerType(int32_t layerIndex);

@@ -88,7 +88,7 @@ void OutputLayerDx11::onRunLayer() {
 			dx11->outputData(layerIndex, cpuData, selfConnects[i].width, selfConnects[i].height, i);
 		}
 		if (layerParamet.bGpu) {
-			if (shardTexs[i]->texture == nullptr)
+			if (shardTexs[i]->texture == nullptr || outTexs[i] == nullptr)
 				return;
 			CComPtr<IDXGIKeyedMutex> pDX11Mutex = nullptr;
 			HRESULT hResult = shardTexs[i]->texture->texture->QueryInterface(__uuidof(IDXGIKeyedMutex), (LPVOID*)&pDX11Mutex);
