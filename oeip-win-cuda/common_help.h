@@ -92,6 +92,18 @@ inline void reCudaAllocGpu(void** data, int32_t length) {
 	cudaMalloc(data, length);
 }
 
+inline void showMat(cv::cuda::GpuMat gpuMat) {
+	cv::Mat cpuresult;
+	gpuMat.download(cpuresult);
+}
+
+inline void showMat(cv::cuda::GpuMat gpuMat, cv::cuda::GpuMat gpuMat1, cv::cuda::GpuMat gpuMat2) {
+	cv::Mat cpuresult, cpuresult1, cpuresult2;
+	gpuMat.download(cpuresult);
+	gpuMat1.download(cpuresult1);
+	gpuMat2.download(cpuresult2);
+}
+
 #ifndef SAFE_GPUDATA
 #define SAFE_GPUDATA(p)  { if (p) { cudaFree(p); p = nullptr; } } 
 #endif

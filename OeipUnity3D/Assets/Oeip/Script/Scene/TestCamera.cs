@@ -43,15 +43,15 @@ public class TestCamera : MonoBehaviour
         //加载神经网络
         btnLoadNet.onClick.AddListener(() =>
         {
-            darknetParamet.bLoad = 1;
-            darknetParamet.confile = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny-test.cfg"));
-            darknetParamet.weightfile = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny_745000.weights"));
-            darknetParamet.thresh = 0.3f;
-            darknetParamet.nms = 0.3f;
-            darknetParamet.bDraw = 1;
-            darknetParamet.drawColor = OeipHelper.getColor(1.0f, 0.1f, 0.1f, 0.8f);
             Loom.RunAsync(() =>
             {
+                darknetParamet.bLoad = 1;
+                darknetParamet.confile = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny-test.cfg"));
+                darknetParamet.weightfile = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny_745000.weights"));
+                darknetParamet.thresh = 0.3f;
+                darknetParamet.nms = 0.3f;
+                darknetParamet.bDraw = 1;
+                darknetParamet.drawColor = OeipHelper.getColor(1.0f, 0.1f, 0.1f, 0.8f);
                 cameraView.VideoPipe.UpdateDarknetParamet(ref darknetParamet);
             });
         });

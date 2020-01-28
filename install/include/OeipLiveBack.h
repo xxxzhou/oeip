@@ -23,7 +23,7 @@ public:
 	//登出房间回调
 	virtual void onLogoutRoom(int32_t code) = 0;
 	//各种操作回调
-	virtual void onOperateResult(int32_t operate, int32_t code, std::string message) = 0;
+	virtual void onOperateResult(int32_t operate, int32_t code, const char* message) = 0;
 	//推流回调
 	virtual void onPushStream(int32_t index, int32_t code) = 0;
 	//拉流回调
@@ -49,7 +49,7 @@ public:
 	virtual void onVideoFrame(int32_t userId, int32_t index, OeipVideoFrame videoFrame) override;
 	virtual void onAudioFrame(int32_t userId, int32_t index, OeipAudioFrame audioFrame) override;
 	virtual void onLogoutRoom(int32_t code) override;
-	virtual void onOperateResult(int32_t operate, int32_t code, std::string message) override;
+	virtual void onOperateResult(int32_t operate, int32_t code, const char* message) override;
 
 	virtual void onPushStream(int32_t index, int32_t code) override;
 	virtual void onPullStream(int32_t userId, int32_t index, int32_t code) override;

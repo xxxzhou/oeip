@@ -70,15 +70,3 @@ void writerMat(GpuMat gpuMat) {
 	fclose(fp);
 	//exit(1);
 }
-
-inline void showMat(GpuMat gpuMat) {
-	cv::Mat cpuresult;
-	gpuMat.download(cpuresult);
-}
-
-inline void showMat(GpuMat gpuMat, GpuMat gpuMat1, GpuMat gpuMat2) {
-	cv::Mat cpuresult, cpuresult1, cpuresult2;
-	gpuMat.download(cpuresult);
-	gpuMat1.download(cpuresult1);
-	gpuMat2.download(cpuresult2);
-}

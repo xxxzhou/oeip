@@ -28,7 +28,7 @@ namespace OeipWrapperTest
         {
             setting = SettingManager.Instance.Setting;
             OeipManager.Instance.OnLogEvent += Instance_OnLogEvent;
-            this.cameraControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, 1, false);
+            this.cameraControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, 0, false);
             objectAttribute = new ObjectBindWF<OeipVideoParamet>();
             objectAttribute.OnChangeEvent += ObjectAttribute_OnChangeEvent;
             this.cameraControl1.VideoPipe.UpdateVideoParamet(setting.videoParamet);

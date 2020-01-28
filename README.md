@@ -2,6 +2,11 @@
 多媒体与游戏引擎(主要支持Unity3D/UE4)
 
 编译项目:
+CUDA 10.1安裝:
+https://developer.nvidia.com/cuda-downloads
+CUDNN 10.1安裝:
+https://developer.nvidia.com/cudnn
+
 下载 https://github.com/xxxzhou/oeip-thridparty
 在Oeip项目下，新建一个ThirdParty文件夹，把oeip-thridparty里的文件全部复制到这。
 二种引用DLL方式。

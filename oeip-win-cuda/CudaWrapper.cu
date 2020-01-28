@@ -84,7 +84,7 @@ void guidedFilter_gpu(PtrStepSz<float4> source, PtrStepSz<float3> col1, PtrStepS
 	guidedFilter << <grid, block, 0, stream >> > (source, col1, col2, col3, dest, eps);
 }
 
-void guidedFilterResult_gpu(PtrStepSz<float4> source, PtrStepSz<float4> guid, PtrStepSz<uchar4> dest,
+void guidedFilterResult_gpu(PtrStepSz<uchar4> source, PtrStepSz<float4> guid, PtrStepSz<uchar4> dest,
 	float intensity, cudaStream_t stream) {
 	dim3 grid(divUp(source.cols, block.x), divUp(source.rows, block.y));
 	guidedFilterResult << <grid, block, 0, stream >> > (source, guid, dest, intensity);

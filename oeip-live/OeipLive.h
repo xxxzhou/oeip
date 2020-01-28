@@ -98,7 +98,7 @@ typedef void (*onStreamUpdateAction)(int32_t userId, int32_t index, bool bAdd);
 typedef void (*onVideoFrameAction)(int32_t userId, int32_t index, OeipVideoFrame videoFrame);
 typedef void (*onAudioFrameAction)(int32_t userId, int32_t index, OeipAudioFrame audioFrame);
 typedef void(*onLogoutRoomAction)(int32_t code);
-typedef void (*onOperateResultAction)(int32_t operate, int32_t code, std::string message);
+typedef void (*onOperateResultAction)(int32_t operate, int32_t code, const char* message);
 typedef void (*onPushStreamAction)(int32_t index, int32_t code);
 typedef void (*onPullStreamAction)(int32_t userId, int32_t index, int32_t code);
 

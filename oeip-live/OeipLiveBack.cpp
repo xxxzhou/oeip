@@ -46,7 +46,7 @@ void OeipLiveBackWrapper::onLogoutRoom(int32_t code) {
 	}
 }
 
-void OeipLiveBackWrapper::onOperateResult(int32_t operate, int32_t code, std::string message) {
+void OeipLiveBackWrapper::onOperateResult(int32_t operate, int32_t code, const char* message) {
 	if (liveBackWrapper.operateResultAction) {
 		liveBackWrapper.operateResultAction(operate, code, message);
 	}

@@ -21,5 +21,12 @@ namespace OeipWrapper.FixPipe
         public float gamma = 90.0f;
         [SliderInput(DisplayName = "Lambda", Order = 4, Default = 450.0f, Min = 200.0f, Max = 800.0f)]
         public float lambda = 450.0f;
+
+        [SliderInput(DisplayName = "Softness", Order = 6, Default = 5, IsInt = true, Min = 1, Max = 30)]
+        public int softness = 5;
+        [SliderInput(DisplayName = "EPS", Order = 7, Default = 5, Min = 1.0f, Max = 10.0f)]
+        public float epslgn10 = 5.0f;
+        [SliderInput(DisplayName = "Intensity", Order = 8, Default = 0.2f, Min = 0.0f, Max = 1.0f)]
+        public float intensity = 0.2f;
     }
 }

@@ -76,6 +76,10 @@ TArray<VideoFormat> OeipManager::GetCameraFormatList(int cameraIndex) {
 	return formatList;
 }
 
+FString OeipManager::GetLiveServer() {
+	return FString("http://129.211.40.225:6110");
+}
+
 void OeipManager::onLogMessage(int level, const char * message) {
 	OnLogEvent.Broadcast(level, UTF8_TO_TCHAR(message));
 }

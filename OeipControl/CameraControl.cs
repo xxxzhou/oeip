@@ -44,7 +44,7 @@ namespace OeipControl
             {
                 cbx_cameraList.Items.Add(camera);
             }
-            cbx_cameraList.SelectedIndex = Math.Min(index, cameraList.Count - 1);
+            cbx_cameraList.SelectedIndex = Math.Min(index + 1, cameraList.Count);
         }
 
         private void Pipe_OnProcessEvent(int layerIndex, IntPtr data, int width, int height, int outputIndex)
@@ -82,11 +82,11 @@ namespace OeipControl
         private void cbx_cameraList_SelectedIndexChanged(object sender, EventArgs e)
         {
             cbx_formatList.Items.Clear();
+            var newCamera = (OeipDeviceInfo)cbx_cameraList.SelectedItem;
+            if (newCamera.id < 0)
+                return;
             if (camera.IsOpen)
                 camera.Close();
-            var newCamera = (OeipDeviceInfo)cbx_cameraList.SelectedItem;
-            if (newCamera.id < 0 || newCamera.id == camera.Id)
-                return;
             camera.SetDevice(newCamera);
             foreach (var format in camera.VideoFormats)
             {

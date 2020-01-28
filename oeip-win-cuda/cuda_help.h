@@ -92,7 +92,7 @@ inline __host__ __device__ void inverseMat3x3(const float3& col0, const float3& 
 	float det = col0.x * (col1.y * col2.z - col2.y * col1.z)
 		- col0.y * (col1.x * col2.z - col1.z * col2.x)
 		+ col0.z * (col1.x * col2.y - col1.y * col2.x);
-	if (det > 0) {
+	if (det != 0) {
 		float invdet = 1.0f / det;
 		invCol0.x = (col1.y * col2.z - col2.y * col1.z) * invdet;
 		invCol0.y = (col0.z * col2.y - col0.y * col2.z) * invdet;

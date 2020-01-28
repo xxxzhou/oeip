@@ -13,6 +13,8 @@ OeipCamera::~OeipCamera() {
 	if (bInit()) {
 		setDeviceDataHandle(id, nullptr);
 		setDeviceEventHandle(id, nullptr);
+		OnDeviceEvent.Clear();
+		OnDeviceDataEvent.Clear();
 		Close();
 	}
 }
@@ -47,6 +49,17 @@ int OeipCamera::GetFormat() {
 	if (!bInit())
 		return false;
 	return getFormat(id);
+}
+
+bool OeipCamera::GetFormat(VideoFormat& videoFormat) {
+	if (!bInit())
+		return false;
+	int index = GetFormat();
+	auto formatList = OeipManager::Get().GetCameraFormatList(id);
+	if (index < 0 || index >= formatList.Num())
+		return false;
+	videoFormat = formatList[index];
+	return true;
 }
 
 void OeipCamera::SetFormat(int index) {

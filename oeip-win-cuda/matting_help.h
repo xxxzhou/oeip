@@ -104,7 +104,7 @@ inline __global__ void showSeedMask(PtrStepSz<uchar4> source, PtrStepSz<uchar4> 
 			color.w = 1.f;
 		}
 		else {
-			color = make_float4(0.0f, 0.0f, 0.0f, 0.0f);
+			color.w = 0.f;
 		}
 		dest(idy, idx) = rgbafloat42uchar4(color);
 	}

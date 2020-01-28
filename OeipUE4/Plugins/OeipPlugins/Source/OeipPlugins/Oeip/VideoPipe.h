@@ -26,23 +26,42 @@ private:
 	int32_t inputWidth = 0;
 	int32_t inputHeight = 0;
 	int32_t dataType = OEIP_CV_8UC4;
+
+	int32_t darknetIndex = -1;
+	int32_t grabcutIndex = -1;
+	int32_t guiderFilterIndex = -1;
+	int32_t mattingOutIndex = -1;
 private:
 	InputParamet ip = {};
 	YUV2RGBAParamet yp = {};
-	MapChannelParamet mp = {};
 	OutputParamet op = {};
 	ResizeParamet rp = {};
+	DarknetParamet darknetParamet = {};
+	GrabcutParamet grabcutParamet = {};
+	GuidedFilterParamet guidedFilterParamet = {};	
 public:
 	//int32_t getPipeId() { return pipe->; };
-	int32_t getOutputId() {
-		return outIndex;
+	int32_t getInputId() {
+		return inputIndex;
 	}
-	int32_t getOutYuvId() {
-		return outYuv2Index;
+
+	int32_t getOutputId() {
+		if (!pipe)
+			return -1;
+		if (pipe->GetGpuType() == OEIP_DX11)
+			return outIndex;
+		return mattingOutIndex;
+	}
+	int32_t getDarknetId() {
+		return darknetIndex;
 	}
 	int32_t getResizeId() {
 		return resizeIndex;
 	}
 	void setVideoFormat(OeipVideoType videoType, int32_t width, int32_t height);
-	void runVideoPipe(int32_t layerIndex, uint8_t* data);
+	void runVideoPipe(uint8_t* data);
+
+	void updateDarknet(DarknetParamet& net);
+	void changeGrabcutMode(bool bDrawSeed, OeipRect& rect);
+	void updateVideoParamet(FGrabCutSetting* grabSetting);
 };

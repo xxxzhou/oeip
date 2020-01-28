@@ -61,27 +61,29 @@ inline __global__ void guidedFilter(PtrStepSz<float4> source, PtrStepSz<float3> 
 		//ax+b,a,b是其线性关系解
 		float3 a = mulMat(cov_Ip, invCol0, invCol1, invCol2);
 		float b = mean_p - dot(a, mean_I);
-
+		//把当前ay+by+cz+w的解存入
 		dest(idy, idx) = make_float4(a, b);
 	}
 }
 
-inline __global__ void guidedFilterResult(PtrStepSz<float4> source, PtrStepSz<float4> guid, PtrStepSz<uchar4> dest, float intensity) {
+inline __global__ void guidedFilterResult(PtrStepSz<uchar4> source, PtrStepSz<float4> guid, PtrStepSz<uchar4> dest, float intensity) {
 	const int idx = blockDim.x * blockIdx.x + threadIdx.x;
 	const int idy = blockDim.y * blockIdx.y + threadIdx.y;
 
 	if (idx < source.cols && idy < source.rows) {
-		float4 color = source(idy, idx);// rgbauchar42float4(source(idy, idx));//I
+		float4 color = rgbauchar42float4(source(idy, idx));//I
 		float3 rgb = make_float3(color);
 		float4 mean = guid(idy, idx);
 		//导向滤波的结果
 		float alpha = clamp(color.x*mean.x + color.y*mean.y + color.z*mean.z + mean.w, 0.f, 1.f);
-		if (alpha < intensity)
+		if (alpha < intensity) {
+			rgb = make_float3(0.f, 0.f, 0.f);
 			alpha = 0;
+		}
 		else
 			alpha = fminf(alpha + intensity, 1);
 		float4 rc = make_float4(rgb, alpha);
-		dest(idy, idx) = rgbafloat42uchar4(rc*rc.w);
+		dest(idy, idx) = rgbafloat42uchar4(rc);
 	}
 }
 

@@ -32,7 +32,7 @@ namespace OeipTestLiveRoom
 
 		virtual void onLogoutRoom(int32_t code) override {};
 
-		virtual void onOperateResult(int32_t operate, int32_t code, std::string message) override {};
+		virtual void onOperateResult(int32_t operate, int32_t code, const char* message) override {};
 
 		virtual void onPushStream(int32_t index, int32_t code) override {};
 

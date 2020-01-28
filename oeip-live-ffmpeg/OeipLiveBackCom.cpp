@@ -72,7 +72,7 @@ HRESULT __stdcall OeipLiveBackCom::raw_OnOperateResult(long operate, long code, 
 	if (!liveBack)
 		return -1;
 	std::string msg = wstring2string(message);
-	liveBack->onOperateResult(operate, code, msg);
+	liveBack->onOperateResult(operate, code, msg.c_str());
 	return 0;
 }
 

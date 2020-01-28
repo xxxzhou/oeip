@@ -25,14 +25,16 @@ private:
 	int id = -1;
 	FString deviceName;
 	FString deviceId;
-	TArray<VideoFormat> formatList;	
+	TArray<VideoFormat> formatList;
 private:
 	bool bInit();
 	void onDeviceHandle(int type, int code);
 	void onReviceHandle(uint8_t* data, int width, int height);
 public:
 	void SetDevice(FCameraInfo* cameraInfo);
+	//返回摄像机的当前用的索引
 	int GetFormat();
+	bool GetFormat(VideoFormat& videoFormat);
 	void SetFormat(int index);
 	bool Open();
 	void Close();

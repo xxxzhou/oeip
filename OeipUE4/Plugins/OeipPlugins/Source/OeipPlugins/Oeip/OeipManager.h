@@ -32,6 +32,7 @@ public:
 	OeipCamera* GetCamera(int index);
 	OeipPipe* CreatePipe(OeipGpgpuType gpgpuType);
 	TArray<VideoFormat> GetCameraFormatList(int cameraIndex);
+	FString GetLiveServer();
 private:
 	void onLogMessage(int level, const char *message);
 };

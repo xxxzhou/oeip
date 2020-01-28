@@ -16,32 +16,30 @@ template<class U>
 class ObjAttribute
 {
 private:
-	//°ó¶¨µÄ¶ÔÏó
+	//ç»‘å®šçš„å¯¹è±¡
 	U * obj = nullptr;
-	//°ó¶¨¶ÔÏóµÄÔª½á¹¹
+	//ç»‘å®šå¯¹è±¡çš„å…ƒç»“æ„
 	UStruct* structDefinition = nullptr;
-	//Éú³ÉUIµÄbox
+	//ç”ŸæˆUIçš„box
 	UVerticalBox* panel = nullptr;
-	//°ó¶¨¶ÔÏóÔªÊı¾İÃèÊö
+	//ç»‘å®šå¯¹è±¡å…ƒæ•°æ®æè¿°
 	TArray<BaseAttribute*> attributeList;
-	//¸ù¾İÔªÊı¾İÃèÊöÉú³ÉµÄUI
+	//æ ¹æ®å…ƒæ•°æ®æè¿°ç”Ÿæˆçš„UI
 	TArray<UBaseAutoWidget*> widgetList;
-	//ÊÇ·ñ°ó¶¨
+	//æ˜¯å¦ç»‘å®š
 	bool bBind = false;
-	//µ±°ó¶¨¶ÔÏó¸Ä±äºóÒı·¢µÄ»Øµ÷
+	//å½“ç»‘å®šå¯¹è±¡æ”¹å˜åå¼•å‘çš„å›è°ƒ
 	std::function<void(ObjAttribute<U>*, FString name)> onObjChangeHandle = nullptr;
 public:
-	//°ó¶¨Ò»¸ö¶ÔÏóµ½UVerticalBoxÉÏ£¬¸ù¾İarrtListÓë¶ÔÏóµÄÔªÊı¾İÒÔ¼°¶ÔÓ¦UIÄ£°æÉú³ÉUIÔÚboxÉÏ,¶ÔÓ¦UIµÄ±ä¶¯»á×Ô¶¯¸üĞÂµ½¶ÔÏóÄÚ´æÊı¾İÖĞ
-	void Bind(U* pobj, UVerticalBox* box, TArray<BaseAttribute*> arrtList, TArray<UClass*> templateWidgetList, UWorld* world)
-	{
+	//ç»‘å®šä¸€ä¸ªå¯¹è±¡åˆ°UVerticalBoxä¸Šï¼Œæ ¹æ®arrtListä¸å¯¹è±¡çš„å…ƒæ•°æ®ä»¥åŠå¯¹åº”UIæ¨¡ç‰ˆç”ŸæˆUIåœ¨boxä¸Š,å¯¹åº”UIçš„å˜åŠ¨ä¼šè‡ªåŠ¨æ›´æ–°åˆ°å¯¹è±¡å†…å­˜æ•°æ®ä¸­
+	void Bind(U* pobj, UVerticalBox* box, TArray<BaseAttribute*> arrtList, TArray<UClass*> templateWidgetList, UWorld* world) {
 		if (bBind)
 			return;
 		obj = pobj;
 		structDefinition = U::StaticStruct();
 		attributeList = arrtList;
 		panel = box;
-		for (auto attribute : attributeList)
-		{
+		for (auto attribute : attributeList) {
 			int index = attribute->GetIndex();
 			//TSubclassOf<UToggleAutoWidget> togglewidget = LoadClass<UToggleAutoWidget>(nullptr, TEXT("WidgetBlueprint'/Game/UI/togglePanel.togglePanel_C'"));
 			auto templateWidget = templateWidgetList[index];
@@ -56,25 +54,22 @@ public:
 			else if (index == 3)
 				InitWidget<UDropdownWidget>(attribute, templateWidget, world);
 		}
-		for (auto widget : widgetList)
-		{
+		for (auto widget : widgetList) {
 			panel->AddChild(widget);
 		}
 		UpdateDropdownParent();
 		bBind = true;
 	};
 
-	//1 probj = nullÈçÖ±½Ó¸üĞÂÄÚ´æÊı¾İ£¬È»ºó·´À¡¸øUI
-	//2 probj != null°ó¶¨µÄÍ¬ÀàĞÍ±ğµÄ¶ÔÏó,ÓÃÕâ¶ÔÏó¸üĞÂUI,²¢ÇÒºóĞøUI¸üĞÂ·´À¡¸ø´ËĞÂ¶ÔÏó
-	void Update(U* pobj = nullptr)
-	{
+	//1 probj = nullå¦‚ç›´æ¥æ›´æ–°å†…å­˜æ•°æ®ï¼Œç„¶ååé¦ˆç»™UI
+	//2 probj != nullç»‘å®šçš„åŒç±»å‹åˆ«çš„å¯¹è±¡,ç”¨è¿™å¯¹è±¡æ›´æ–°UI,å¹¶ä¸”åç»­UIæ›´æ–°åé¦ˆç»™æ­¤æ–°å¯¹è±¡
+	void Update(U* pobj = nullptr) {
 		if (!bBind)
 			return;
 		if (pobj)
 			obj = pobj;
-		for (auto widget : widgetList)
-		{
-			int index = widget->index;			
+		for (auto widget : widgetList) {
+			int index = widget->index;
 			if (index == 0)
 				GetValue<UToggleAutoWidget>(widget);
 			else if (index == 1)
@@ -86,27 +81,22 @@ public:
 		}
 	}
 
-	//µ±¶ÔÓ¦½á¹¹µÄUI¸Ä¶¯¸üĞÂ¶ÔÏóºó£¬·µ»ØµÄ»Øµ÷£¬µÚÒ»¸ö²ÎÊı±íÊ¾µ±Ç°¶ÔÏó£¬µÚ¶ş¸ö²ÎÊı±íÊ¾¶ÔÓ¦×Ö¶ÎÃû
-	void SetOnObjChangeAction(std::function<void(ObjAttribute<U>*, FString name)> onChange)
-	{
+	//å½“å¯¹åº”ç»“æ„çš„UIæ”¹åŠ¨æ›´æ–°å¯¹è±¡åï¼Œè¿”å›çš„å›è°ƒï¼Œç¬¬ä¸€ä¸ªå‚æ•°è¡¨ç¤ºå½“å‰å¯¹è±¡ï¼Œç¬¬äºŒä¸ªå‚æ•°è¡¨ç¤ºå¯¹åº”å­—æ®µå
+	void SetOnObjChangeAction(std::function<void(ObjAttribute<U>*, FString name)> onChange) {
 		onObjChangeHandle = onChange;
 	}
 
-	//·µ»Øµ±Ç°BindµÄ¶ÔÏó
-	U* GetObj()
-	{
+	//è¿”å›å½“å‰Bindçš„å¯¹è±¡
+	U* GetObj() {
 		return obj;
 	}
 
-	//¸ù¾İ×Ö¶ÎÃûµÃµ½¶ÔÓ¦UToggleAutoWidget/UInputWidget/USliderInputWidget/UDropdownWidget
+	//æ ¹æ®å­—æ®µåå¾—åˆ°å¯¹åº”UToggleAutoWidget/UInputWidget/USliderInputWidget/UDropdownWidget
 	template<typename A>
-	A* GetWidget(FString name)
-	{
-		for (auto widget : widgetList)
-		{
+	A* GetWidget(FString name) {
+		for (auto widget : widgetList) {
 			A* awidget = dynamic_cast<A*>(widget);
-			if (awidget && awidget->memberName == name)
-			{
+			if (awidget && awidget->memberName == name) {
 				return awidget;
 			}
 		}
@@ -115,113 +105,91 @@ public:
 
 private:
 	template<typename A>
-	void InitWidget(BaseAttribute* attribute, UClass* widgetTemplate, UWorld* world)
-	{
+	void InitWidget(BaseAttribute* attribute, UClass* widgetTemplate, UWorld* world) {
 		auto widget = CreateWidget<A>(world, widgetTemplate);
 		widget->onValueChange = std::bind(&ObjAttribute<U>::SetValue<A::Type>, this, _1, _2);
 		widget->attribute = attribute;
 		widget->uproperty = FindProperty(attribute->MemberName);
 		widget->index = attribute->GetIndex();
-		//µ÷ÓÃ¶ÔÓ¦À¶Í¼µÄUI¸³Öµ
+		//è°ƒç”¨å¯¹åº”è“å›¾çš„UIèµ‹å€¼
 		widget->InitWidget();
-		//¹ØÁªUIµÄÊÂ¼şµ½ÈçÉÏµÄonValueChangeÖĞ
+		//å…³è”UIçš„äº‹ä»¶åˆ°å¦‚ä¸Šçš„onValueChangeä¸­
 		widget->InitEvent();
 		widget->memberName = attribute->MemberName;
 		widget->text->SetText(FText::FromString(attribute->DisplayName));
 		widgetList.Add(widget);
 	}
 
-	//ÔÚ¶ÔÓ¦µÄWidgetÉÏÖ±½Ó±£´æ´ËUProperty¶ÔÏó£¬´Ëºó¸üĞÂÊı¾İ/UI¸ü¿ì
-	UProperty* FindProperty(FString name)
-	{
-		for (TFieldIterator<UProperty> It(structDefinition); It; ++It)
-		{
+	//åœ¨å¯¹åº”çš„Widgetä¸Šç›´æ¥ä¿å­˜æ­¤UPropertyå¯¹è±¡ï¼Œæ­¤åæ›´æ–°æ•°æ®/UIæ›´å¿«
+	UProperty* FindProperty(FString name) {
+		for (TFieldIterator<UProperty> It(structDefinition); It; ++It) {
 			UProperty* Property = *It;
-			if (Property->GetName() == name)
-			{
+			if (Property->GetName() == name) {
 				return Property;
 			}
 		}
 		return nullptr;
 	}
 
-	//µ±¶ÔÓ¦µÄUI¸Ä¶¯ºó£¬UIÓ°Ïì¶ÔÓ¦objµÄÖµ£¬·ºĞÍt±íÊ¾¶ÔÓ¦UI·µ»ØµÄÊı¾İ
-	//ComponentTemplate¶ÔÓ¦µÄ·ºĞÍtÊÇ¹Ì¶¨µÄ£¬µ«ÊÇÊı¾İ½á¹¹ÀïµÄ×Ö¶ÎÀàĞÍ¿É¶àÖÖ£¬×ª»¯Âß¼­ÔÚÈçÏÂĞ´ºÃ¾ÍĞĞ
+	//å½“å¯¹åº”çš„UIæ”¹åŠ¨åï¼ŒUIå½±å“å¯¹åº”objçš„å€¼ï¼Œæ³›å‹tè¡¨ç¤ºå¯¹åº”UIè¿”å›çš„æ•°æ®
+	//ComponentTemplateå¯¹åº”çš„æ³›å‹tæ˜¯å›ºå®šçš„ï¼Œä½†æ˜¯æ•°æ®ç»“æ„é‡Œçš„å­—æ®µç±»å‹å¯å¤šç§ï¼Œè½¬åŒ–é€»è¾‘åœ¨å¦‚ä¸‹å†™å¥½å°±è¡Œ
 	template<typename T>
-	void SetValue(ComponentTemplate<T>* widget, T t)
-	{
-		if (widget->uproperty != nullptr)
-		{
+	void SetValue(ComponentTemplate<T>* widget, T t) {
+		if (widget->uproperty != nullptr) {
 			ValueToUProperty(widget->uproperty, t);
-			if (onObjChangeHandle)
-			{
+			if (onObjChangeHandle) {
 				onObjChangeHandle(this, widget->uproperty->GetName());
 			}
 		}
 	};
 
-	void ValueToUProperty(UProperty* Property, bool t)
-	{
+	void ValueToUProperty(UProperty* Property, bool t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UBoolProperty *BoolProperty = Cast<UBoolProperty>(Property))
-		{
+		if (UBoolProperty *BoolProperty = Cast<UBoolProperty>(Property)) {
 			BoolProperty->SetPropertyValue(Value, t);
 		}
 	};
 
-	void ValueToUProperty(UProperty* Property, float t)
-	{
+	void ValueToUProperty(UProperty* Property, float t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property))
-		{
-			if (NumericProperty->IsFloatingPoint())
-			{
+		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property)) {
+			if (NumericProperty->IsFloatingPoint()) {
 				NumericProperty->SetFloatingPointPropertyValue(Value, (float)t);
 			}
-			else if (NumericProperty->IsInteger())
-			{
+			else if (NumericProperty->IsInteger()) {
 				NumericProperty->SetIntPropertyValue(Value, (int64)t);
 			}
 		}
 	};
 
-	void ValueToUProperty(UProperty* Property, FString t)
-	{
+	void ValueToUProperty(UProperty* Property, FString t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UStrProperty *StringProperty = Cast<UStrProperty>(Property))
-		{
+		if (UStrProperty *StringProperty = Cast<UStrProperty>(Property)) {
 			StringProperty->SetPropertyValue(Value, t);
 		}
 	}
 
-	void ValueToUProperty(UProperty* Property, int t)
-	{
+	void ValueToUProperty(UProperty* Property, int t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property))
-		{
-			if (NumericProperty->IsFloatingPoint())
-			{
+		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property)) {
+			if (NumericProperty->IsFloatingPoint()) {
 				NumericProperty->SetFloatingPointPropertyValue(Value, (int64)t);
 			}
-			else if (NumericProperty->IsInteger())
-			{
+			else if (NumericProperty->IsInteger()) {
 				NumericProperty->SetIntPropertyValue(Value, (int64)t);
 			}
 		}
-		else if (UEnumProperty* EnumProperty = Cast<UEnumProperty>(Property))
-		{
+		else if (UEnumProperty* EnumProperty = Cast<UEnumProperty>(Property)) {
 			EnumProperty->GetUnderlyingProperty()->SetIntPropertyValue(Value, (int64)t);
 		}
 	}
 
-	//´Ó¶ÔÓ¦µÄobjÀïÈ¥È¡Öµ¸üĞÂUI£¬»á×ªµ½ComponentTemplate::Update
-	//Í¬SetValue£¬ComponentTemplateÀàĞÍ¹Ì¶¨£¬Êı¾İ½á¹¹ÀàĞÍ¿É¶àÖÖ£¬¶àÖÖĞèÒªĞ´ÏàÓ¦µÄ×ª»¯Âß¼­
+	//ä»å¯¹åº”çš„objé‡Œå»å–å€¼æ›´æ–°UIï¼Œä¼šè½¬åˆ°ComponentTemplate::Update
+	//åŒSetValueï¼ŒComponentTemplateç±»å‹å›ºå®šï¼Œæ•°æ®ç»“æ„ç±»å‹å¯å¤šç§ï¼Œå¤šç§éœ€è¦å†™ç›¸åº”çš„è½¬åŒ–é€»è¾‘
 	template<typename A>//template<typename T, typename A>
-	void GetValue(UBaseAutoWidget* baseWidget)//ComponentTemplate<T>* widget, T* t)
-	{
+	void GetValue(UBaseAutoWidget* baseWidget) {//ComponentTemplate<T>* widget, T* t)	
 		A* widget = (A*)baseWidget;
-		if (widget->uproperty != nullptr)
-		{
+		if (widget->uproperty != nullptr) {
 			A::Type t;
 			if (UPropertyToValue(widget->uproperty, t))
 				widget->Update(t);
@@ -240,11 +208,9 @@ private:
 		//}
 	};
 
-	bool UPropertyToValue(UProperty* Property, bool& t)
-	{
+	bool UPropertyToValue(UProperty* Property, bool& t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UBoolProperty *BoolProperty = Cast<UBoolProperty>(Property))
-		{
+		if (UBoolProperty *BoolProperty = Cast<UBoolProperty>(Property)) {
 			bool value = BoolProperty->GetPropertyValue(Value);
 			t = value;
 			return true;
@@ -252,19 +218,15 @@ private:
 		return false;
 	};
 
-	bool UPropertyToValue(UProperty* Property, float& t)
-	{
+	bool UPropertyToValue(UProperty* Property, float& t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property))
-		{
-			if (NumericProperty->IsFloatingPoint())
-			{
+		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property)) {
+			if (NumericProperty->IsFloatingPoint()) {
 				float value = NumericProperty->GetFloatingPointPropertyValue(Value);
 				t = value;
 				return true;
 			}
-			else if (NumericProperty->IsInteger())
-			{
+			else if (NumericProperty->IsInteger()) {
 				int value = NumericProperty->GetSignedIntPropertyValue(Value);
 				t = (float)value;
 				return true;
@@ -273,11 +235,9 @@ private:
 		return false;
 	};
 
-	bool UPropertyToValue(UProperty* Property, FString& t)
-	{
+	bool UPropertyToValue(UProperty* Property, FString& t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UStrProperty *StringProperty = Cast<UStrProperty>(Property))
-		{
+		if (UStrProperty *StringProperty = Cast<UStrProperty>(Property)) {
 			FString value = StringProperty->GetPropertyValue(Value);
 			t = value;
 			return true;
@@ -285,26 +245,21 @@ private:
 		return false;
 	}
 
-	bool UPropertyToValue(UProperty* Property, int& t)
-	{
+	bool UPropertyToValue(UProperty* Property, int& t) {
 		void* Value = Property->ContainerPtrToValuePtr<uint8>(obj);
-		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property))
-		{
-			if (NumericProperty->IsFloatingPoint())
-			{
+		if (UNumericProperty *NumericProperty = Cast<UNumericProperty>(Property)) {
+			if (NumericProperty->IsFloatingPoint()) {
 				float value = NumericProperty->GetFloatingPointPropertyValue(Value);
 				t = (int)value;
 				return true;
 			}
-			else if (NumericProperty->IsInteger())
-			{
+			else if (NumericProperty->IsInteger()) {
 				int value = NumericProperty->GetSignedIntPropertyValue(Value);
 				t = value;
 				return true;
 			}
 		}
-		else if (UEnumProperty* EnumProperty = Cast<UEnumProperty>(Property))
-		{
+		else if (UEnumProperty* EnumProperty = Cast<UEnumProperty>(Property)) {
 			UEnum* EnumDef = EnumProperty->GetEnum();
 			t = EnumProperty->GetUnderlyingProperty()->GetSignedIntPropertyValue(Value);
 			return true;
@@ -312,21 +267,16 @@ private:
 		return false;
 	};
 
-	void UpdateDropdownParent()
-	{
-		for (auto widget : widgetList)
-		{
+	void UpdateDropdownParent() {
+		for (auto widget : widgetList) {
 			panel->AddChild(widget);
-			if (widget->index == 3)
-			{
+			if (widget->index == 3) {
 				UDropdownWidget* dropWidget = (UDropdownWidget*)widget;
 				DropdownAttribute* dropAttribut = (DropdownAttribute*)(dropWidget->attribute);
 				if (dropAttribut->Parent.IsEmpty())
 					continue;
-				for (auto widget : widgetList)
-				{
-					if (widget->index == 3 && widget->memberName == dropAttribut->Parent)
-					{
+				for (auto widget : widgetList) {
+					if (widget->index == 3 && widget->memberName == dropAttribut->Parent) {
 						dropWidget->parent = (UDropdownWidget*)widget;
 						dropWidget->InitParentEvent();
 					}

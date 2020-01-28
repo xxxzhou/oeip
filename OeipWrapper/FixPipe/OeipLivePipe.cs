@@ -83,6 +83,7 @@ namespace OeipWrapper.FixPipe
                 VideoFormat.fps = 30;
                 VideoFormat.width = (int)videoFrame.width;
                 VideoFormat.height = (int)videoFrame.height;
+                yuvfmt = videoFrame.fmt;
                 VideoFormat.videoType = OeipVideoType.OEIP_VIDEO_RGBA32;
                 ResetPipe();
             }

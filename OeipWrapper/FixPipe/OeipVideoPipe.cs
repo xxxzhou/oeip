@@ -23,7 +23,7 @@ namespace OeipWrapper.FixPipe
         public int DarknetIndex { get; private set; }
         public int GrabcutIndex { get; private set; }
         public int MattingOutIndex { get; private set; }
-
+        public int GuiderFilterIndex { get; private set; }
         public int OutGpuIndex
         {
             get
@@ -46,6 +46,7 @@ namespace OeipWrapper.FixPipe
 
         private DarknetParamet darknetParamet = new DarknetParamet();
         private GrabcutParamet grabcutParamet = new GrabcutParamet();
+        private GuidedFilterParamet guidedFilterParamet = new GuidedFilterParamet();
 
         public OeipVideoPipe(OeipPipe pipe)
         {
@@ -113,6 +114,13 @@ namespace OeipWrapper.FixPipe
                 grabcutParamet.lambda = 450.0f;
                 grabcutParamet.rect = new OeipRect();
                 Pipe.UpdateParamet(GrabcutIndex, grabcutParamet);
+                //GuiderFilter
+                GuiderFilterIndex = pipe.AddLayer("guider filter", OeipLayerType.OEIP_GUIDEDFILTER_LAYER);
+                guidedFilterParamet.zoom = 8;
+                guidedFilterParamet.softness = 5;
+                guidedFilterParamet.eps = 0.000001f;
+                guidedFilterParamet.intensity = 0.2f;
+                Pipe.UpdateParamet(GuiderFilterIndex, guidedFilterParamet);
                 //输出第三个流，网络处理层流
                 MattingOutIndex = pipe.AddLayer("matting out put", OeipLayerType.OEIP_OUTPUT_LAYER);
                 outputParamet.bGpu = 1;
@@ -203,6 +211,13 @@ namespace OeipWrapper.FixPipe
             grabcutParamet.lambda = paramet.lambda;
             grabcutParamet.bGpuSeed = paramet.bGpuSeed ? 1 : 0;
             Pipe.UpdateParamet(GrabcutIndex, grabcutParamet);
+
+            guidedFilterParamet.softness = paramet.softness;
+            int epsx = (int)paramet.epslgn10;
+            float epsf = Math.Max(1.0f, (paramet.epslgn10 - epsx) * 10.0f);
+            guidedFilterParamet.eps = epsf * (float)Math.Pow(10, -epsx);
+            guidedFilterParamet.intensity = paramet.intensity;
+            Pipe.UpdateParamet(GuiderFilterIndex, guidedFilterParamet);
         }
 
         public void UpdateDarknetParamet(ref DarknetParamet paramet)

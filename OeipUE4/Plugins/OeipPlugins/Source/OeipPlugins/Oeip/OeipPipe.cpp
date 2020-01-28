@@ -57,12 +57,40 @@ void OeipPipe::UpdateInput(int layerIndex, uint8_t * data, int inputIndex) {
 	updatePipeInput(pipeId, layerIndex, data, inputIndex);
 }
 
-void OeipPipe::UpdatePipeInputGpuTex(int layerIndex, void * device, void * tex, int inputIndex) {
-	updatePipeInputGpuTex(pipeId, layerIndex, device, tex, inputIndex);
+void OeipPipe::UpdateInputGpuTex(int layerIndex, UTexture * tex, int inputIndex) {	
+	ENQUEUE_UNIQUE_RENDER_COMMAND_FOURPARAMETER(
+		UpdatePipeInputGpuTex,
+		int, pipeId, pipeId,
+		int, layerIndex, layerIndex,
+		UTexture*, uTex, tex,
+		int, texIndex, inputIndex,
+		{
+			if (pipeId < 0)
+				return;
+			void* device = RHICmdList.GetNativeDevice();
+			if (!uTex->Resource || !uTex->Resource->TextureRHI)
+				return;
+			void* textureResource = uTex->Resource->TextureRHI->GetNativeResource();
+			updatePipeInputGpuTex(pipeId, layerIndex, device, textureResource, texIndex);
+		});
 }
 
-void OeipPipe::UpdatePipeOutputGpuTex(int layerIndex, void * device, void * tex, int inputIndex) {
-	updatePipeOutputGpuTex(pipeId, layerIndex, device, tex, inputIndex);
+void OeipPipe::UpdateOutputGpuTex(int layerIndex, UTexture * tex, int inputIndex) {
+	ENQUEUE_UNIQUE_RENDER_COMMAND_FOURPARAMETER(
+		UpdatePipeOutputGpuTex,
+		int, pipeId, pipeId,
+		int, layerIndex, layerIndex,
+		UTexture*, uTex, tex,
+		int, texIndex, inputIndex,
+		{
+			if (pipeId < 0)
+				return;
+			void* device = RHICmdList.GetNativeDevice();
+			if (!uTex->Resource || !uTex->Resource->TextureRHI)
+				return;
+			void* textureResource = uTex->Resource->TextureRHI->GetNativeResource();
+			updatePipeOutputGpuTex(pipeId, layerIndex, device, textureResource, texIndex);
+		});
 }
 
 bool OeipPipe::RunPipe() {

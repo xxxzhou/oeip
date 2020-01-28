@@ -7,28 +7,41 @@ VideoPipe::VideoPipe(OeipPipe* opipe) {
 	inputIndex = pipe->AddLayer("input", OEIP_INPUT_LAYER);
 	yuv2rgba = pipe->AddLayer("yuv2rgba", OEIP_YUV2RGBA_LAYER);
 	mapChannel = pipe->AddLayer("map channel", OEIP_MAPCHANNEL_LAYER);
-
-	int32_t t1 = pipe->AddLayer("rgba2yuv test", OEIP_RGBA2YUV_LAYER);
-	int32_t t2 = pipe->AddLayer("yuv2rgba test", OEIP_YUV2RGBA_LAYER);
-	resizeIndex = pipe->AddLayer("resize", OEIP_RESIZE_LAYER);
-	//auto x = addPiepLayer(pipeId, "blend", OEIP_BLEND_LAYER);
-	outMap = pipe->AddLayer("out map channel", OEIP_MAPCHANNEL_LAYER);
-	outIndex = pipe->AddLayer("output", OEIP_OUTPUT_LAYER);
-	outYuv2Index = pipe->AddLayer("yuv output", OEIP_OUTPUT_LAYER);
 	//mapChannel与yuv2rgba同级
-	pipe->ConnectLayer(mapChannel, "input");
-	pipe->ConnectLayer(outYuv2Index, "rgba2yuv test");
-
-	RGBA2YUVParamet ry = {};
-	YUV2RGBAParamet yr = {};
-	ry.yuvType = OEIP_YUVFMT_YUV420P;
-	yr.yuvType = OEIP_YUVFMT_YUV420P;
-	pipe->UpdateParamet(t1, ry);
-	pipe->UpdateParamet(t2, yr);
-	MapChannelParamet mp = {};
-	mp.red = 0;
-	mp.blue = 2;
-	pipe->UpdateParamet(outMap, mp);
+	pipe->ConnectLayer(mapChannel, inputIndex);
+	//可以变化大小
+	resizeIndex = pipe->AddLayer("resize", OEIP_RESIZE_LAYER);
+	//输出原始图像
+	outIndex = pipe->AddLayer("output", OEIP_OUTPUT_LAYER);
+	op.bGpu = true;
+	//没必要输出CPU数据
+	op.bCpu = false;
+	pipe->UpdateParamet(outIndex, op);
+	if (pipe->GetGpuType() == OeipGpgpuType::OEIP_CUDA) {
+		//神经网络层
+		darknetIndex = pipe->AddLayer("darknet", OEIP_DARKNET_LAYER);
+		pipe->ConnectLayer(darknetIndex, resizeIndex);
+		//Grab cut扣像层
+		grabcutIndex = pipe->AddLayer("grab cut", OEIP_GRABCUT_LAYER);
+		grabcutParamet.bDrawSeed = 0;
+		grabcutParamet.iterCount = 1;
+		grabcutParamet.seedCount = 1000;
+		grabcutParamet.count = 250;
+		grabcutParamet.gamma = 90.0f;
+		grabcutParamet.lambda = 450.0f;
+		grabcutParamet.rect = {};
+		pipe->UpdateParamet(grabcutIndex, grabcutParamet);
+		//GuiderFilter
+		guiderFilterIndex = pipe->AddLayer("guider filter", OEIP_GUIDEDFILTER_LAYER);
+		guidedFilterParamet.zoom = 8;
+		guidedFilterParamet.softness = 5;
+		guidedFilterParamet.eps = 0.000001f;
+		guidedFilterParamet.intensity = 0.2f;
+		pipe->UpdateParamet(guiderFilterIndex, guidedFilterParamet);
+		//输出第三个流，网络处理层流
+		mattingOutIndex = pipe->AddLayer("matting out put", OEIP_OUTPUT_LAYER);
+		pipe->UpdateParamet(mattingOutIndex, op);
+	}
 }
 
 VideoPipe::~VideoPipe() {
@@ -66,7 +79,39 @@ void VideoPipe::setVideoFormat(OeipVideoType videoType, int32_t width, int32_t h
 	pipe->SetInput(inputIndex, inputWidth, inputHeight, dataType);
 }
 
-void VideoPipe::runVideoPipe(int32_t layerIndex, uint8_t * data) {
-	pipe->UpdateInput(layerIndex, data);
+void VideoPipe::runVideoPipe(uint8_t * data) {
+	pipe->UpdateInput(inputIndex, data);
 	pipe->RunPipe();
+}
+
+void VideoPipe::updateDarknet(DarknetParamet& net) {
+	darknetParamet = net;
+	pipe->UpdateParamet(darknetIndex, darknetParamet);
+}
+
+void VideoPipe::changeGrabcutMode(bool bDrawSeed, OeipRect& rect) {
+	//关闭画框 以免影响grabcut效果
+	darknetParamet.bDraw = false;
+	pipe->UpdateParamet(darknetIndex, darknetParamet);
+
+	grabcutParamet.bDrawSeed = bDrawSeed ? 1 : 0;
+	grabcutParamet.rect = rect;
+	pipe->UpdateParamet(grabcutIndex, grabcutParamet);
+}
+
+void VideoPipe::updateVideoParamet(FGrabCutSetting * grabSetting) {
+	grabcutParamet.iterCount = grabSetting->iterCount;
+	grabcutParamet.seedCount = grabSetting->seedCount;
+	grabcutParamet.count = grabSetting->flowCount;
+	grabcutParamet.gamma = grabSetting->gamma;
+	grabcutParamet.lambda = grabSetting->lambda;
+	grabcutParamet.bGpuSeed = grabSetting->bGpuSeed ? 1 : 0;
+	pipe->UpdateParamet(grabcutIndex, grabcutParamet);
+
+	guidedFilterParamet.softness = grabSetting->softness;
+	int epsx = (int)grabSetting->epslgn10;
+	float epsf = FMath::Max(1.0f, (grabSetting->epslgn10 - epsx) * 10.0f);
+	guidedFilterParamet.eps = epsf * (float)FMath::Pow(10, -epsx);
+	guidedFilterParamet.intensity = grabSetting->intensity;
+	pipe->UpdateParamet(guiderFilterIndex, guidedFilterParamet);
 }

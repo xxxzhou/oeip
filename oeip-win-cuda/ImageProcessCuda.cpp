@@ -5,6 +5,7 @@
 #include "CudaComputeLayer.h"
 #include "DarknetLayer.h"
 #include "GrabcutLayerCuda.h"
+#include "GuidedFilterLayer.h"
 
 ImageProcessCuda::ImageProcessCuda() {
 	stream = {};
@@ -12,7 +13,7 @@ ImageProcessCuda::ImageProcessCuda() {
 }
 
 ImageProcessCuda::~ImageProcessCuda() {
-	std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	//std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
 }
 
 BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
@@ -49,6 +50,9 @@ BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {
 		break;
 	case OEIP_GRABCUT_LAYER:
 		layer = new GrabcutLayerCuda();
+		break;
+	case OEIP_GUIDEDFILTER_LAYER:
+		layer = new GuidedFilterLayerCuda();
 		break;
 	case OEIP_MAX_LAYER:
 		break;

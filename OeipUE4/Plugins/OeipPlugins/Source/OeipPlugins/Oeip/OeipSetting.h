@@ -5,7 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/WorldSettings.h"
 #include "Oeip.h"
+#include "ObjAttribute.h"
 #include "OeipSetting.generated.h"
+
+UENUM(BlueprintType)
+enum class EOeipSettingType : uint8
+{
+	Device,
+	GrabCut,
+	LiveRoom,
+};
 
 USTRUCT(BlueprintType)
 struct FGrabCutSetting
@@ -24,6 +33,12 @@ public:
 		float gamma = 90.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		float lambda = 450.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		int softness = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		float epslgn10 = 5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		float intensity = 0.2f;
 };
 
 USTRUCT(BlueprintType)
@@ -33,6 +48,8 @@ struct FLiveRoom
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		FString roomName = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		FString userIndex = "";
 };
 
 USTRUCT(BlueprintType)
@@ -50,8 +67,6 @@ public:
 		float thresh = 0.3f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		float nms = 0.4f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
-		int timeDelay = 500;
 };
 
 USTRUCT(BlueprintType)
@@ -68,6 +83,19 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FDeviceSetting
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		int cameraIndex = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		int formatIndex = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		int rateIndex = 0;
+};
+
+USTRUCT(BlueprintType)
 struct FOeipSetting
 {
 	GENERATED_BODY()
@@ -79,7 +107,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		FLiveRoom roomSetting = {};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
-		FCameraInfo cameraInfo = {};
+		FDeviceSetting cameraSetting = {};
+};
+
+USTRUCT(BlueprintType)
+struct FPipeTex
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		int layerIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		int texIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		UTexture2D* tex;
 };
 
 /**
@@ -91,15 +132,32 @@ public:
 	~OeipSetting();
 	static OeipSetting& Get();
 	static void Close();
+public:
+	FOeipSetting setting = {};
 private:
 	OeipSetting();
 	static OeipSetting *singleton;
 private:
 	FString fileName = L"OeipSetting";
-	FOeipSetting setting = {};
+
+	TArray<FString> videoTypeList;
+	TArray<FString> rateNameList;
+	TArray<int> rateList;
+	TArray<BaseAttribute*> deviceArrList;
+	TArray<BaseAttribute*> grabCutArrList;
+	TArray<BaseAttribute*> roomArrList;
+private:
 	void loadJson();
+	TArray<FString> GetCameraFormat(int index);
 public:
 	void SaveJson();
+	//得到设备UI描述信息
+	TArray<BaseAttribute*> GetDeviceAttribute();
+	//得到GrabCut扣图UI描述信息
+	TArray<BaseAttribute*> GetGrabCutAttribute();
+	//得到登陆房间的UI描述信息
+	TArray<BaseAttribute*> GetRoomAttribute();
+	int GetRate(int index);
 };
 
 template <typename T>
@@ -119,3 +177,4 @@ void clearList(TArray<T*> list) {
 }
 
 void updateTexture(UTexture2D ** ptexture, int width, int height);
+void copycharstr(char* dest, const char* source, int32_t maxlength);

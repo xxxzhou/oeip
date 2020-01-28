@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "OeipSetting.h"
 #include "OeipExport.h"
+#include <vector>
 
 DECLARE_MULTICAST_DELEGATE_FiveParams(FOeipDataEvent, int32_t, uint8_t*, int32_t, int32_t, int32_t);
 /**
@@ -17,7 +18,7 @@ public:
 	~OeipPipe();
 private:
 	int pipeId = -1;
-	OeipGpgpuType gpgpuType = OeipGpgpuType::OEIP_CUDA;
+	OeipGpgpuType gpgpuType = OeipGpgpuType::OEIP_DX11;
 public:
 	FOeipDataEvent OnOeipDataEvent;
 private:
@@ -26,8 +27,10 @@ public:
 	void SetPipeId(int id);
 	void Close();
 	bool IsEmpty();
+	OeipGpgpuType GetGpuType() {
+		return gpgpuType;
+	}
 	int AddLayer(FString layerName, OeipLayerType layerType);
-
 	template<typename T>
 	int AddLayer(FString layerName, OeipLayerType layerType, T& t) {
 		return addPiepLayer(pipeId, TCHAR_TO_UTF8(*layerName), layerType, &t);
@@ -43,7 +46,10 @@ public:
 	//(0 8UC1) (24 8UC3)
 	void SetInput(int layerIndex, int width, int height, int dataType = 0, int inputIndex = 0);
 	void UpdateInput(int layerIndex, uint8_t* data, int inputIndex = 0);
-	void UpdatePipeInputGpuTex(int layerIndex, void* device, void* tex, int inputIndex = 0);
-	void UpdatePipeOutputGpuTex(int layerIndex, void* device, void* tex, int inputIndex = 0);
+	//UE4的RHI资源当做输入，自动转入渲染线程
+	void UpdateInputGpuTex(int layerIndex, UTexture* tex, int inputIndex = 0);	
+	//更新UE4渲染相应的RHI资源，自动转入渲染线程
+	void UpdateOutputGpuTex(int layerIndex, UTexture* tex, int inputIndex = 0);
+	//运行管线，任何线程都可以，在设备线程最好
 	bool RunPipe();
 };
