@@ -23,13 +23,13 @@ private:
 	static OeipManager *singleton;
 private:
 	TArray<FCameraInfo*> cameraList;
-	TArray<OeipCamera*> cameraArray;
+	//TArray<OeipCamera*> cameraArray;
 	TArray<OeipPipe*> pipeList;
 public:
 	FOeipLogEvent OnLogEvent;
 public:
 	TArray<FCameraInfo*> GetCameraList();
-	OeipCamera* GetCamera(int index);
+	FCameraInfo* GetCamera(int index);
 	OeipPipe* CreatePipe(OeipGpgpuType gpgpuType);
 	TArray<VideoFormat> GetCameraFormatList(int cameraIndex);
 	FString GetLiveServer();

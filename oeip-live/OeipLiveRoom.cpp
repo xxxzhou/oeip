@@ -25,6 +25,10 @@ bool OeipLiveRoom::initRoom(const OeipLiveContext& liveCtx) {
 }
 
 bool OeipLiveRoom::loginRoom(std::string roomName, int32_t userId) {
+	if (roomName.empty()) {
+		logMessage(OEIP_WARN, "room name is empty.");
+		return false;
+	}
 	this->roomName = roomName;
 	this->userId = userId;
 

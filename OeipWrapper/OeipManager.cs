@@ -39,7 +39,7 @@ namespace OeipWrapper
 
             LiveCtx.liveMode = OeipLiveMode.OIEP_FFMPEG;
             LiveCtx.bLoopback = 0;
-            LiveCtx.liveServer = "http://129.211.40.225:6110";
+            LiveCtx.liveServer = "http://127.0.0.1:6110";//"http://129.211.40.225:6110" "http://127.0.0.1:6110"
         }
 
         public bool IsCudaLoad

@@ -11,6 +11,10 @@ void UPanelManager::OnDeviceValue(ObjAttribute<FDeviceSetting>* objAttribut, FSt
 	onSettingChangeEvent.Broadcast(EOeipSettingType::Device, name);
 }
 
+void UPanelManager::OnLiveRoom(ObjAttribute<FLiveRoom>* objAttribut, FString name) {
+	onSettingChangeEvent.Broadcast(EOeipSettingType::LiveRoom, name);
+}
+
 void UPanelManager::InitTemplate(UClass * toggleTemplate, UClass * inputeTemplate, UClass * sliderTemplate, UClass * dropdownTemplate) {
 	templateList.Add(toggleTemplate);
 	templateList.Add(inputeTemplate);
@@ -32,4 +36,12 @@ void UPanelManager::BindGrabCut(UVerticalBox * keyBox) {
 
 	objGrabcut.Bind(&OeipSetting::Get().setting.grabSetting, keyBox, OeipSetting::Get().GetGrabCutAttribute(), templateList, word);
 	objGrabcut.Update();
+}
+
+void UPanelManager::BindLiveRoom(UVerticalBox * keyBox) {
+	auto word = this->GetWorld();
+	objLiveRoom.SetOnObjChangeAction(std::bind(&UPanelManager::OnLiveRoom, this, _1, _2));
+
+	objLiveRoom.Bind(&OeipSetting::Get().setting.roomSetting, keyBox, OeipSetting::Get().GetRoomAttribute(), templateList, word);
+	objLiveRoom.Update();
 }

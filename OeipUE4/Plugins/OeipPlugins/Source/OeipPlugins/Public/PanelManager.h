@@ -20,12 +20,14 @@ private:
 	TArray<UClass*> templateList;
 	ObjAttribute<FDeviceSetting> objDevice = {};
 	ObjAttribute<FGrabCutSetting> objGrabcut = {};
+	ObjAttribute<FLiveRoom> objLiveRoom = {};
 public:
 	UPROPERTY(BlueprintAssignable, Category = Oeip)
 		FSettingChangeEvnet onSettingChangeEvent;
-public:
+private:
 	void OnKeyValue(ObjAttribute<FGrabCutSetting>* objAttribut, FString name);
 	void OnDeviceValue(ObjAttribute<FDeviceSetting>* objAttribut, FString name);
+	void OnLiveRoom(ObjAttribute<FLiveRoom>* objAttribut, FString name);
 public:
 	UFUNCTION(BlueprintCallable)
 		void InitTemplate(UClass * toggleTemplate, UClass * inputeTemplate, UClass * sliderTemplate, UClass * dropdownTemplate);
@@ -33,6 +35,8 @@ public:
 		void BindDevice(UVerticalBox * keyBox);
 	UFUNCTION(BlueprintCallable)
 		void BindGrabCut(UVerticalBox * keyBox);
+	UFUNCTION(BlueprintCallable)
+		void BindLiveRoom(UVerticalBox * keyBox);
 	//蓝图里优先调用OnSettingChangeEvent重载实现，如果没有，调用OnSettingChangeEvent_Implementation
 	//UFUNCTION(BlueprintNativeEvent)
 	//	void OnSettingChangeEvent(const EOeipSettingType& settingType, const FString& name);

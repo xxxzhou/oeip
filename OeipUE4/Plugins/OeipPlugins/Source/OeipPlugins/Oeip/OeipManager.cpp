@@ -15,7 +15,7 @@ OeipManager::OeipManager() {
 
 OeipManager::~OeipManager() {
 	clearList(pipeList);
-	clearList(cameraArray);
+	//clearList(cameraArray);
 	clearList(cameraList);
 }
 
@@ -43,18 +43,18 @@ TArray<FCameraInfo*> OeipManager::GetCameraList() {
 			cameraInfo->deviceId = camera.deviceId;
 			cameraInfo->deviceName = camera.deviceName;
 			cameraList.Push(cameraInfo);
-			OeipCamera* camera = new OeipCamera();
-			camera->SetDevice(cameraInfo);
-			cameraArray.Push(camera);
+			//OeipCamera* camera = new OeipCamera();
+			//camera->SetDevice(cameraInfo);
+			//cameraArray.Push(camera);
 		}
 	}
 	return cameraList;
 }
 
-OeipCamera * OeipManager::GetCamera(int index) {
-	if (index<0 || index>cameraArray.Num())
+FCameraInfo * OeipManager::GetCamera(int index) {
+	if (index<0 || index>cameraList.Num())
 		return nullptr;
-	return cameraArray[index];
+	return cameraList[index];
 }
 
 OeipPipe * OeipManager::CreatePipe(OeipGpgpuType gpgpuType) {
@@ -77,7 +77,7 @@ TArray<VideoFormat> OeipManager::GetCameraFormatList(int cameraIndex) {
 }
 
 FString OeipManager::GetLiveServer() {
-	return FString("http://129.211.40.225:6110");
+	return FString("http://127.0.0.1:6110");//http://129.211.40.225:6110
 }
 
 void OeipManager::onLogMessage(int level, const char * message) {

@@ -62,10 +62,10 @@ inline void d3dTexture2GpuMat(cv::cuda::GpuMat frame, Dx11CudaResource& cudaReso
 };
 
 //绑定一个DX11共享资源与CUDA资源,分别在DX11与CUDA都有相关引用,二边分别可读可写
-inline bool registerCudaResource(Dx11CudaResource& cudaDx11, std::shared_ptr<Dx11SharedTex>& sharedResource, ID3D11Device* device, int32_t width, int32_t height) {
+inline bool registerCudaResource(Dx11CudaResource& cudaDx11, std::shared_ptr<Dx11SharedTex>& sharedResource, ID3D11Device* device, int32_t width, int32_t height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM) {
 
 	cudaDx11.unBind();
-	bool bInit = sharedResource->restart(device, width, height);
+	bool bInit = sharedResource->restart(device, width, height, format);
 	if (bInit) {
 		cudaDx11.texture = sharedResource->texture->texture;
 		cudaError_t result = cudaGraphicsD3D11RegisterResource(&cudaDx11.cudaResource, cudaDx11.texture, cudaGraphicsRegisterFlagsNone);

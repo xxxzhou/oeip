@@ -4,6 +4,7 @@
 #include "OeipFree.h"
 #include <mutex>
 #include "FNetCommon.h"
+//#include <future>
 
 //拉流
 class FRtmpInput :public FNetInput
@@ -31,11 +32,12 @@ private:
 	bool bOpenPull = false;
 
 	OAVFrame frame = nullptr;
-	std::vector<uint8_t> videoData;
+	//std::vector<uint8_t> videoData;
 
 	std::mutex mtx;
 	//信号量.
 	std::condition_variable signal;
+	//std::future<int32_t> openUrl;
 private:
 	void readPack();
 public:

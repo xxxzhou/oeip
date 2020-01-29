@@ -41,7 +41,10 @@ bool InputLayerCuda::onInitBuffer() {
 		//暂时只支持RGBA
 		if (layerParamet.bGpu) {
 			DXGI_FORMAT dxFormat = getDxFormat(selfConnects[i].dataType);
-			registerCudaResource(cudaResoures[i], shardTexs[i], device, selfConnects[i].width, selfConnects[i].height);
+			//因UE4 RTT是DXGI_FORMAT_B8G8R8A8_UNORM，所以传GPU格式为OEIP_CV_8UC3，和DXGI_FORMAT_R8G8B8A8_UNORM区分开传入OEIP_CV_8UC3
+			if (selfConnects[i].dataType == OEIP_CV_8UC3)
+				dxFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+			registerCudaResource(cudaResoures[i], shardTexs[i], device, selfConnects[i].width, selfConnects[i].height, dxFormat);
 		}
 	}
 	return LayerCuda::onInitBuffer();
@@ -75,7 +78,7 @@ void InputLayerCuda::onRunLayer() {
 	}
 }
 
-void InputLayerCuda::inputGpuTex(void * device, void * texture, int32_t inputIndex) {
+void InputLayerCuda::inputGpuTex(void* device, void* texture, int32_t inputIndex) {
 	ID3D11Device* dxdevice = (ID3D11Device*)device;
 	ID3D11Texture2D* dxtexture = (ID3D11Texture2D*)texture;
 	if (!layerParamet.bGpu || dxdevice == nullptr || dxtexture == nullptr)
@@ -85,7 +88,7 @@ void InputLayerCuda::inputGpuTex(void * device, void * texture, int32_t inputInd
 	shardTexs[inputIndex]->bGpuUpdate = true;
 }
 
-void InputLayerCuda::inputCpuData(uint8_t * byteData, int32_t inputIndex) {
+void InputLayerCuda::inputCpuData(uint8_t* byteData, int32_t inputIndex) {
 	cudaResoures[inputIndex].cpuData = byteData;
 	cpuUpdates[inputIndex] = true;
 }

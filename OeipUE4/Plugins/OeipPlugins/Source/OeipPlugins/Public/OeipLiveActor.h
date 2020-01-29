@@ -20,26 +20,34 @@ public:
 	AOeipLiveActor();
 private:
 	OeipYUVFMT yuvFmt = OEIP_YUVFMT_YUV420P;
-	bool IsPullSelf = false;
+	//bool IsPullSelf = false;
 	OeipPipe* pullPipe = nullptr;
 	OeipPipe* pushPipe = nullptr;
 	LivePullPipe* livePullPipe = nullptr;
 	LivePushPipe* livePushPipe = nullptr;
+	bool bPush = false;
 public:
 	//后期不放出来，前期主要在编辑器里查看
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture2D *liveTex;
+		UTexture2D *liveTex = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		AOeipDisplayActor *LiveShow;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTexture2D *nullTex;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UTexture *uePushTex;
+		UTextureRenderTarget2D *uePushTex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool IsPullSelf = false;
 private:
+	//推流管线处理数据后让直播模块推出去
 	void onPipeDataHandle(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex);
+	//拉流得到的大小变化
 	void onPullTexChange(int width, int height);
+	//用户登陆
 	void onLoginRoom(int32_t code, int32_t userId);
+	//有流更新的情况
 	void onStreamUpdate(int32_t userId, int32_t index, bool bAdd);
+	//拉流的视频流更新
 	void onVideoFrame(int32_t userId, int32_t index, OeipVideoFrame videoFrame);
 protected:
 	// Called when the game starts or when spawned

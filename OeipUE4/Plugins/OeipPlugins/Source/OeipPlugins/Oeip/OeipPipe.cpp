@@ -57,12 +57,12 @@ void OeipPipe::UpdateInput(int layerIndex, uint8_t * data, int inputIndex) {
 	updatePipeInput(pipeId, layerIndex, data, inputIndex);
 }
 
-void OeipPipe::UpdateInputGpuTex(int layerIndex, UTexture * tex, int inputIndex) {	
+void OeipPipe::UpdateInputGpuTex(int layerIndex, UTexture2D * tex, int inputIndex) {
 	ENQUEUE_UNIQUE_RENDER_COMMAND_FOURPARAMETER(
 		UpdatePipeInputGpuTex,
 		int, pipeId, pipeId,
 		int, layerIndex, layerIndex,
-		UTexture*, uTex, tex,
+		UTexture2D*, uTex, tex,
 		int, texIndex, inputIndex,
 		{
 			if (pipeId < 0)
@@ -72,6 +72,26 @@ void OeipPipe::UpdateInputGpuTex(int layerIndex, UTexture * tex, int inputIndex)
 				return;
 			void* textureResource = uTex->Resource->TextureRHI->GetNativeResource();
 			updatePipeInputGpuTex(pipeId, layerIndex, device, textureResource, texIndex);
+		});
+}
+
+void OeipPipe::UpdateInputGpuTex(int layerIndex, UTextureRenderTarget2D * tex, int inputIndex) {
+	ENQUEUE_UNIQUE_RENDER_COMMAND_FOURPARAMETER(
+		UpdatePipeInputGpuRTex,
+		int, pipeId, pipeId,
+		int, layerIndex, layerIndex,
+		UTextureRenderTarget2D*, uTex, tex,
+		int, texIndex, inputIndex,
+		{
+			if (pipeId < 0)
+				return;
+			void* device = RHICmdList.GetNativeDevice();
+			FTextureRenderTargetResource* resource = uTex->GetRenderTargetResource();
+			if (resource != nullptr) {
+				auto textureResource = resource->GetTextureRenderTarget2DResource()->GetTextureRHI()->GetNativeResource();
+				if (textureResource != nullptr)
+					updatePipeInputGpuTex(pipeId, layerIndex, device, textureResource, texIndex);
+			}
 		});
 }
 
@@ -90,6 +110,26 @@ void OeipPipe::UpdateOutputGpuTex(int layerIndex, UTexture * tex, int inputIndex
 				return;
 			void* textureResource = uTex->Resource->TextureRHI->GetNativeResource();
 			updatePipeOutputGpuTex(pipeId, layerIndex, device, textureResource, texIndex);
+		});
+}
+
+void OeipPipe::UpdateOutputGpuTex(int layerIndex, UTextureRenderTarget2D * tex, int inputIndex) {
+	ENQUEUE_UNIQUE_RENDER_COMMAND_FOURPARAMETER(
+		UpdatePipeInputGpuRTex,
+		int, pipeId, pipeId,
+		int, layerIndex, layerIndex,
+		UTextureRenderTarget2D*, uTex, tex,
+		int, texIndex, inputIndex,
+		{
+			if (pipeId < 0)
+				return;
+			void* device = RHICmdList.GetNativeDevice();
+			FTextureRenderTargetResource* resource = uTex->GetRenderTargetResource();
+			if (resource != nullptr) {
+				auto textureResource = resource->GetTextureRenderTarget2DResource()->GetTextureRHI()->GetNativeResource();
+				if (textureResource != nullptr)
+					updatePipeOutputGpuTex(pipeId, layerIndex, device, textureResource, texIndex);
+			}
 		});
 }
 

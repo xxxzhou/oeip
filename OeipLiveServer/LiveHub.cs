@@ -22,29 +22,8 @@ namespace OeipLiveServer
                 return GlobalHost.ConnectionManager.GetHubContext<LiveHub>();
             }
         }
-        /// <summary>        
-        /// 其直接在OnConnected/OnDisconnected的添加与删除事件还是会导致事件累加
-        /// 声明成静态方法可以解决
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="bAdd"></param>
-        private static void Instance_OnStreamChangeEvent(StreamDesc stream, bool bAdd)
-        {
-            //通知此房间所有用户都可以拉流了
-            Hub.Clients.Group(stream.User.InRoom.Name)?.OnStreamUpdate(stream.User.Id, stream.Index, bAdd);
-        }
 
-        private static void Instance_OnServerCreateEvent(Room room)
-        {
-            if (room == null)
-                return;
-            foreach (var user in room.Users)
-            {
-                SetUserLogin(user);
-            }
-        }
-
-        private static void SetUserLogin(User user)
+        internal static void SetUserLogin(User user)
         {
             if (user.IsSend)
                 return;
@@ -141,11 +120,9 @@ namespace OeipLiveServer
             Clients.Client(Context.ConnectionId)?.OnLogoutRoom();
             return 0;
         }
-
+        //在signalR中，HUB中最好不要用事件，多个连接后会累加
         public override Task OnConnected()
         {
-            RoomManager.Instance.OnServerCreateEvent += Instance_OnServerCreateEvent;
-            RoomManager.Instance.OnStreamChangeEvent += Instance_OnStreamChangeEvent;
             LogHelper.LogMessage($"用户 {Context.ConnectionId} 连接成功");
             RoomManager.Instance.AddUser(Context.ConnectionId);
             return base.OnConnected();
@@ -153,8 +130,6 @@ namespace OeipLiveServer
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            RoomManager.Instance.OnServerCreateEvent -= Instance_OnServerCreateEvent;
-            RoomManager.Instance.OnStreamChangeEvent -= Instance_OnStreamChangeEvent;
             RoomManager.Instance.DeleteUser(Context.ConnectionId);
             LogHelper.LogMessage($"用户 {Context.ConnectionId} 失去连接");
             return base.OnDisconnected(stopCalled);

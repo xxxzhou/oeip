@@ -44,7 +44,7 @@ bool OutputLayerCuda::onInitBuffer() {
 		//暂时只支持RGBA
 		if (layerParamet.bGpu) {
 			DXGI_FORMAT dxFormat = getDxFormat(selfConnects[i].dataType);
-			registerCudaResource(cudaResoures[i], shardTexs[i], device, selfConnects[i].width, selfConnects[i].height);
+			registerCudaResource(cudaResoures[i], shardTexs[i], device, selfConnects[i].width, selfConnects[i].height, dxFormat);
 		}
 	}
 	return LayerCuda::onInitBuffer();

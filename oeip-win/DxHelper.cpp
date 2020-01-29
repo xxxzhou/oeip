@@ -133,10 +133,11 @@ DXGI_FORMAT getDxFormat(int32_t dataType) {
 	case OEIP_CV_16UC1:
 		dxFormat = DXGI_FORMAT_R16_UINT;
 		break;
-	case OEIP_CV_8UC3:
+	case OEIP_CV_8UC3:		
 		dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		break;
 	case OEIP_CV_8UC4:
+		//UE4 RTT是DXGI_FORMAT_B8G8R8A8_UNORM,我靠
 		dxFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		break;
 	default:

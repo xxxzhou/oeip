@@ -34,10 +34,11 @@ void InputLayerDx11::onInitLayer() {
 	//同时也避免一些CPU数据直接上传到纹理要求的一些宽度对齐,如32倍数这些
 	groupSize.X = divUp(threadSizeX * threadSizeY, 240);
 	groupSize.Y = 1;
-	groupSize.Z = 1;	
+	groupSize.Z = 1;
 }
 //OEIP_CV_8UC3 没有相应的纹理格式
 bool InputLayerDx11::onInitBuffer() {
+	bool bInit = true;
 	for (int32_t i = 0; i < inCount; i++) {
 		DXGI_FORMAT dxFormat = getDxFormat(selfConnects[i].dataType);
 		if (layerParamet.bCpu) {
@@ -55,10 +56,18 @@ bool InputLayerDx11::onInitBuffer() {
 			inBuffers[i]->initResource(dx11->device);
 		}
 		if (layerParamet.bGpu) {
+			if (selfConnects[i].dataType == OEIP_CV_8UC3)//OEIP_CV_8UC3
+				dxFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 			shardTexs[i]->restart(dx11->device, selfConnects[i].width, selfConnects[i].height, dxFormat);
-		}
+		}		
+		outTextures[i]->setTextureSize(outConnects[i].width, outConnects[i].height, dxFormat);
+		bInit &= outTextures[i]->initResource(dx11->device);
+		outUAVs[i] = outTextures[i]->uavView;
 	}
-	return LayerDx11::onInitBuffer();
+	onInitCBuffer();
+	updateCBuffer();
+	return true;
+	//return LayerDx11::onInitBuffer();
 }
 
 bool InputLayerDx11::initHlsl() {
@@ -91,7 +100,7 @@ void InputLayerDx11::onRunLayer() {
 
 void InputLayerDx11::inputCpuData(uint8_t* byteData, int32_t inputIndex) {
 	//CPU更新
-	inBuffers[inputIndex]->cpuData = byteData;	
+	inBuffers[inputIndex]->cpuData = byteData;
 	cpuUpdates[inputIndex] = true;
 }
 

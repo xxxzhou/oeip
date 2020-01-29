@@ -14,7 +14,8 @@ int32_t FLiveInput::open(const char* url) {
 	if (bOpen)
 		return 1;
 	std::thread ted = std::thread([&]() {	
-		std::unique_lock<std::mutex> lck(mtx);		
+		//std::unique_lock<std::mutex> lck(mtx);	
+		//std::unique_lock <std::recursive_mutex> mtx_locker(mtx, std::try_to_lock);
 		ret = input->openURL(liveUrl.c_str(), bVideo, bAudio);
 		if (ret == 0)
 			bOpen = true;		
@@ -23,8 +24,8 @@ int32_t FLiveInput::open(const char* url) {
 	return 0;
 }
 
-void FLiveInput::close() {
-	std::unique_lock <std::mutex> lck(mtx);
+void FLiveInput::close() {	
+	//std::unique_lock <std::recursive_mutex> mtx_locker(mtx, std::try_to_lock);
 	if (!bOpen)
 		return;
 	bOpen = false;

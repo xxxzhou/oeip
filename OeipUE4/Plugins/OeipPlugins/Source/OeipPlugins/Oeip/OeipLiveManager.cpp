@@ -45,8 +45,7 @@ bool OeipLiveManager::PushStream(int index, OeipPushSetting & setting) {
 	return pushStream(index, setting);
 }
 
-bool OeipLiveManager::PushVideoFrame(int index, uint8_t * data, int width, int height, OeipYUVFMT fmt) {
-	std::lock_guard<std::mutex> mtx_locker(mtx);
+bool OeipLiveManager::PushVideoFrame(int index, uint8_t * data, int width, int height, OeipYUVFMT fmt) {	
 	if (!bLogin)
 		return false;
 	OeipVideoFrame& videoFrame = index == 0 ? mainVideoFrame : auxVideoFrame;
@@ -55,7 +54,7 @@ bool OeipLiveManager::PushVideoFrame(int index, uint8_t * data, int width, int h
 }
 
 bool OeipLiveManager::PushAudioFrame(int index, OeipAudioFrame & audioFrame) {
-	std::lock_guard<std::mutex> mtx_locker(mtx);
+	
 	if (!bLogin)
 		return false;
 	return pushAudioFrame(index, audioFrame);
@@ -73,8 +72,7 @@ bool OeipLiveManager::StopPullStream(int userId, int index) {
 	return stopPullStream(userId, index);
 }
 
-bool OeipLiveManager::LogoutRoom() {
-	std::lock_guard<std::mutex> mtx_locker(mtx);
+bool OeipLiveManager::LogoutRoom() {	
 	bLogin = false;
 	return logoutRoom();
 }

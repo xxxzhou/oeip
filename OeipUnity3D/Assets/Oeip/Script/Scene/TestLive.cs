@@ -11,10 +11,12 @@ using UnityEngine.UI;
 
 public class TestLive : MonoBehaviour
 {
+    public bool bPullSelf;
     public Text label;
     public RectTransform cameraSelectPanel;
     public RectTransform grabCutPanel;
     public MeshRenderer showPanel;
+    public MeshRenderer livePanel;
     public Button btnLoadNet;
     public Button btnGrabcut;
     public CameraView cameraView;
@@ -27,7 +29,6 @@ public class TestLive : MonoBehaviour
     private ObjectBind3D<OeipVideoParamet> objBindGrabcut = new ObjectBind3D<OeipVideoParamet>();
 
     public LiveView liveView;
-    public bool IsPullSelf { get; set; } = false;
     public Button btnLoginRoom;
     public Button btnLogoutRoom;
     public InputField inputRoom;
@@ -57,6 +58,12 @@ public class TestLive : MonoBehaviour
         OeipLiveManager.Instance.OnStreamUpdateEvent += Instance_OnStreamUpdateEvent;
         btnLoginRoom.onClick.AddListener(OnLoginRoom);
         btnLogoutRoom.onClick.AddListener(OnLogoutRoom);
+        liveView.OnLiveTexChange += LiveView_OnLiveTexChange;
+    }
+
+    private void LiveView_OnLiveTexChange()
+    {
+        livePanel.material.SetTexture("_MainTex", liveView.SourceTex);
     }
 
     //登陆成功后推流
@@ -70,15 +77,17 @@ public class TestLive : MonoBehaviour
 
     private void Instance_OnStreamUpdateEvent(int userId, int index, bool bAdd)
     {
-        if (!IsPullSelf && OeipLiveManager.Instance.UserId == userId)
+        if (!bPullSelf && OeipLiveManager.Instance.UserId == userId)
             return;
         if (bAdd)
         {
             OeipLiveManager.Instance.PullStream(userId, index);
+            liveView.SetPullUserIndex(userId, index);
         }
         else
         {
             OeipLiveManager.Instance.StopPullStream(userId, index);
+            liveView.SetPullUserIndex(-1, -1);
         }
     }
 

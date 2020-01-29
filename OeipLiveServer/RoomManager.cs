@@ -69,10 +69,6 @@ namespace OeipLiveServer
         //public event Func<MediaServer, string, bool, Task> OnMediaServerEvent;
         //当需要删除或是添加服务器的时候
         internal event Action<MediaServer, string, bool> OnMediaServerEvent;
-        //媒体服务器返回对应sever/port后
-        internal event Action<Room> OnServerCreateEvent;
-        //用户推流
-        internal event Action<StreamDesc, bool> OnStreamChangeEvent;
         protected RoomManager() { }
         protected static RoomManager instance = null;
         public static RoomManager Instance
@@ -253,7 +249,7 @@ namespace OeipLiveServer
         private void OnRoomChange(Room room, User user, bool bAdd)
         {
             var amessage = bAdd ? "添加" : "删除";
-            LogHelper.LogMessage($"房间 {room.Name} {amessage}用户 {user.ConnectId}");
+            LogHelper.LogMessage($"房间 {room.Name} {amessage}用户 {user.ConnectId} 现有用户人数:{room.Users.Count}");
             OnRoomChangeEvent?.Invoke(room, user, bAdd);
         }
 
@@ -261,12 +257,26 @@ namespace OeipLiveServer
         {
             var amessage = bAdd ? "添加" : "删除";
             LogHelper.LogMessage($"媒体服务器 {media.ConnectId} {amessage}房间 {roomName}");
-            OnMediaServerEvent?.Invoke(media, roomName, bAdd);
+            //OnMediaServerEvent?.Invoke(media, roomName, bAdd);
+            if (bAdd)
+            {
+                MediaHub.Hub.Clients.Client(media.ConnectId).AddRoom(roomName);
+            }
+            else
+            {
+                MediaHub.Hub.Clients.Client(media.ConnectId).RemoveRoom(roomName);
+            }
         }
 
         private void OnServerCreate(Room room)
         {
-            OnServerCreateEvent?.Invoke(room);
+            //OnServerCreateEvent?.Invoke(room);
+            if (room == null)
+                return;
+            foreach (var user in room.Users)
+            {
+                LiveHub.SetUserLogin(user);
+            }
         }
 
         private void OnStreamChange(StreamDesc desc, bool bAdd)
@@ -278,7 +288,8 @@ namespace OeipLiveServer
                 string pullUri = $"{ desc.User.InRoom.Server }:{ desc.User.InRoom.Port}/live/{desc.User.InRoom.Name}_{desc.User.Id}_{desc.Index}";
                 LogHelper.LogMessage($"生成地址:{ pullUri}");
             }
-            OnStreamChangeEvent?.Invoke(desc, bAdd);
+            //OnStreamChangeEvent?.Invoke(desc, bAdd);
+            LiveHub.Hub.Clients.Group(desc.User.InRoom.Name)?.OnStreamUpdate(desc.User.Id, desc.Index, bAdd);
         }
 
         /// <summary>

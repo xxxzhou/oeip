@@ -19,20 +19,13 @@ void AOeipCameraActor::SettingChange(const EOeipSettingType & settingType, const
 		//如果更新了摄像机
 		if ((name == L"cameraIndex" || name == L"formatIndex") && deviceSetting.cameraIndex >= 0) {
 			//先把原来摄像机关闭
-			if (oeipCamera != nullptr) {
-				oeipCamera->Close();
-			}
-			oeipCamera = OeipManager::Get().GetCamera(deviceSetting.cameraIndex);
-			//如果没绑定过事件
-			if (oeipCamera != nullptr) {
-				if (!oeipCamera->OnDeviceDataEvent.IsBound()) {
-					oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
-				}
-				if (deviceSetting.formatIndex >= 0)
-					oeipCamera->SetFormat(deviceSetting.formatIndex);
-				changeFormat();
-				oeipCamera->Open();
-			}
+			oeipCamera->Close();
+			//重新设置
+			auto* cameraInfo = OeipManager::Get().GetCamera(deviceSetting.cameraIndex);
+			oeipCamera->SetDevice(cameraInfo);
+			oeipCamera->SetFormat(deviceSetting.formatIndex);
+			changeFormat();
+			oeipCamera->Open();
 		}
 	}
 	else if (settingType == EOeipSettingType::GrabCut) {
@@ -72,18 +65,11 @@ void AOeipCameraActor::onLogMessage(int level, FString message) {
 		else if (level > 1)
 			color = FColor::Red;
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, color, message);
+		UE_LOG(LogTemp, Log, TEXT("%s"), *message);
 	});
 }
 
 void AOeipCameraActor::changeFormat() {
-	if (gpuPipe == nullptr) {
-		gpuPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_CUDA);
-		//声明一条封装设备处理的管线
-		if (gpuPipe != nullptr) {
-			videoPipe = new VideoPipe(gpuPipe);
-		}
-		gpuPipe->OnOeipDataEvent.AddUObject(this, &AOeipCameraActor::onPipeDataHandle);
-	}
 	//得到设备选择的数据大小
 	int formatIndex = oeipCamera->GetFormat();
 	VideoFormat vformat = {};
@@ -110,7 +96,7 @@ void AOeipCameraActor::onPipeDataHandle(int32_t layerIndex, uint8_t * data, int3
 			if (width > 0) {
 				memcpy(personBoxs.GetData(), data, sizeof(PersonBox)*width);
 				for (auto& person : personBoxs) {
-					personMsg += FString::SanitizeFloat(person.prob) + " ";
+					personMsg += FString::SanitizeFloat(person.prob, 2) + " ";
 				}
 			}
 			OnPeronChange.Broadcast(personMsg);
@@ -121,17 +107,25 @@ void AOeipCameraActor::onPipeDataHandle(int32_t layerIndex, uint8_t * data, int3
 // Called when the game starts or when spawned
 void AOeipCameraActor::BeginPlay() {
 	Super::BeginPlay();
+	//设备管理类
+	oeipCamera = new OeipCamera();
+	oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
+	//设备处理类
+	gpuPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_CUDA);
+	videoPipe = new VideoPipe(gpuPipe);
+	gpuPipe->OnOeipDataEvent.AddUObject(this, &AOeipCameraActor::onPipeDataHandle);
 	OeipManager::Get().OnLogEvent.AddUObject(this, &AOeipCameraActor::onLogMessage);
 }
 
 void AOeipCameraActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
 	OeipManager::Get().OnLogEvent.RemoveAll(this);
-	if (gpuPipe && gpuPipe->OnOeipDataEvent.IsBound())
+	if (gpuPipe && gpuPipe->OnOeipDataEvent.IsBoundToObject(this))
 		gpuPipe->OnOeipDataEvent.RemoveAll(this);
-	if (oeipCamera && oeipCamera->OnDeviceDataEvent.IsBound())
+	if (oeipCamera && oeipCamera->OnDeviceDataEvent.IsBoundToObject(this))
 		oeipCamera->OnDeviceDataEvent.RemoveAll(this);
 	safeDelete(videoPipe);
+	safeDelete(oeipCamera);
 }
 
 // Called every frame

@@ -274,4 +274,5 @@ Binaries/Win64
 /OeipUE4/Saved/Config/CrashReportClient
 /OeipUE4/OeipUE4.sln
 /OeipUnity3D/UIElementsSchema
-!README.md
+!/OeipUE4/Plugins/OeipPlugins/ThirdParty/Oeip/README.md
+!/OeipUnity3D/Assets/Oeip/Plugins/x86_64/README.md

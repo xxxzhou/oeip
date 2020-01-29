@@ -16,18 +16,22 @@ void AOeipLiveActor::onPipeDataHandle(int32_t layerIndex, uint8_t * data, int32_
 }
 
 void AOeipLiveActor::onPullTexChange(int width, int height) {
-	updateTexture(&liveTex, width, height);
+	AsyncTask(ENamedThreads::GameThread, [=]()
+	{
+		updateTexture(&liveTex, width, height);
+		LiveShow->SetTexture(liveTex);
+	});
 }
 
 void AOeipLiveActor::onLoginRoom(int32_t code, int32_t userId) {
 	OeipPushSetting setting = {};
 	setting.bAudio = false;
 	setting.bVideo = true;
-	OeipLiveManager::Get().PushStream(0, setting);
+	bPush = OeipLiveManager::Get().PushStream(0, setting);
 }
 
 void AOeipLiveActor::onStreamUpdate(int32_t userId, int32_t index, bool bAdd) {
-	if (!IsPullSelf && OeipLiveManager::Get().userId == userId)
+	if (!IsPullSelf && OeipLiveManager::Get().GetUserId() == userId)
 		return;
 	if (bAdd) {
 		OeipLiveManager::Get().PullStream(userId, index);
@@ -47,7 +51,7 @@ void AOeipLiveActor::BeginPlay() {
 	pushPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_CUDA);
 	livePushPipe = new LivePushPipe(pushPipe, yuvFmt);
 	pushPipe->OnOeipDataEvent.AddUObject(this, &AOeipLiveActor::onPipeDataHandle);
-	pullPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_CUDA);
+	pullPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_DX11);
 	livePullPipe = new LivePullPipe(pullPipe);
 	livePullPipe->OnPullDataEvent.AddUObject(this, &AOeipLiveActor::onPullTexChange);
 	//用户连接上服务器
@@ -56,6 +60,9 @@ void AOeipLiveActor::BeginPlay() {
 	OeipLiveManager::Get().OnStreamUpdateEvent.AddUObject(this, &AOeipLiveActor::onStreamUpdate);
 	//拉到视频流数据
 	OeipLiveManager::Get().OnVideoFrameEvent.AddUObject(this, &AOeipLiveActor::onVideoFrame);
+	//
+	SetPushTex(uePushTex);
+	LiveShow->SetTexture(nullTex);
 }
 
 void AOeipLiveActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -72,23 +79,29 @@ void AOeipLiveActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 void AOeipLiveActor::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	//更新输出结果到UE4纹理上
-	if (liveTex)
+	if (liveTex) {
 		pullPipe->UpdateOutputGpuTex(livePullPipe->getOutputId(), liveTex);
+	}
 	//把UE4的纹理当做输入
-	if (uePushTex)
+	if (bPush && uePushTex) {
+		//uePushTex->TextureReference.TextureReferenceRHI->GetNativeResource();
 		pushPipe->UpdateInputGpuTex(livePushPipe->GetInputId(), uePushTex);
+		pushPipe->RunPipe();
+	}
 }
 
 void AOeipLiveActor::SetPushTex(UTextureRenderTarget2D * tex) {
 	//告诉这个管线 输入的格式	
-	pushPipe->SetInput(livePushPipe->GetInputId(), tex->GetSurfaceWidth(), tex->GetSurfaceHeight(), OEIP_CV_8UC4);
-	uePushTex = tex;
+	pushPipe->SetInput(livePushPipe->GetInputId(), tex->GetSurfaceWidth(), tex->GetSurfaceHeight(), OEIP_CV_8UC3);
+	//uePushTex = tex;
 }
 
 void AOeipLiveActor::LoginRoom(FString roomName, int userId) {
-	OeipLiveManager::Get().LoginRoom(roomName, userId);
+	OeipLiveManager::Get().LoginRoom(roomName, userId);	
 }
 
 void AOeipLiveActor::LogoutRoom() {
 	OeipLiveManager::Get().LogoutRoom();
+	LiveShow->SetTexture(nullTex);
+	bPush = false;
 }

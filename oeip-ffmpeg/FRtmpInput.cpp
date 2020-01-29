@@ -1,12 +1,12 @@
 #include "FRtmpInput.h"
-#include <future>
+
 
 int decode_interrupt_cb(void* ctx) {
 	// abort blocking operation
 	FRtmpInput* rInput = (FRtmpInput*)(ctx);
 	//logMessage(OEIP_INFO, rInput->bTempOpen ? "OEPN." : "CLOSE");
 	if (rInput->bTempOpen)
-		return 0;
+		return 0;//继续
 	else
 		return 1;// abort
 }
@@ -16,6 +16,7 @@ FRtmpInput::FRtmpInput() {
 
 FRtmpInput::~FRtmpInput() {
 	//videoData.clear();
+	close();
 }
 
 void FRtmpInput::readPack() {
@@ -55,14 +56,14 @@ void FRtmpInput::readPack() {
 					}
 					else if (videoEncoder.yuvType == OEIP_YUVFMT_YUV420P) {
 						videoFrame.dataSize = width * height * 3 / 2;
-					}					
+					}
 					if (videoEncoder.yuvType == OEIP_YUVFMT_YUY2P || videoEncoder.yuvType == OEIP_YUVFMT_YUV420P) {
 						videoFrame.data[0] = frame->data[0];
 						videoFrame.data[1] = frame->data[1];
 						videoFrame.data[2] = frame->data[2];
 					}
 					videoFrame.width = width;
-					videoFrame.height = height;					
+					videoFrame.height = height;
 					videoFrame.fmt = videoEncoder.yuvType;
 					videoFrame.timestamp = frame->pts;
 					onVideoDataEvent(videoFrame);
@@ -83,14 +84,13 @@ int32_t FRtmpInput::openURL(const char* curl, bool bVideo, bool bAudio) {
 	this->url = curl;
 	this->bVideo = bVideo;
 	this->bAudio = bAudio;
+	int32_t ret = 0;
 	OeipFAVFormat oformat = getAvformat(this->url);
 	std::string format_name = getAvformatName(oformat);
 	bRtmp = oformat == OEIP_AVFORMAT_RTMP;
-	//std::thread ted = std::thread([&]() {
-	std::future<int32_t> openUrl = std::async([&]() {
-		bTempOpen = true;
+	{
 		std::unique_lock <std::mutex> lck(mtx);
-		int32_t ret = 0;
+		bTempOpen = true;		
 		AVFormatContext* temp = avformat_alloc_context();
 		//interrupt_callback需要在avformat_open_input之前设置，否则av_read_frame阻塞里应用不到
 		temp->interrupt_callback.callback = decode_interrupt_cb;
@@ -141,10 +141,8 @@ int32_t FRtmpInput::openURL(const char* curl, bool bVideo, bool bAudio) {
 				return ret;
 			}
 		}
-		bOpenPull = true;
-		return 0;
-	});	
-	int32_t ret = openUrl.get();
+	}
+	bOpenPull = true;
 	onOperateAction(OEIP_LIVE_OPERATE_OPEN, ret);
 	if (ret == 0) {
 		logMessage(OEIP_INFO, "rtmp input open sucess.");
@@ -157,8 +155,8 @@ int32_t FRtmpInput::openURL(const char* curl, bool bVideo, bool bAudio) {
 }
 
 void FRtmpInput::close() {
-	if (!bOpenPull)
-		return;
+	//if (!bOpenPull)
+	//	return;	
 	bTempOpen = false;
 	bOpenPull = false;
 	videoIndex = -1;

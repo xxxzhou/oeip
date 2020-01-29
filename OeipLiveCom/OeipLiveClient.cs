@@ -45,7 +45,7 @@ namespace OeipLiveCom
                     return false;
                 }
                 Connection = new HubConnection(uri);
-                HubProxy = Connection.CreateHubProxy("OeipLive"); 
+                HubProxy = Connection.CreateHubProxy("OeipLive");
                 onActions.Add(HubProxy.On("OnLoginRoom", (int code, string server, int port) =>
                 {
                     liveBack?.OnLoginRoom(code, server, port);
@@ -72,7 +72,6 @@ namespace OeipLiveCom
             return bInit;
         }
 
-        //调用本方法的线程与执行异步
         public async Task InvokeAsync(string serverMethod, params object[] objs)
         {
             try
@@ -86,9 +85,13 @@ namespace OeipLiveCom
             }
         }
 
+        //调用本方法的线程与执行异步
         public void Invoke(string serverMethod, params object[] objs)
         {
-            InvokeAsync(serverMethod, objs).Wait(3000);
+            Task.Run(() =>
+            {
+                InvokeAsync(serverMethod, objs).Wait(3000);
+            });
         }
 
         //调用本方法的线程与执行同步
@@ -169,7 +172,7 @@ namespace OeipLiveCom
         public virtual void Dispose(bool disposing)
         {
             if (disposed)
-                return;     
+                return;
             liveBack?.Dispose();
             liveBack = null;
             if (disposing)

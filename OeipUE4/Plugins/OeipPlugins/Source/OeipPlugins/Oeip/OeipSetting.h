@@ -47,9 +47,9 @@ struct FLiveRoom
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
-		FString roomName = "";
+		FString roomName = "oeiplive";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
-		FString userIndex = "";
+		FString userIndex = "31";
 };
 
 USTRUCT(BlueprintType)

@@ -17,7 +17,8 @@ private:
 	bool bOpen = false;
 	std::string liveUrl;
 
-	std::mutex mtx;
+	//std::recursive_mutex mtx;
+	//std::mutex mtx;
 public:
 	int32_t open(const char* url);
 	void close();

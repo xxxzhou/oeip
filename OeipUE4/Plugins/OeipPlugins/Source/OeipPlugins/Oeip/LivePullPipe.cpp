@@ -25,6 +25,8 @@ LivePullPipe::~LivePullPipe() {
 
 void LivePullPipe::RunPipe(OeipVideoFrame & videoFrame) {
 	if (width != videoFrame.width || height != videoFrame.height) {
+		width = videoFrame.width;
+		height = videoFrame.height;
 		yuvFmt = videoFrame.fmt;
 		ResetPipe();
 	}
@@ -42,7 +44,7 @@ void LivePullPipe::ResetPipe() {
 	YUV2RGBAParamet yp = {};
 	yp.yuvType = yuvFmt;
 	pipe->UpdateParamet(yuv2rgb, yp);
-	pipe->SetInput(inputIndex, width, height, dataType);
+	pipe->SetInput(inputIndex, width, inputHeight, dataType);
 	data.SetNum(width*inputHeight);
 	OnPullDataEvent.Broadcast(width, height);
 }

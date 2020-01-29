@@ -57,7 +57,7 @@ namespace OeipLiveServer
 
         public override Task OnConnected()
         {
-            RoomManager.Instance.OnMediaServerEvent += Instance_OnMediaServerEvent;
+            //RoomManager.Instance.OnMediaServerEvent += Instance_OnMediaServerEvent;
             LogHelper.LogMessage($"媒体服务器 {Context.ConnectionId} 连接成功");
             RoomManager.Instance.AddMediaServe(Context.ConnectionId);
             Clients.Caller.OnConnect(RoomManager.Instance.SelfHost);
@@ -66,7 +66,7 @@ namespace OeipLiveServer
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            RoomManager.Instance.OnMediaServerEvent -= Instance_OnMediaServerEvent;
+           // RoomManager.Instance.OnMediaServerEvent -= Instance_OnMediaServerEvent;
             LogHelper.LogMessage($"媒体服务器 {Context.ConnectionId} 丢失连接");
             RoomManager.Instance.RemoveMediaServer(Context.ConnectionId);
             return base.OnDisconnected(stopCalled);

@@ -38,15 +38,17 @@ public:
 	FOnOperateResultEvent OnOperateResultEvent;
 	FOnPushStreamEvent OnPushStreamEvent;
 	FOnPullStreamEvent OnPullStreamEvent;
-	int userId = -1;
 private:
 	std::mutex mtx;
 	bool bInit = false;
 	bool bLogin = false;
-
+	int userId = -1;
 	OeipVideoFrame mainVideoFrame = {};
 	OeipVideoFrame auxVideoFrame = {};
 public:
+	int GetUserId() {
+		return userId;
+	}
 	//主动操作
 	bool LoginRoom(FString roomName, int userId);
 	bool PushStream(int index, OeipPushSetting& setting);
