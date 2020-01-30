@@ -4,12 +4,13 @@
     <VideoParamet>
       <OeipVideoParamet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <bGpuSeed>true</bGpuSeed>
-        <iterCount>1</iterCount>
-        <seedCount>1000</seedCount>
-        <count>250</count>
-        <gamma>90</gamma>
-        <lambda>450</lambda>
-        <softness>5</softness>
+        <iterCount>4</iterCount>
+        <seedCount>1583</seedCount>
+        <count>315</count>
+        <gamma>137.557312</gamma>
+        <lambda>475</lambda>
+        <bDraw>false</bDraw>
+        <softness>10</softness>
         <epslgn10>5</epslgn10>
         <intensity>0.2</intensity>
       </OeipVideoParamet>

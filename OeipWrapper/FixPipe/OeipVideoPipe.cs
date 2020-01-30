@@ -212,6 +212,9 @@ namespace OeipWrapper.FixPipe
             grabcutParamet.bGpuSeed = paramet.bGpuSeed ? 1 : 0;
             Pipe.UpdateParamet(GrabcutIndex, grabcutParamet);
 
+            darknetParamet.bDraw = paramet.bDraw ? 1 : 0;
+            Pipe.UpdateParametStruct(DarknetIndex, darknetParamet);
+
             guidedFilterParamet.softness = paramet.softness;
             int epsx = (int)paramet.epslgn10;
             float epsf = Math.Max(1.0f, (paramet.epslgn10 - epsx) * 10.0f);

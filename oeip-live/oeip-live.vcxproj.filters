@@ -27,11 +27,11 @@
     <ClCompile Include="OeipLiveManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="OeipLiveBack.cpp">
-      <Filter>export</Filter>
-    </ClCompile>
     <ClCompile Include="OeipLiveExport.cpp">
       <Filter>export</Filter>
+    </ClCompile>
+    <ClCompile Include="OeipLiveBackWrapper.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="OeipLiveExport.h">
       <Filter>export</Filter>
+    </ClInclude>
+    <ClInclude Include="OeipLiveBackWrapper.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

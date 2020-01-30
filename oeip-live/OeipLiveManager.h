@@ -1,5 +1,6 @@
 #pragma once
 #include "OeipLiveRoom.h"
+#include "OeipLiveBackWrapper.h"
 #include <memory>
 
 class OeipLiveManager

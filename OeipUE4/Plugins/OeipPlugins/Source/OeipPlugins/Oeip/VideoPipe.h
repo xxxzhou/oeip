@@ -5,9 +5,7 @@
 #include "CoreMinimal.h"
 #include "OeipPipe.h"
 
-/**
- *
- */
+//直接从OEIP那拷来实现
 class OEIPPLUGINS_API VideoPipe
 {
 public:

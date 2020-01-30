@@ -40,8 +40,8 @@ bool OeipLiveManager::LoginRoom(FString roomName, int userId) {
 }
 
 bool OeipLiveManager::PushStream(int index, OeipPushSetting & setting) {
-	if (!bLogin)
-		return false;
+	//if (!bLogin)
+	//	return false;
 	return pushStream(index, setting);
 }
 

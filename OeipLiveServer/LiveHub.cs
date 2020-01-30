@@ -92,7 +92,9 @@ namespace OeipLiveServer
             {
                 string roomuser = $"{user.InRoom.Name}_{user.Id}_{index}";
                 string pullUri = $"{ user.InRoom.Server }:{ user.InRoom.Port}/live/{roomuser}";
-                LogHelper.LogMessage($"用户ID {userId} 开始拉流 {pullUri}");
+                //拉的用户
+                var userx = RoomManager.Instance.GetUser(Context.ConnectionId);
+                LogHelper.LogMessage($"用户ID {userx.Id} 开始拉流 {pullUri}");
                 return roomuser;
             }
             return string.Empty;
@@ -105,7 +107,9 @@ namespace OeipLiveServer
             {
                 string roomuser = $"{user.InRoom.Name}_{user.Id}_{index}";
                 string pullUri = $"{ user.InRoom.Server }:{ user.InRoom.Port}/live/{roomuser}";
-                LogHelper.LogMessage($"用户ID {userId} 停止拉流 {pullUri}");
+                //拉的用户
+                var userx = RoomManager.Instance.GetUser(Context.ConnectionId);
+                LogHelper.LogMessage($"用户ID {userx.Id} 停止拉流 {pullUri}");
             }
             return 0;
         }

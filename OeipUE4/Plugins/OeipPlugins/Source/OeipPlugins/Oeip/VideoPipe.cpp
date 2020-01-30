@@ -16,7 +16,7 @@ VideoPipe::VideoPipe(OeipPipe* opipe) {
 	op.bGpu = true;
 	//没必要输出CPU数据
 	op.bCpu = false;
-	pipe->UpdateParamet(outIndex, op);
+	pipe->UpdateParamet(outIndex, &op);
 	if (pipe->GetGpuType() == OeipGpgpuType::OEIP_CUDA) {
 		//神经网络层
 		darknetIndex = pipe->AddLayer("darknet", OEIP_DARKNET_LAYER);
@@ -30,17 +30,17 @@ VideoPipe::VideoPipe(OeipPipe* opipe) {
 		grabcutParamet.gamma = 90.0f;
 		grabcutParamet.lambda = 450.0f;
 		grabcutParamet.rect = {};
-		pipe->UpdateParamet(grabcutIndex, grabcutParamet);
+		pipe->UpdateParamet(grabcutIndex, &grabcutParamet);
 		//GuiderFilter
 		guiderFilterIndex = pipe->AddLayer("guider filter", OEIP_GUIDEDFILTER_LAYER);
 		guidedFilterParamet.zoom = 8;
 		guidedFilterParamet.softness = 5;
 		guidedFilterParamet.eps = 0.000001f;
 		guidedFilterParamet.intensity = 0.2f;
-		pipe->UpdateParamet(guiderFilterIndex, guidedFilterParamet);
+		pipe->UpdateParamet(guiderFilterIndex, &guidedFilterParamet);
 		//输出第三个流，网络处理层流
 		mattingOutIndex = pipe->AddLayer("matting out put", OEIP_OUTPUT_LAYER);
-		pipe->UpdateParamet(mattingOutIndex, op);
+		pipe->UpdateParamet(mattingOutIndex, &op);
 	}
 }
 
@@ -49,7 +49,7 @@ VideoPipe::~VideoPipe() {
 
 void VideoPipe::setVideoFormat(OeipVideoType videoType, int32_t width, int32_t height) {
 	yp.yuvType = getVideoYUV(videoType);
-	pipe->UpdateParamet(yuv2rgba, yp);
+	pipe->UpdateParamet(yuv2rgba, &yp);
 
 	inputWidth = width;
 	inputHeight = height;
@@ -86,17 +86,17 @@ void VideoPipe::runVideoPipe(uint8_t * data) {
 
 void VideoPipe::updateDarknet(DarknetParamet& net) {
 	darknetParamet = net;
-	pipe->UpdateParamet(darknetIndex, darknetParamet);
+	pipe->UpdateParamet(darknetIndex, &darknetParamet);
 }
 
 void VideoPipe::changeGrabcutMode(bool bDrawSeed, OeipRect& rect) {
 	//关闭画框 以免影响grabcut效果
-	darknetParamet.bDraw = false;
-	pipe->UpdateParamet(darknetIndex, darknetParamet);
+	//darknetParamet.bDraw = false;
+	//pipe->UpdateParamet(darknetIndex, &darknetParamet);
 
 	grabcutParamet.bDrawSeed = bDrawSeed ? 1 : 0;
 	grabcutParamet.rect = rect;
-	pipe->UpdateParamet(grabcutIndex, grabcutParamet);
+	pipe->UpdateParamet(grabcutIndex, &grabcutParamet);
 }
 
 void VideoPipe::updateVideoParamet(FGrabCutSetting * grabSetting) {
@@ -106,12 +106,15 @@ void VideoPipe::updateVideoParamet(FGrabCutSetting * grabSetting) {
 	grabcutParamet.gamma = grabSetting->gamma;
 	grabcutParamet.lambda = grabSetting->lambda;
 	grabcutParamet.bGpuSeed = grabSetting->bGpuSeed ? 1 : 0;
-	pipe->UpdateParamet(grabcutIndex, grabcutParamet);
+	pipe->UpdateParamet(grabcutIndex, &grabcutParamet);
+
+	darknetParamet.bDraw = grabSetting->bDraw;
+	pipe->UpdateParamet(darknetIndex, &darknetParamet);
 
 	guidedFilterParamet.softness = grabSetting->softness;
 	int epsx = (int)grabSetting->epslgn10;
 	float epsf = FMath::Max(1.0f, (grabSetting->epslgn10 - epsx) * 10.0f);
 	guidedFilterParamet.eps = epsf * (float)FMath::Pow(10, -epsx);
 	guidedFilterParamet.intensity = grabSetting->intensity;
-	pipe->UpdateParamet(guiderFilterIndex, guidedFilterParamet);
+	pipe->UpdateParamet(guiderFilterIndex, &guidedFilterParamet);
 }

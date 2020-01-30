@@ -21,7 +21,8 @@ namespace OeipWrapper.FixPipe
         public float gamma = 90.0f;
         [SliderInput(DisplayName = "Lambda", Order = 4, Default = 450.0f, Min = 200.0f, Max = 800.0f)]
         public float lambda = 450.0f;
-
+        [Toggle(DisplayName = "画框", Order = 5)]
+        public bool bDraw = true;
         [SliderInput(DisplayName = "Softness", Order = 6, Default = 5, IsInt = true, Min = 1, Max = 30)]
         public int softness = 5;
         [SliderInput(DisplayName = "EPS", Order = 7, Default = 5, Min = 1.0f, Max = 10.0f)]

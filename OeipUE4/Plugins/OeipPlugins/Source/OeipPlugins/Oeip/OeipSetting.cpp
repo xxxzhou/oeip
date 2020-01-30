@@ -11,7 +11,7 @@ using namespace std::placeholders;
 OeipSetting *OeipSetting::singleton = nullptr;
 
 OeipSetting::OeipSetting() {
-	rateNameList.Push("20M");
+	//rateNameList.Push("20M");
 	rateNameList.Push("8M");
 	rateNameList.Push("6M");
 	rateNameList.Push("4M");
@@ -19,7 +19,7 @@ OeipSetting::OeipSetting() {
 	rateNameList.Push("1M");
 	rateNameList.Push("512K");
 
-	rateList.Push(20000000);
+	//rateList.Push(20000000);
 	rateList.Push(8000000);
 	rateList.Push(6000000);
 	rateList.Push(4000000);
@@ -149,6 +149,12 @@ TArray<BaseAttribute*> OeipSetting::GetGrabCutAttribute() {
 		ld->offset = 50.0f;
 		ld->range = 1000.0f;
 		grabCutArrList.Add(ld);
+
+		ToggleAttribute* bdt = new ToggleAttribute();
+		bdt->MemberName = "bDraw";
+		bdt->DisplayName = "Is Draw";
+		bdt->DefaultValue = true;
+		grabCutArrList.Add(bdt);
 
 		SliderAttribute* sn = new SliderAttribute();
 		sn->MemberName = "softness";

@@ -94,8 +94,8 @@ namespace OeipWrapper.Live
 
         public bool PushStream(int index, ref OeipPushSetting setting)
         {
-            if (!bLogin)
-                return false;
+            //if (!bLogin)
+            //    return false;
             return OeipLiveHelper.pushStream(index, ref setting);
         }
 

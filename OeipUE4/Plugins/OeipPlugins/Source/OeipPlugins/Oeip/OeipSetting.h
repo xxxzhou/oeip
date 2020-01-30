@@ -34,6 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		float lambda = 450.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
+		bool bDraw = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		int softness = 5;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Oeip)
 		float epslgn10 = 5.f;

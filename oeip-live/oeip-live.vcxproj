@@ -174,7 +174,7 @@ COPY "$(SolutionDir)$(ProjectName)\OeipLiveExport.h" "$(SolutionDir)install\incl
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="OeipLiveBack.cpp" />
+    <ClCompile Include="OeipLiveBackWrapper.cpp" />
     <ClCompile Include="OeipLiveExport.cpp" />
     <ClCompile Include="OeipLiveManager.cpp" />
     <ClCompile Include="OeipLiveRoom.cpp" />
@@ -187,6 +187,7 @@ COPY "$(SolutionDir)$(ProjectName)\OeipLiveExport.h" "$(SolutionDir)install\incl
   <ItemGroup>
     <ClInclude Include="OeipLive.h" />
     <ClInclude Include="OeipLiveBack.h" />
+    <ClInclude Include="OeipLiveBackWrapper.h" />
     <ClInclude Include="OeipLiveExport.h" />
     <ClInclude Include="OeipLiveManager.h" />
     <ClInclude Include="OeipLiveRoom.h" />

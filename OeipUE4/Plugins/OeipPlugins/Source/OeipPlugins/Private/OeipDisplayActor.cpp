@@ -2,7 +2,7 @@
 
 #include "OeipDisplayActor.h"
 #include "Engine/Texture2D.h"
-#include "MeshUtilities.h"
+//#include "MeshUtilities.h"
 
 // Sets default values
 AOeipDisplayActor::AOeipDisplayActor() {

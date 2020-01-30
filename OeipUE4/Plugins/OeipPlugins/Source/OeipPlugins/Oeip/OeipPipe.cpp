@@ -33,6 +33,10 @@ int OeipPipe::AddLayer(FString layerName, OeipLayerType layerType) {
 	return addPiepLayer(pipeId, TCHAR_TO_UTF8(*layerName), layerType);
 }
 
+bool OeipPipe::UpdateParamet(int layerIndex, void* t) {
+	return updatePipeParamet(pipeId, layerIndex, t);
+}
+
 void OeipPipe::ConnectLayer(int layerIndex, FString forwardName, int inputIndex, int selfIndex) {
 	connectLayerName(pipeId, layerIndex, TCHAR_TO_UTF8(*forwardName), inputIndex, selfIndex);
 }

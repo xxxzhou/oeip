@@ -14,14 +14,14 @@ LivePushPipe::LivePushPipe(OeipPipe* opipe, OeipYUVFMT fmt) {
 	InputParamet ip = {};
 	ip.bCpu = false;
 	ip.bGpu = true;
-	pipe->UpdateParamet(inputIndex, ip);
+	pipe->UpdateParamet(inputIndex, &ip);
 	OutputParamet op = {};
 	op.bCpu = true;
 	op.bGpu = false;
-	pipe->UpdateParamet(outIndex, op);
+	pipe->UpdateParamet(outIndex, &op);
 	RGBA2YUVParamet yp = {};
 	yp.yuvType = OEIP_YUVFMT_YUV420P;
-	pipe->UpdateParamet(rgba2yuv, yp);
+	pipe->UpdateParamet(rgba2yuv, &yp);
 	//CUDA模块需要手动把BGRA转成RGBA
 	if (pipe->GetGpuType() == OEIP_CUDA) {
 		MapChannelParamet mparamet = {};
@@ -29,7 +29,7 @@ LivePushPipe::LivePushPipe(OeipPipe* opipe, OeipYUVFMT fmt) {
 		mparamet.green = 1;
 		mparamet.red = 2;
 		mparamet.alpha = 3;
-		pipe->UpdateParamet(mapIndex, mparamet);
+		pipe->UpdateParamet(mapIndex, &mparamet);
 	}	
 }
 

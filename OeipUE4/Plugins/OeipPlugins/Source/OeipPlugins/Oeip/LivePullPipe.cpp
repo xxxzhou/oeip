@@ -12,11 +12,11 @@ LivePullPipe::LivePullPipe(OeipPipe* opipe) {
 	InputParamet ip = {};
 	ip.bCpu = true;
 	ip.bGpu = false;
-	pipe->UpdateParamet(inputIndex, ip);
+	pipe->UpdateParamet(inputIndex, &ip);
 	OutputParamet op = {};
 	op.bCpu = false;
 	op.bGpu = true;
-	pipe->UpdateParamet(outIndex, op);
+	pipe->UpdateParamet(outIndex, &op);
 }
 
 LivePullPipe::~LivePullPipe() {
@@ -43,7 +43,7 @@ void LivePullPipe::ResetPipe() {
 	}
 	YUV2RGBAParamet yp = {};
 	yp.yuvType = yuvFmt;
-	pipe->UpdateParamet(yuv2rgb, yp);
+	pipe->UpdateParamet(yuv2rgb, &yp);
 	pipe->SetInput(inputIndex, width, inputHeight, dataType);
 	data.SetNum(width*inputHeight);
 	OnPullDataEvent.Broadcast(width, height);

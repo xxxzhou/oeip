@@ -26,7 +26,7 @@ namespace OeipWrapperTest
         private void LiveForm_Load(object sender, EventArgs e)
         {
             OeipManager.Instance.OnLogEvent += Instance_OnLogEvent;
-            cameraControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, 1, false);
+            cameraControl1.NativeLoad(OeipGpgpuType.OEIP_CUDA, 0, false);
             cameraControl1.VideoPipe.Pipe.OnProcessEvent += Pipe_OnProcessEvent;
             OeipLiveManager.Instance.OnLoginRoomEvent += Instance_OnLoginRoomEvent;
             OeipLiveManager.Instance.OnStreamUpdateEvent += Instance_OnStreamUpdateEvent;

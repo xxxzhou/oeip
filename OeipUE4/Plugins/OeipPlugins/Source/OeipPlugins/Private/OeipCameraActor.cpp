@@ -81,7 +81,7 @@ void AOeipCameraActor::changeFormat() {
 	CameraShow->SetTexture(cameraTex);
 }
 
-void AOeipCameraActor::onReviceHandle(uint8_t * data, int width, int height) {
+void AOeipCameraActor::onReviceHandle(uint8 * data, int width, int height) {
 	if (videoPipe) {
 		videoPipe->runVideoPipe(data);
 	}
@@ -106,15 +106,17 @@ void AOeipCameraActor::onPipeDataHandle(int32_t layerIndex, uint8_t * data, int3
 
 // Called when the game starts or when spawned
 void AOeipCameraActor::BeginPlay() {
-	Super::BeginPlay();
 	//设备管理类
 	oeipCamera = new OeipCamera();
+	//这个绑定会自动没有?
+	//cameraReviceHandle = oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
 	oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
 	//设备处理类
 	gpuPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_CUDA);
 	videoPipe = new VideoPipe(gpuPipe);
 	gpuPipe->OnOeipDataEvent.AddUObject(this, &AOeipCameraActor::onPipeDataHandle);
 	OeipManager::Get().OnLogEvent.AddUObject(this, &AOeipCameraActor::onLogMessage);
+	Super::BeginPlay();
 }
 
 void AOeipCameraActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
@@ -134,6 +136,12 @@ void AOeipCameraActor::Tick(float DeltaTime) {
 	if (oeipCamera && oeipCamera->IsOpen()) {
 		//告诉运行管线要更新的UE4纹理
 		gpuPipe->UpdateOutputGpuTex(videoPipe->getOutputId(), cameraTex);
+	}
+	if (gpuPipe && !gpuPipe->OnOeipDataEvent.IsBoundToObject(this)) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, L"lost pipe data handle");
+	}
+	if (oeipCamera && !oeipCamera->OnDeviceDataEvent.IsBoundToObject(this)) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, L"lost camera data handle");
 	}
 }
 

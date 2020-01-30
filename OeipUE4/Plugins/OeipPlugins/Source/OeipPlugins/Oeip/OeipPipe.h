@@ -32,17 +32,15 @@ public:
 		return gpgpuType;
 	}
 	int AddLayer(FString layerName, OeipLayerType layerType);
-	template<typename T>
-	int AddLayer(FString layerName, OeipLayerType layerType, T& t) {
-		return addPiepLayer(pipeId, TCHAR_TO_UTF8(*layerName), layerType, &t);
-	};
-	template<typename T>
-	bool UpdateParamet(int layerIndex, T& t) {
-		updatePipeParamet(pipeId, layerIndex, &t);
-	};
-	//bool UpdateParamet(int layerIndex, const void* t) {
-	//	updatePipeParamet(pipeId, layerIndex, t);
-	//}
+	//template<typename T>
+	//int AddLayer(FString layerName, OeipLayerType layerType, T& t) {
+	//	return addPiepLayer(pipeId, TCHAR_TO_UTF8(*layerName), layerType, &t);
+	//};
+	//template<typename T>
+	//bool UpdateParamet(int layerIndex, T& t) {
+	//	updatePipeParamet(pipeId, layerIndex, &t);
+	//};
+	bool UpdateParamet(int layerIndex, void* t);
 	void ConnectLayer(int layerIndex, FString forwardName, int inputIndex = 0, int selfIndex = 0);
 	void ConnectLayer(int layerIndex, int forwardIndex, int inputIndex = 0, int selfIndex = 0);
 	void SetEnableLayer(int layerIndex, bool bEnable);
@@ -56,6 +54,6 @@ public:
 	//更新UE4渲染相应的RHI资源，自动转入渲染线程
 	void UpdateOutputGpuTex(int layerIndex, UTexture* tex, int inputIndex = 0);
 	void UpdateOutputGpuTex(int layerIndex, UTextureRenderTarget2D* tex, int inputIndex = 0);
-	//运行管线，任何线程都可以，在设备线程最好
+	//运行管线，任何线程都可以，在设备数据线程不需要复制数据最好
 	bool RunPipe();
 };

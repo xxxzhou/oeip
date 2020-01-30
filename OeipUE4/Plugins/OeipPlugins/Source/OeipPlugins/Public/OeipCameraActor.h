@@ -28,6 +28,7 @@ private:
 	VideoPipe* videoPipe = nullptr;
 	TArray<PersonBox> personBoxs;
 	//UTexture2D *cameraTex;
+	FDelegateHandle cameraReviceHandle = {};
 public:
 	//后期不放出来，前期主要在编辑器里查看
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -52,7 +53,7 @@ public:
 	//virtual void OnPeronChange_Implementation(const FString& message) {
 	//};
 private:
-	void onReviceHandle(uint8_t* data, int width, int height);
+	void onReviceHandle(uint8* data, int width, int height);
 	void onPipeDataHandle(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex);
 	void changeFormat();
 protected:

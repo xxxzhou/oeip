@@ -35,9 +35,11 @@ void AOeipLiveActor::onStreamUpdate(int32_t userId, int32_t index, bool bAdd) {
 		return;
 	if (bAdd) {
 		OeipLiveManager::Get().PullStream(userId, index);
+		LiveShow->SetTexture(liveTex);
 	}
 	else {
 		OeipLiveManager::Get().StopPullStream(userId, index);
+		LiveShow->SetTexture(nullTex);
 	}
 }
 
