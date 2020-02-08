@@ -17,7 +17,7 @@ namespace OeipWrapperTest
     {
         private bool bPush = false;
         //是否拉自己推的流,一般用来测试
-        public bool IsPullSelf { get; set; } = false;
+        public bool IsPullSelf { get; set; } = true;
         public LiveForm()
         {
             InitializeComponent();

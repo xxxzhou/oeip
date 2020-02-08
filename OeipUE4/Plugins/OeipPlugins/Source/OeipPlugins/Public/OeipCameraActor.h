@@ -28,7 +28,8 @@ private:
 	VideoPipe* videoPipe = nullptr;
 	TArray<PersonBox> personBoxs;
 	//UTexture2D *cameraTex;
-	FDelegateHandle cameraReviceHandle = {};
+	FDelegateHandle cameraReviceHandle;
+	FDelegateHandle pipeDataHandle;
 public:
 	//后期不放出来，前期主要在编辑器里查看
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

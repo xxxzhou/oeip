@@ -14,6 +14,8 @@ ImageProcessCuda::ImageProcessCuda() {
 
 ImageProcessCuda::~ImageProcessCuda() {
 	//std::lock_guard<std::recursive_mutex> mtx_locker(mtx);
+	cudaStreamSynchronize(cudaStream);
+	cudaStreamDestroy(cudaStream);
 }
 
 BaseLayer* ImageProcessCuda::onAddLayer(OeipLayerType layerType) {

@@ -158,8 +158,8 @@ public class TestLive : MonoBehaviour
     private void OnLoadNet()
     {
         darknetParamet.bLoad = 1;
-        darknetParamet.confile = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny-test.cfg"));
-        darknetParamet.weightfile = Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny_745000.weights"));
+        darknetParamet.confile = @"D:\Workspace\github\eip\ThirdParty\yolov3-tiny-test.cfg";// Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny-test.cfg"));
+        darknetParamet.weightfile = @"D:\Workspace\github\eip\ThirdParty\yolov3-tiny_745000.weights";// Path.GetFullPath(Path.Combine(Application.dataPath, "../../ThirdParty/yolov3-tiny_745000.weights"));
         darknetParamet.thresh = 0.3f;
         darknetParamet.nms = 0.3f;
         darknetParamet.bDraw = 1;
