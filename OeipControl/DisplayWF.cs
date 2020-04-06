@@ -42,7 +42,6 @@ namespace OeipControl
                 }
                 mainMap.UnlockBits(mapData);
             }
-
             Action action = () =>
             {
                 pctBox.Refresh();

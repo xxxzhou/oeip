@@ -70,7 +70,7 @@ void AudioMixer::mixerData() {
 	int frameSize = sampleSize * audioDesc.bitSize / 8;//这里功能暂限定bitsize只能是16
 	int16_t* pcmbuf = new int16_t[sampleSize];
 	long total = 0;
-	while (bStart) {
+	while (this->bStart) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(sampleTime));
 		std::vector<std::vector<int16_t>> vecBuffers;
 		for (auto& ring : resampleBuffers) {
@@ -94,7 +94,7 @@ void AudioMixer::mixerData() {
 			onDataHandle((uint8_t*)pcmbuf, frameSize);
 		}
 	}
-	signal.notify_all();
+	signal.notify_all();	
 }
 
 void AudioMixer::close() {

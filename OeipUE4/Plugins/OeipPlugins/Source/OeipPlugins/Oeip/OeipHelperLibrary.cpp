@@ -7,3 +7,7 @@ FString UOeipHelperLibrary::FStreamQualityToFString(const FCameraInfo& cameraInf
 	return FString::FromInt(cameraInfo.index) + " " + cameraInfo.deviceName;
 }
 
+FDateTime UOeipHelperLibrary::GetDateNow() {
+	return FDateTime::Now();
+}
+

@@ -106,6 +106,18 @@ enum OeipAudioDataType : int32_t
 	OEIP_Audio_WavHeader,
 };
 
+enum OeipFFmpegMode :int32_t
+{
+	OEIP_CODER = 300,
+	OEIP_CODER_OPEN = OEIP_CODER + 1,
+	OEIP_CODER_READ = OEIP_CODER + 2,
+	OEIP_CODER_CLOSE = OEIP_CODER + 3,
+	OEIP_DECODER = 500,
+	OEIP_DECODER_OPEN = OEIP_DECODER + 1,
+	OEIP_DECODER_READ = OEIP_DECODER + 2,
+	OEIP_DECODER_CLOSE = OEIP_DECODER + 3,
+};
+
 struct OeipRect
 {
 	float centerX = 0.f;
@@ -292,6 +304,51 @@ struct OeipDateDesc
 	int32_t elementChannel;
 };
 
+struct OeipVideoEncoder
+{
+	int32_t width = 1920;
+	int32_t height = 1080;
+	int32_t fps = 30;
+	OeipYUVFMT yuvType = OEIP_YUVFMT_YUY2P;
+	int32_t bitrate = 4000000;
+};
+
+//固定数据格式为AV_SAMPLE_FMT_S16
+struct OeipAudioEncoder
+{
+	//采集率
+	int32_t frequency = 32000;
+	//声道数
+	int32_t channel = 1;
+	//码率
+	int32_t bitrate = 48000;
+};
+
+//用于传输，用data[4]而不是data,主要是为了整合别的直播SDK考虑
+//同理，data[4]直接拿到就是内存地址，在回调要么copy内存保存，要么直接处理完，不要保存地址
+struct OeipVideoFrame
+{
+	//传输一般用平面YUV格式
+	uint8_t* data[4];
+	int32_t dataSize;
+	int64_t timestamp;
+	int32_t width;
+	int32_t height;
+	OeipYUVFMT fmt = OEIP_YUVFMT_YUY2P;
+	int32_t linesize[4];
+};
+
+//暂定只支持单声道,如果是多声道,需要数据交叉格式
+struct OeipAudioFrame
+{
+	uint8_t* data;
+	int32_t dataSize;
+	int64_t timestamp;
+	int32_t sampleRate = 8000;
+	int32_t channels = 1;
+	int32_t bitDepth = 16;
+};
+
 //日志回调
 typedef void(*logEventAction)(int32_t level, const char* message);
 typedef std::function<void(int32_t, const char*)> logEventHandle;
@@ -300,8 +357,10 @@ typedef std::function<void(int32_t, const char*)> logEventHandle;
 typedef void(*onAudioRecordAction)(uint8_t* data, int32_t dataLen, OeipAudioDataType dataType);
 typedef std::function<void(uint8_t*, int32_t, OeipAudioDataType)> onAudioRecordHandle;
 //原始声音回调，指明是否是麦
+typedef void(*onAudioOutputAction)(bool bMic, uint8_t* data, int32_t size, OeipAudioDataType type);
 typedef std::function<void(bool bMic, uint8_t * data, int32_t size, OeipAudioDataType type)> onAudioOutputHandle;
 //处理后声音回调(如重采样,混音)
+typedef void(*onAudioDataAction)(uint8_t* data, int32_t size);
 typedef std::function<void(uint8_t * data, int32_t size)> onAudioDataHandle;
 
 //设备事件，如中断等
@@ -315,3 +374,13 @@ typedef std::function<void(uint8_t*, int32_t, int32_t)> onReviceHandle;
 //GPU运算管线返回
 typedef void(*onProcessAction)(int32_t layerIndex, uint8_t* data, int32_t width, int32_t height, int32_t outputIndex);
 typedef std::function<void(int32_t, uint8_t*, int32_t, int32_t, int32_t)> onProcessHandle;
+
+//用于多媒体音视频事件
+typedef void(*onOperateAction)(int32_t type, int32_t code);
+typedef std::function<void(int32_t operate, int32_t code)> onOperateHandle;
+//用于返回多媒体视频数据
+typedef void(*onVideoFrameAction)(OeipVideoFrame videoFrame);
+typedef std::function<void(OeipVideoFrame)> onVideoFrameHandle;
+//用于返回多媒体音频数据
+typedef void(*onAudioFrameAction)(OeipAudioFrame videoFrame);
+typedef std::function<void(OeipAudioFrame)> onAudioFrameHandle;

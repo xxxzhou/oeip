@@ -35,11 +35,13 @@ bool OutputLayerCuda::onInitBuffer() {
 		device.Release();
 		ctx.Release();
 		createDevice11(&device, &ctx);
+		//cudaD3D11GetDirect3DDevice(&device);
+		//device->GetImmediateContext(&ctx);
 	}
 	for (int32_t i = 0; i < inCount; i++) {
 		if (layerParamet.bCpu) {
 			//reCudaAllocCpu((void**)&cudaResoures[i].cpuData, selfConnects[i].width*selfConnects[i].height*OEIP_CV_ELEM_SIZE(selfConnects[i].dataType));
-			cpudatas[i].resize(selfConnects[i].width*selfConnects[i].height*OEIP_CV_ELEM_SIZE(selfConnects[i].dataType));
+			cpudatas[i].resize(selfConnects[i].width * selfConnects[i].height * OEIP_CV_ELEM_SIZE(selfConnects[i].dataType));
 		}
 		//暂时只支持RGBA
 		if (layerParamet.bGpu) {
@@ -78,7 +80,7 @@ void OutputLayerCuda::onRunLayer() {
 	}
 }
 
-void OutputLayerCuda::outputGpuTex(void * device, void * texture, int32_t outputIndex) {
+void OutputLayerCuda::outputGpuTex(void* device, void* texture, int32_t outputIndex) {
 	ID3D11Device* dxdevice = (ID3D11Device*)device;
 	ID3D11Texture2D* dxtexture = (ID3D11Texture2D*)texture;
 	if (!layerParamet.bGpu || dxdevice == nullptr || dxtexture == nullptr)

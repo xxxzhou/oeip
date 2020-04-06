@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <LangVersion>7.3</LangVersion>
@@ -60,6 +60,8 @@
     <Compile Include="OeipHelper.cs" />
     <Compile Include="OeipHelperUnity3D.cs" />
     <Compile Include="OeipManager.cs" />
+    <Compile Include="OeipMediaOutput.cs" />
+    <Compile Include="OeipMediaPlay.cs" />
     <Compile Include="OeipPipe.cs" />
     <Compile Include="PInvokeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

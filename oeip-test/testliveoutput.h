@@ -17,6 +17,7 @@
 #include <../oeip-ffmpeg/FLiveOutput.h>
 #include <../oeip-ffmpeg/FLiveInput.h>
 #include <../oeip-live/OeipLiveExport.h>
+#include <../oeip-ffmpeg/FMuxing.h>
 
 using namespace std;
 using namespace cv;
@@ -37,13 +38,14 @@ namespace OeipLiveOutput
 
 	bool bRecord = false;
 	VideoFormat videoFormat = {};
-	std::unique_ptr<FLiveOutput> liveOut = nullptr;
+	//std::unique_ptr<FLiveOutput> liveOut = nullptr;
+	std::unique_ptr<FMuxing> liveOut = nullptr;
 	std::unique_ptr<FLiveInput> liveIn = nullptr;
 	OeipAudioDesc cdesc = {};
 	int32_t sampleRate = 8000;
 	OeipYUVFMT fmt = OEIP_YUVFMT_YUV420P;
 	std::vector<uint8_t> frameData;
-	const char* rtmpUrl = "rtmp://192.168.0.140:8011/live/ivroom1_2_0";
+	const char* rtmpUrl = "rtmp://127.0.0.1:8011/live/ivroom1_2_0";
 	void dataRecive(uint8_t* data, int32_t width, int32_t height) {
 		//std::cout << width << height << std::endl;
 		vpipe->runVideoPipe(0, data);
@@ -59,9 +61,9 @@ namespace OeipLiveOutput
 			memcpy(show->ptr<char>(0), data, width * height * 4);
 		}
 		if (vpipe->getOutYuvId() == layerIndex) {
-			if (bPush && bRecord && liveOut) {		
-				OeipVideoFrame vf = {};	
-				getVideoFrame(data, width, height, fmt, vf);
+			if (bPush && bRecord && liveOut) {
+				OeipVideoFrame vf = {};
+				setVideoFrame(data, width, height, fmt, vf);
 				liveOut->pushVideo(vf);
 			}
 		}
@@ -132,10 +134,23 @@ namespace OeipLiveOutput
 					cdesc.channel = 1;
 					cdesc.sampleRate = sampleRate;
 					cdesc.bitSize = 16;
-					startAudioOutput(true, true, cdesc, onMixData);
+					setAudioOutputAction(onMixData, nullptr);
+					startAudioOutput(true, true, cdesc);
 					if (bPush) {
-						liveOut = std::make_unique< FLiveOutput>();
-						liveOut->open(rtmpUrl);
+						//liveOut = std::make_unique< FLiveOutput>();
+						liveOut = std::make_unique<FMuxing>();
+						OeipAudioEncoder audioEd = {};
+						audioEd.bitrate = 48000;
+						audioEd.channel = cdesc.channel;
+						audioEd.frequency = cdesc.sampleRate;
+						liveOut->setAudioEncoder(audioEd);
+						OeipVideoEncoder videoEd = {};
+						videoEd.width = videoFormat.width;
+						videoEd.height = videoFormat.height;
+						videoEd.fps = videoFormat.fps;
+						videoEd.yuvType = fmt;
+						liveOut->setVideoEncoder(videoEd);
+						liveOut->open(rtmpUrl, true, true);
 						lpipe->setVideoFormat(fmt, videoFormat.width, videoFormat.height);
 					}
 					if (bPull) {

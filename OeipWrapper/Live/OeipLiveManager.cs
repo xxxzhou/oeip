@@ -108,7 +108,7 @@ namespace OeipWrapper.Live
                 ref OeipVideoFrame videoFrame = ref mainVideoFrame;
                 if (index == 1)
                     videoFrame = ref auxVideoFrame;
-                OeipLiveHelper.getVideoFrame(data, width, height, fmt, ref videoFrame);
+                OeipHelper.setVideoFrame(data, width, height, fmt, ref videoFrame);
                 return OeipLiveHelper.pushVideoFrame(index, ref videoFrame);
             }
         }

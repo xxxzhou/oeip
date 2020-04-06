@@ -58,8 +58,8 @@ namespace OeipAudio
 					cdesc.channel = 1;
 					cdesc.sampleRate = 8000;
 					cdesc.bitSize = 16;
-					setAudioOutputHandle(audioRecord);
-					startAudioOutput(true, true, cdesc, onMixData);
+					setAudioOutputHandle(onMixData, audioRecord);
+					startAudioOutput(true, true, cdesc);
 					logMessage(OEIP_INFO, "record audio");
 				}
 				else {

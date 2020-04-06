@@ -69,6 +69,12 @@
     <ClInclude Include="FNetCommon.h">
       <Filter>live</Filter>
     </ClInclude>
+    <ClInclude Include="FMuxing.h">
+      <Filter>live</Filter>
+    </ClInclude>
+    <ClInclude Include="FAudioPlay.h">
+      <Filter>audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AudioMixer.cpp">
@@ -97,6 +103,12 @@
     </ClCompile>
     <ClCompile Include="FLiveInput.cpp">
       <Filter>live</Filter>
+    </ClCompile>
+    <ClCompile Include="FMuxing.cpp">
+      <Filter>live</Filter>
+    </ClCompile>
+    <ClCompile Include="FAudioPlay.cpp">
+      <Filter>audio</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

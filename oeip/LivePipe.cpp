@@ -4,7 +4,7 @@ LivePipe::LivePipe(OeipGpgpuType gpuType) {
 	pipeId = initPipe(gpuType);
 	inputIndex = addPiepLayer(pipeId, "input", OEIP_INPUT_LAYER);
 	yuv2rgba = addPiepLayer(pipeId, "yuv2rgba", OEIP_YUV2RGBA_LAYER);
-	resizeIndex = addPiepLayer(pipeId, "resize", OEIP_RESIZE_LAYER);
+	//resizeIndex = addPiepLayer(pipeId, "resize", OEIP_RESIZE_LAYER);
 	outMap = addPiepLayer(pipeId, "out map channel", OEIP_MAPCHANNEL_LAYER);
 	outIndex = addPiepLayer(pipeId, "output", OEIP_OUTPUT_LAYER);
 
@@ -12,6 +12,11 @@ LivePipe::LivePipe(OeipGpgpuType gpuType) {
 	mp.red = 2;
 	mp.blue = 0;
 	updatePipeParamet(pipeId, outMap, &mp);
+
+	//ResizeParamet rp = {};
+	//rp.width = 640;
+	//rp.height = 480;
+	//updatePipeParamet(pipeId, resizeIndex, &rp);
 }
 
 LivePipe::~LivePipe() {

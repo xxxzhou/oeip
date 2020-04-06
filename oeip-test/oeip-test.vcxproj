@@ -179,8 +179,10 @@
     <ClInclude Include="testcamer.h" />
     <ClInclude Include="testencoderaudio.h" />
     <ClInclude Include="testencodervideo.h" />
+    <ClInclude Include="testffmpeg.h" />
     <ClInclude Include="testliveoutput.h" />
     <ClInclude Include="testliveroom.h" />
+    <ClInclude Include="testoeipffmpeg.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

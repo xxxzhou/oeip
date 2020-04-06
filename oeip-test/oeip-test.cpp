@@ -10,6 +10,8 @@
 #include "testencoderaudio.h"
 #include "testliveoutput.h"
 #include "testliveroom.h"
+#include "testffmpeg.h"
+#include "testoeipffmpeg.h"
 
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
@@ -27,7 +29,10 @@ int main() {
 	//OeipEncoderVideo::test();
 	//OeipEncoderAudio::test();
 	//OeipLiveOutput::test();
-	OeipTestLiveRoom::test();
+	//OeipTestLiveRoom::test();
+	//FFmpeg::testDemux();
+	//FFmpeg::testMux();
+	OeipFFmpeg::test();
 
 	std::cout << "close!\n";
 	shutdownOeip();

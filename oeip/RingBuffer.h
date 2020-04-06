@@ -75,7 +75,7 @@ public:
 	int32_t push(uint8_t* pdata, int32_t len) {
 		std::unique_lock <std::mutex> lck(mtx);
 		if (bFull()) {
-			logMessage(OEIP_WARN, "push ring buffer is full.");
+			//logMessage(OEIP_WARN, "push ring buffer is full.");
 			return -1;
 		}
 		//应该从循环写区头重新开始写，暂时先这样

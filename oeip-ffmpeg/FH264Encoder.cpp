@@ -1,10 +1,15 @@
 #include "FH264Encoder.h"
 #include "config.h"
 
-FH264Encoder::FH264Encoder(const OeipVideoEncoder& encoderDesc) {
-	this->encoderDesc = encoderDesc;
+FH264Encoder::FH264Encoder(const OeipVideoEncoder& videoDesc) {
+	encoderDesc = videoDesc;
+	if (encoderDesc.fps == 0) {
+		encoderDesc.fps = 25;
+	}
+	if (encoderDesc.bitrate == 0) {
+		encoderDesc.bitrate = encoderDesc.width * encoderDesc.height * encoderDesc.fps;
+	}
 	openEncode();
-
 	if (!bInit)
 		return;
 	frame = getUniquePtr(av_frame_alloc());
@@ -77,7 +82,7 @@ int32_t FH264Encoder::openEncode(AVCodec* codec) {
 	cdeCtx->max_b_frames = 0;
 	cdeCtx->me_pre_cmp = 2;
 	AVDictionary* param = nullptr;
-	av_dict_set(&param, "tune", "zerolatency", 0);
+	//av_dict_set(&param, "tune", "zerolatency", 0);
 	if (encoderDesc.yuvType == OEIP_YUVFMT_YUV420P) {
 		temp->pix_fmt = AV_PIX_FMT_YUV420P;
 		av_dict_set(&param, "profile", "high", 0);
@@ -92,29 +97,24 @@ int32_t FH264Encoder::openEncode(AVCodec* codec) {
 	int ret = avcodec_open2(cdeCtx.get(), codec, &param);
 	if (ret < 0) {
 		cdeCtx.reset();
-		std::string message = "open codec faild :" + std::to_string(ret);
-		logMessage(OEIP_WARN, message.c_str());
+		std::string message = "open codec faild :";
+		checkRet(message, ret);
 	}
 	std::string message = "open codec " + std::string(codec->name);
 	logMessage(OEIP_INFO, message.c_str());
 	return ret;
 }
 
+AVCodecContext* FH264Encoder::getCodecCtx() {
+	if (!bInit)
+		return nullptr;
+	return cdeCtx.get();
+}
+
 int FH264Encoder::encoder(uint8_t** indata, int length, uint64_t timestamp) {
 	if (!bInit)
 		return -1;
 	int ret = 0;
-	//uint8_t* yuv_buf = const_cast<uint8_t*>(indata);
-	//if (encoderDesc.yuvType == OEIP_YUVFMT_YUV420P) {
-	//	frame->data[0] = yuv_buf;
-	//	frame->data[1] = yuv_buf + ysize;
-	//	frame->data[2] = yuv_buf + ysize * 5 / 4;
-	//}
-	//else if (encoderDesc.yuvType == OEIP_YUVFMT_YUY2P) {
-	//	frame->data[0] = yuv_buf;
-	//	frame->data[1] = yuv_buf + ysize;
-	//	frame->data[2] = yuv_buf + ysize * 3 / 2;
-	//}
 	frame->data[0] = indata[0];
 	frame->data[1] = indata[1];
 	frame->data[2] = indata[2];

@@ -6,14 +6,6 @@
 static const int avf_time_base = 1000000;
 static const AVRational avf_time_base_q = { 1, avf_time_base };
 
-void make_dsi(int frequencyInHz, int channelCount, uint8_t* dsi)
-{
-	int sampling_frequency_index = get_sr_index(frequencyInHz);
-	unsigned int object_type = 2; // AAC LC by default
-	dsi[0] = (object_type << 3) | (sampling_frequency_index >> 1);
-	dsi[1] = ((sampling_frequency_index & 1) << 7) | (channelCount << 3);
-}
-
 int32_t readAudioIO(void* obj, uint8_t* buf, int32_t size) {
 	FRtmpOutput* rtmp = (FRtmpOutput*)obj;
 	if (rtmp) {
@@ -181,7 +173,7 @@ int32_t FRtmpOutput::videoIO(uint8_t* buffer, int32_t bufsize) {
 	return 0;
 }
 
-int32_t FRtmpOutput::openURL(const char* url, bool bVideo, bool bAudio) {
+int32_t FRtmpOutput::open(const char* url, bool bVideo, bool bAudio) {
 	this->url = url;
 	this->bAudio = bAudio;
 	this->bVideo = bVideo;
@@ -201,7 +193,7 @@ void FRtmpOutput::close() {
 	bAACFirst = false;
 	audioPack.clear();
 	videoPack.clear();
-	onOperateAction(OEIP_LIVE_OPERATE_CLOSE, 0);
+	onOperateAction(OEIP_CODER_CLOSE, 0);
 }
 
 int32_t FRtmpOutput::pushVideo(uint8_t* data, int32_t size, uint64_t timestamp) {
@@ -221,7 +213,7 @@ int32_t FRtmpOutput::pushVideo(uint8_t* data, int32_t size, uint64_t timestamp) 
 	if (!bOpenPush && bKeyFrame) {
 		if ((bAudio && bAACFirst) || (!bAudio && bVideo)) {
 			ret = startPush();
-			onOperateAction(OEIP_LIVE_OPERATE_OPEN, ret);
+			onOperateAction(OEIP_CODER_OPEN, ret);
 			if (ret < 0)
 				return ret;			
 		}
@@ -292,7 +284,7 @@ int32_t FRtmpOutput::pushAudio(uint8_t* data, int32_t size, uint64_t timestamp) 
 		//如果需要推视频，保证已经有视频信息，则开始推流，否则等视频那边开始推
 		if ((bVideo && bIFrameFirst) || (!bVideo && bAudio)) {
 			ret = startPush();
-			onOperateAction(OEIP_LIVE_OPERATE_OPEN, ret);
+			onOperateAction(OEIP_CODER_OPEN, ret);
 			if (ret < 0)
 				return ret;			
 		}

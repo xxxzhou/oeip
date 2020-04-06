@@ -22,11 +22,12 @@ namespace OeipEncoderAudio
 {
 	using namespace std;
 	using namespace cv;
+
 	vector<uint8_t> micData;
 	vector<uint8_t> loopData;
 	vector<uint8_t> mixData;
 	OeipAudioDesc cdesc = {};
-	std::unique_ptr< FAACEncoder> encoder;
+	std::unique_ptr<FAACEncoder> encoder;
 	bool bRecord = false;
 
 	void onMixData(uint8_t* data, int32_t lenght) {
@@ -93,15 +94,15 @@ namespace OeipEncoderAudio
 				if (bRecord) {
 					cdesc.channel = 1;
 					cdesc.sampleRate = 8000;
-					cdesc.bitSize = 16;	
+					cdesc.bitSize = 16;
 
 					OeipAudioEncoder vencoder = {};
 					vencoder.channel = 1;
 					vencoder.frequency = 8000;
 					encoder = std::make_unique< FAACEncoder>(vencoder);
 
-					setAudioOutputHandle(audioRecord);
-					startAudioOutput(true, true, cdesc, onMixData);
+					setAudioOutputHandle(onMixData, audioRecord);
+					startAudioOutput(true, true, cdesc);
 
 					//vencoder.bitrate = 
 					logMessage(OEIP_INFO, "record audio");

@@ -17,7 +17,8 @@ namespace OeipLiveMedia
             try
             {
                 //TaskTest taskTest = new TaskTest();
-                //taskTest.Test();
+                //taskTest.Test7();
+                //Console.ReadLine();
                 LiveMedia mediaServer = new LiveMedia();
                 mediaServer.Run();
                 LogHelper.LogMessage("启动媒体服务器");

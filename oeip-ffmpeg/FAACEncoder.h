@@ -18,7 +18,7 @@ private:
 	OSwrContext swrCtx = nullptr;
 	//限定音频数据输入格式
 	AVSampleFormat inSampleFormat = AV_SAMPLE_FMT_S16;
-	//限定AAC输出数据格式
+	//指定AAC输出数据格式
 	AVSampleFormat outSampleFormat = AV_SAMPLE_FMT_FLTP;
 	uint8_t* samples = nullptr;
 	std::vector<uint8_t> pcmBuffer;
@@ -26,6 +26,7 @@ private:
 private:
 	int32_t openEncode();
 public:
+	virtual AVCodecContext* getCodecCtx() override;
 	// 通过 FEncoder 继承
 	virtual int encoder(uint8_t** indata, int length, uint64_t timestamp) override;
 	virtual int readPacket(uint8_t* outData, int& outLength, uint64_t& timestamp) override;

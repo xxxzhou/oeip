@@ -87,7 +87,7 @@ namespace OeipWrapper.FixPipe
                 VideoFormat.videoType = OeipVideoType.OEIP_VIDEO_RGBA32;
                 ResetPipe();
             }
-            OeipLiveHelper.getVideoFrameData(yuvData, ref videoFrame);
+            OeipHelper.getVideoFrameData(yuvData, ref videoFrame);
             Pipe.UpdateInput(InputIndex, yuvData);
             Pipe.RunPipe();
         }

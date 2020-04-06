@@ -31,6 +31,8 @@ bool InputLayerCuda::onInitBuffer() {
 		device.Release();
 		ctx.Release();
 		createDevice11(&device, &ctx);
+		//cudaD3D11GetDirect3DDevice(&device);
+		//device->GetImmediateContext(&ctx);
 	}
 	for (int32_t i = 0; i < inCount; i++) {
 		if (layerParamet.bCpu) {

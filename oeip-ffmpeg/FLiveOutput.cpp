@@ -16,7 +16,7 @@ int32_t FLiveOutput::open(const char* url) {
 	int32_t ret = 0;
 	if (bOpen)
 		return 1;
-	ret = output->openURL(url, bVideo, bAudio);
+	ret = output->open(url, bVideo, bAudio);
 	if (ret == 0)
 		bOpen = true;
 	liveUrl = url;
@@ -40,7 +40,7 @@ int32_t FLiveOutput::pushVideo(const OeipVideoFrame& videoFrame) {
 	if (videoEncoder && (videoFrame.width != videoWidth || videoFrame.height != videoHeight)) {
 		//重新开始推流
 		output->close();
-		output->openURL(liveUrl.c_str(), bVideo, bAudio);
+		output->open(liveUrl.c_str(), bVideo, bAudio);
 		logMessage(OEIP_INFO, "video resolution changes, reinitialize push flow");
 	}
 	if (!videoEncoder) {
@@ -70,7 +70,7 @@ int32_t FLiveOutput::pushVideo(const OeipVideoFrame& videoFrame) {
 		ret = output->pushVideo(videoBuffer.data(), outLen, timestmap);
 		if (ret < 0) {
 			output->close();
-			output->openURL(liveUrl.c_str(), bVideo, bAudio);
+			output->open(liveUrl.c_str(), bVideo, bAudio);
 		}
 	}
 	return 0;
@@ -103,7 +103,7 @@ int32_t FLiveOutput::pushAudio(const OeipAudioFrame& audioFrame) {
 		ret = output->pushAudio(audioBuffer.data(), outLen, timestmap);
 		if (ret < 0) {
 			output->close();
-			output->openURL(liveUrl.c_str(), bVideo, bAudio);
+			output->open(liveUrl.c_str(), bVideo, bAudio);
 		}
 	}
 	return 0;

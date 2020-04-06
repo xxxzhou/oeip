@@ -16,7 +16,8 @@ namespace OeipWrapperTest
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new LiveForm());
+            Application.Run(new IndexForm());
+            //Application.Run(new MainForm());
         }
     }
 }

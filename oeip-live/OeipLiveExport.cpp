@@ -83,39 +83,3 @@ bool logoutRoom() {
 	return liveRoom->logoutRoom();
 }
 
-void getVideoFrame(uint8_t* data, int32_t width, int32_t height, OeipYUVFMT fmt, OeipVideoFrame& videoFrame) {
-	int32_t iheight = height;
-	if (fmt == OEIP_YUVFMT_YUY2P) {
-		iheight = height / 2;
-		videoFrame.data[0] = data;
-		videoFrame.data[1] = data + width * iheight;
-		videoFrame.data[2] = data + width * iheight * 3 / 2;
-	}
-	else if (fmt == OEIP_YUVFMT_YUV420P) {
-		iheight = height * 2 / 3;
-		videoFrame.data[0] = data;
-		videoFrame.data[1] = data + width * iheight;
-		videoFrame.data[2] = data + width * iheight * 5 / 4;
-	}
-	videoFrame.dataSize = width * height;
-	videoFrame.fmt = fmt;
-	videoFrame.width = width;
-	videoFrame.height = iheight;
-	videoFrame.timestamp = (uint32_t)getNowTimestamp();
-}
-
-void getVideoFrameData(uint8_t* data, const OeipVideoFrame& videoFrame) {
-	int32_t width = videoFrame.width;
-	int32_t height = videoFrame.height;
-	if (videoFrame.fmt == OEIP_YUVFMT_YUY2P) {
-		memcpy(data, videoFrame.data[0], width * height);
-		memcpy(data + width * height, videoFrame.data[1], width * height / 2);
-		memcpy(data + width * height * 3 / 2, videoFrame.data[2], width * height / 2);
-	}
-	else if (videoFrame.fmt == OEIP_YUVFMT_YUV420P) {
-		memcpy(data, videoFrame.data[0], width * height);
-		memcpy(data + width * height, videoFrame.data[1], width * height / 4);
-		memcpy(data + width * height * 5 / 4, videoFrame.data[2], width * height / 4);
-	}
-}
-

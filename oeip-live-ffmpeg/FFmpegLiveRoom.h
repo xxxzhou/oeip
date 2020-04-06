@@ -6,6 +6,7 @@
 #include "../oeip-ffmpeg/FLiveInput.h"
 #include "../oeip-ffmpeg/FLiveOutput.h"
 #include "../oeip-ffmpeg/FAudioOutput.h"
+#include "../oeip-ffmpeg/FMuxing.h"
 #include <memory>
 #include <vector>
 
@@ -28,13 +29,19 @@ private:
 	//engine这个对象现在实际是C#/COM传递过来的托管对象
 	IOeipLiveClient* engine = nullptr;
 	OeipLiveBackCom* liveCom = nullptr;
-	std::vector<std::unique_ptr<FLiveOutput>> liveOuts;
+	//推流对象
+	//std::vector<std::unique_ptr<FLiveOutput>> liveOuts;
+	std::vector<std::unique_ptr<FMuxing>> liveOuts;
+	//拉流对象
 	std::vector<LiveInput> liveIns;
 	std::string mediaServer;
 	bool bShutDown = false;
 	bool bLogin = false;
-	//std::unique_ptr<FAudioOutput> audioOutput = nullptr;
-	//OeipAudioDesc audioDesc = {};
+	bool bSystemMic = true;
+	bool bSystemLoopback = false;
+
+	std::unique_ptr<FAudioOutput> audioOutput = nullptr;
+	OeipAudioDesc audioDesc = {};
 private:
 	void onServerBack(std::string server, int32_t port, int32_t userId);
 	void onOperateAction(bool bPush, int32_t index, int32_t operate, int32_t code);

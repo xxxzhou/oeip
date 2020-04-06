@@ -26,6 +26,3 @@ private:
 };
 
 OEIP_DEFINE_PLUGIN_CLASS(AudioOutput, FAudioOutput)
-
-extern "C" __declspec(dllexport) bool bCanLoad();
-extern "C" __declspec(dllexport) void registerFactory();

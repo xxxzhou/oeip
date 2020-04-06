@@ -18,12 +18,12 @@ namespace OeipWrapper.FixPipe
         public int MapChannel { get; private set; }
         public int OutMap { get; private set; }
         public int OutIndex { get; private set; }
-        public int OutYuvIndex { get; private set; }
-        public int ResizeIndex { get; private set; }
-        public int DarknetIndex { get; private set; }
-        public int GrabcutIndex { get; private set; }
-        public int MattingOutIndex { get; private set; }
-        public int GuiderFilterIndex { get; private set; }
+        public int OutYuvIndex { get; private set; } = -1;
+        public int ResizeIndex { get; private set; } = -1;
+        public int DarknetIndex { get; private set; } = -1;
+        public int GrabcutIndex { get; private set; } = -1;
+        public int MattingOutIndex { get; private set; } = -1;
+        public int GuiderFilterIndex { get; private set; } = -1;
         public int OutGpuIndex
         {
             get
@@ -60,7 +60,12 @@ namespace OeipWrapper.FixPipe
             //mapChannel与yuv2rgba同级
             pipe.ConnectLayer(MapChannel, InputIndex);
             //经过大小变化
-            ResizeIndex = pipe.AddLayer("resize", OeipLayerType.OEIP_RESIZE_LAYER);
+            //ResizeIndex = pipe.AddLayer("resize", OeipLayerType.OEIP_RESIZE_LAYER);           
+            //ResizeParamet rp = new ResizeParamet();
+            //rp.width = 1920;
+            //rp.height = 1080;
+            //pipe.UpdateParamet(ResizeIndex, rp);
+
             //如果显示格式要求BRG
             OutMap = pipe.AddLayer("out map channel", OeipLayerType.OEIP_MAPCHANNEL_LAYER);
             //输出层
@@ -74,11 +79,16 @@ namespace OeipWrapper.FixPipe
             yuvParamet.yuvType = YUVFMT;
             Pipe.UpdateParamet(Rgba2Yuv, yuvParamet);
             //输出第二个流,YUV流,用于推送数据
-            pipe.ConnectLayer(Rgba2Yuv, ResizeIndex);
+            pipe.ConnectLayer(Rgba2Yuv, OutMap);
             OutYuvIndex = pipe.AddLayer("out put yuv", OeipLayerType.OEIP_OUTPUT_LAYER);
             outputParamet.bGpu = 0;
             outputParamet.bCpu = 1;
             Pipe.UpdateParamet(OutYuvIndex, outputParamet);
+
+            InputParamet input = new InputParamet();
+            input.bCpu = 1;
+            input.bGpu = 0;
+            Pipe.UpdateParamet(InputIndex, input);
             if (pipe.GpgpuType == OeipGpgpuType.OEIP_DX11)
             {
                 int yuv2rgba2 = pipe.AddLayer("yuv2rgba 2", OeipLayerType.OEIP_YUV2RGBA_LAYER);
@@ -95,7 +105,7 @@ namespace OeipWrapper.FixPipe
             {
                 //神经网络层
                 DarknetIndex = pipe.AddLayer("darknet", OeipLayerType.OEIP_DARKNET_LAYER);
-                pipe.ConnectLayer(DarknetIndex, ResizeIndex);
+                pipe.ConnectLayer(DarknetIndex, OutMap);
                 darknetParamet.bLoad = 1;
                 darknetParamet.confile = "../../ThirdParty/yolov3-tiny-test.cfg";
                 darknetParamet.weightfile = "../../ThirdParty/yolov3-tiny_745000.weights";
@@ -152,7 +162,7 @@ namespace OeipWrapper.FixPipe
             int inputHeight = height;
             Pipe.SetEnableLayer(Yuv2Rgba, true);
             Pipe.SetEnableLayer(MapChannel, false);
-            Pipe.SetEnableLayer(ResizeIndex, false);
+            //Pipe.SetEnableLayer(ResizeIndex, false);
             OeipDataType dataType = OeipDataType.OEIP_CU8C1;
             if (yuvType == OeipYUVFMT.OEIP_YUVFMT_OTHER)
             {

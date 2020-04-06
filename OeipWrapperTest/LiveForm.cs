@@ -1,14 +1,8 @@
 using OeipCommon;
+using OeipControl;
 using OeipWrapper;
 using OeipWrapper.Live;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace OeipWrapperTest
@@ -75,7 +69,7 @@ namespace OeipWrapperTest
             {
                 this.label1.Text = $"level:{oeipLogLevel} message:{message}";
             };
-            this.BeginInvoke(action);
+            this.TryBeginInvoke(action);
             LogHelper.LogMessage(message, oeipLogLevel);
         }
 
@@ -84,6 +78,11 @@ namespace OeipWrapperTest
             OeipPushSetting pushSetting = new OeipPushSetting();
             pushSetting.bVideo = 1;
             pushSetting.bAudio = 0;
+            pushSetting.videoEncoder.bitrate = 4000000;
+            pushSetting.videoEncoder.fps = cameraControl1.Format.fps;
+            pushSetting.videoEncoder.width = cameraControl1.Format.width;
+            pushSetting.videoEncoder.height = cameraControl1.Format.height;
+            pushSetting.videoEncoder.yuvType = cameraControl1.VideoPipe.YUVFMT;
             bPush = OeipLiveManager.Instance.PushStream(0, ref pushSetting);
         }
 
@@ -96,8 +95,7 @@ namespace OeipWrapperTest
         private void LiveForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             cameraControl1.Close();
-            OeipLiveManager.Instance.Close();
-            OeipManager.Instance.Close();
+            OeipLiveManager.Instance.LogoutRoom();
         }
 
         private void button2_Click(object sender, EventArgs e)

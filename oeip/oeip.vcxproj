@@ -138,6 +138,8 @@ COPY "$(SolutionDir)$(ProjectName)\OeipExport.h" "$(SolutionDir)install\include\
     <ClInclude Include="BaseLayer.h" />
     <ClInclude Include="ImageProcess.h" />
     <ClInclude Include="LivePipe.h" />
+    <ClInclude Include="MediaOutput.h" />
+    <ClInclude Include="MediaPlay.h" />
     <ClInclude Include="Oeip.h" />
     <ClInclude Include="OeipCommon.h" />
     <ClInclude Include="OeipDefine.h" />

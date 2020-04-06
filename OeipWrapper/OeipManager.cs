@@ -39,7 +39,7 @@ namespace OeipWrapper
 
             LiveCtx.liveMode = OeipLiveMode.OIEP_FFMPEG;
             LiveCtx.bLoopback = 0;
-            LiveCtx.liveServer = "http://129.211.40.225:6110";//"http://129.211.40.225:6110" "http://127.0.0.1:6110"
+            LiveCtx.liveServer = "http://127.0.0.1:6110";//"http://129.211.40.225:6110" "http://127.0.0.1:6110"
         }
 
         public bool IsCudaLoad
@@ -108,6 +108,26 @@ namespace OeipWrapper
             pipe.SetPipeId(pipeId);
             //OeipPipes.Add(pipe);
             return pipe;
+        }
+
+        public OeipMediaPlay GetMediaPlay()
+        {
+            int mediaId = OeipHelper.initReadMedia();
+            if (mediaId < 0)
+                return null;
+            OeipMediaPlay mediaPlay = new OeipMediaPlay();
+            mediaPlay.SetMediaId(mediaId);
+            return mediaPlay;
+        }
+
+        public OeipMediaOutput GetMediaOutput()
+        {
+            int mediaId = OeipHelper.initWriteMedia();
+            if (mediaId < 0)
+                return null;
+            OeipMediaOutput mediaPlay = new OeipMediaOutput();
+            mediaPlay.SetMediaId(mediaId);
+            return mediaPlay;
         }
 
         private void OnLogHandle(int level, string message)

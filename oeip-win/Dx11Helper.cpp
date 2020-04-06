@@ -11,7 +11,7 @@ bool createDevice11(ID3D11Device** deviceDx11, ID3D11DeviceContext** ctxDx11) {
 	uCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 	D3D_FEATURE_LEVEL flOut;
-	static const D3D_FEATURE_LEVEL flvl[] = { D3D_FEATURE_LEVEL_11_0 };//, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 
+	static const D3D_FEATURE_LEVEL flvl[] = { D3D_FEATURE_LEVEL_11_0 ,D3D_FEATURE_LEVEL_10_1 };//, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 
 
 	bool bHaveCompute = false;
 	hr = D3D11CreateDevice(nullptr,                        // Use default graphics card

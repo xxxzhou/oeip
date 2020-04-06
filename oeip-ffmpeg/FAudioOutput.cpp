@@ -1,6 +1,15 @@
 #include "FAudioOutput.h"
 #include <OeipExport.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <SDL.h>
+#include <SDL_audio.h>
+#ifdef __cplusplus
+}
+#endif
+
 using namespace std::placeholders;
 
 FAudioOutput::FAudioOutput() {
@@ -82,11 +91,3 @@ void FAudioOutput::onMixData(uint8_t* data, int32_t lenght) {
 	}
 }
 
-bool bCanLoad() {
-	auto version = avformat_version();
-	return version > 0;
-}
-
-void registerFactory() {
-	registerFactory(new FAudioOutputFactory(), 0, "ffmpeg output");
-}

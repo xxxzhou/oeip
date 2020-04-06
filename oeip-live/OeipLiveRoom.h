@@ -16,6 +16,9 @@ protected:
 	OeipLiveContext liveCtx = {};
 	bool bInit = false;
 	OeipLiveStatus liveStatus = OEIP_LIVE_UNINIT;
+
+	OeipPushSetting mainPushSetting = {};
+	OeipPushSetting auxPushSetting = {};
 protected:
 	//初始化对应数据
 	virtual bool initRoom() = 0;

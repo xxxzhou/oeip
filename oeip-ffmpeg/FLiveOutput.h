@@ -42,7 +42,9 @@ public:
 	void setAudioBitrate(int32_t bitrate);
 
 	void setFps(int32_t fps);
+	//是否推送视频数据
 	void enableVideo(bool bVideo);
+	//是否推送音频数据
 	void enableAudio(bool bAudio);
 
 	void setOperateEvent(onOperateHandle onHandle);

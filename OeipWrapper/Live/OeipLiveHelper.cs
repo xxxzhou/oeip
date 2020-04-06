@@ -37,44 +37,6 @@ namespace OeipWrapper.Live
         public string liveServer;
     }
 
-    public struct OeipVideoEncoder
-    {
-        public int width;//1920
-        public int height;//1080
-        public int fps;//30
-        public int bitrate;//4000000
-        public OeipYUVFMT yuvType;//OEIP_YUVFMT_YUY2P
-    };
-
-    public struct OeipAudioEncoder
-    {
-        public int frequency;//8000
-        public int channel;//1
-        public int bitrate;//48000        
-    };
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct OeipVideoFrame
-    {
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-        public IntPtr[] data;
-        public uint dataSize;
-        public ulong timestamp;
-        public uint width;
-        public uint height;
-        public OeipYUVFMT fmt;//OEIP_YUVFMT_YUY2P
-    };
-
-    public struct OeipAudioFrame
-    {
-        public IntPtr data;
-        public uint dataSize;
-        public ulong timestamp;
-        public uint sampleRate;// = 8000;
-        public uint channels;// = 1;
-        public uint bitDepth;// = 16;
-    };
-
     public struct OeipPushSetting
     {
         public int bAudio;//true   
@@ -204,23 +166,5 @@ namespace OeipWrapper.Live
         /// <returns></returns>
         [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool logoutRoom();
-        /// <summary>
-        /// 根据data,width,height,fmt组合一个OeipVideoFrame
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="fmt"></param>
-        /// <param name="videoFrame"></param>
-        [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
-        public static extern void getVideoFrame(IntPtr data, int width, int height, OeipYUVFMT fmt, ref OeipVideoFrame videoFrame);
-        /// <summary>
-        /// 复制OeipVideoFrame里数据到IntPtr
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="videoFrame"></param>
-        [DllImport(OeipLiveDll, CallingConvention = PInvokeHelper.funcall)]
-        public static extern void getVideoFrameData(IntPtr data, ref OeipVideoFrame videoFrame);
-
     }
 }

@@ -53,7 +53,8 @@ namespace OeipEncoderVideo
 				yuvdata[1] = data + ysize;
 				yuvdata[2] = data + ysize * 3 / 2;
 			}
-			int ret = encoder->encoder(&yuvdata[0], width * height, timestamp);
+			int ret = encoder->
+				encoder(&yuvdata[0], width * height, timestamp);
 			if (ret != 0) {
 				return;
 			}

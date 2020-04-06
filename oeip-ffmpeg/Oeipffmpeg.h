@@ -14,8 +14,8 @@ extern "C" {
 }
 #endif
 
-#include "../oeip/OeipCommon.h"
-#include "../oeip-live/OeipLive.h"
+#include <OeipCommon.h>
+//#include "../oeip-live/OeipLive.h"
 #include <string>
 #include <memory>
 
@@ -25,13 +25,14 @@ extern "C" {
 #define OEIPFMDLL_EXPORT __declspec(dllimport)
 #endif
 
-
 enum OeipFAVFormat : int32_t
 {
 	OEIP_AVFORMAT_OTHER,
 	OEIP_AVFORMAT_RTMP,
 	OEIP_AVFORMAT_HTTP,
 	OEIP_AVFORMAT_RTSP,
+	OEIP_AVFORMAT_MP4,
+	OEIP_AVFORMAT_FLV,
 };
 
 class StreamFrame
@@ -65,13 +66,20 @@ inline OeipFAVFormat getAvformat(std::string uri) {
 	else if (uri.find("rtsp://") == 0) {
 		format = OEIP_AVFORMAT_RTSP;
 	}
+	else if (uri.find(".mp4") != std::string::npos) {
+		format = OEIP_AVFORMAT_MP4;
+	}
+	else {
+		format = OEIP_AVFORMAT_FLV;
+	}
 	return format;
 }
 
 inline std::string getAvformatName(OeipFAVFormat format) {
 	std::string name = "";
 	switch (format) {
-	case OEIP_AVFORMAT_OTHER:
+	case OEIP_AVFORMAT_FLV:
+		name = "flv";
 		break;
 	case OEIP_AVFORMAT_RTMP:
 		name = "flv";
@@ -82,10 +90,17 @@ inline std::string getAvformatName(OeipFAVFormat format) {
 	case OEIP_AVFORMAT_RTSP:
 		name = "rtsp";
 		break;
+	case OEIP_AVFORMAT_MP4:
+		name = "mp4";
+		break;
 	default:
 		break;
 	}
 	return name;
+}
+
+inline bool isfile(OeipFAVFormat format) {
+	return format == OEIP_AVFORMAT_MP4 || format == OEIP_AVFORMAT_FLV;
 }
 
 inline void checkRet(std::string meg, int32_t ret) {
@@ -94,8 +109,7 @@ inline void checkRet(std::string meg, int32_t ret) {
 	logMessage(OEIP_ERROR, message.c_str());
 }
 
-inline int get_sr_index(unsigned int sampling_frequency)
-{
+inline int get_sr_index(unsigned int sampling_frequency) {
 	switch (sampling_frequency) {
 	case 96000: return 0;
 	case 88200: return 1;
@@ -115,8 +129,83 @@ inline int get_sr_index(unsigned int sampling_frequency)
 	return 0;
 }
 
-typedef std::function<void(int32_t operate, int32_t code)> onOperateHandle;
-typedef std::function<void(OeipVideoFrame)> onVideoDataHandle;
+inline int get_format_from_sample_fmt(const char** fmt, enum AVSampleFormat sample_fmt) {
+	int i;
+	struct sample_fmt_entry {
+		enum AVSampleFormat sample_fmt; const char* fmt_be, * fmt_le;
+	} sample_fmt_entries[] = {
+		{ AV_SAMPLE_FMT_U8,  "u8",    "u8"    },
+		{ AV_SAMPLE_FMT_S16, "s16be", "s16le" },
+		{ AV_SAMPLE_FMT_S32, "s32be", "s32le" },
+		{ AV_SAMPLE_FMT_FLT, "f32be", "f32le" },
+		{ AV_SAMPLE_FMT_DBL, "f64be", "f64le" },
+	};
+	*fmt = NULL;
+
+	for (i = 0; i < FF_ARRAY_ELEMS(sample_fmt_entries); i++) {
+		struct sample_fmt_entry* entry = &sample_fmt_entries[i];
+		if (sample_fmt == entry->sample_fmt) {
+			*fmt = AV_NE(entry->fmt_be, entry->fmt_le);
+			return 0;
+		}
+	}
+
+	fprintf(stderr,
+		"Sample format %s not supported as output format\n",
+		av_get_sample_fmt_name(sample_fmt));
+	return AVERROR(EINVAL);
+}
+
+inline bool check_sample_fmt(AVCodec* codec, enum AVSampleFormat sample_fmt) {
+	const enum AVSampleFormat* p = codec->sample_fmts;
+	int i = 0;
+	while (p[i] != AV_SAMPLE_FMT_NONE) {
+		if (p[i] == sample_fmt) {
+			return true;
+		}
+		i++;
+	}
+	return false;
+}
+
+inline void buildAdts(int size, uint8_t* buffer, int samplerate, int channels) {
+	char* padts = (char*)buffer;
+	int profile = 2;                                            //AAC LC
+	int freqIdx = get_sr_index(samplerate);                     //44.1KHz
+	int chanCfg = channels;            //MPEG-4 Audio Channel Configuration. 1 Channel front-center
+	padts[0] = (char)0xFF;      // 11111111     = syncword
+	padts[1] = (char)0xF1;      // 1111 1 00 1  = syncword MPEG-2 Layer CRC
+	padts[2] = (char)(((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
+	padts[6] = (char)0xFC;
+	padts[3] = (char)(((chanCfg & 3) << 6) + ((7 + size) >> 11));
+	padts[4] = (char)(((7 + size) & 0x7FF) >> 3);
+	padts[5] = (char)((((7 + size) & 7) << 5) + 0x1F);
+}
+
+//av_image_copy_to_buffer frame->data 	av_image_fill_arrays data->frame					
+inline bool fillFFmpegFrame(uint8_t* data, const OeipVideoFrame& videoFrame) {
+	if (videoFrame.fmt != OEIP_YUVFMT_YUY2P && videoFrame.fmt != OEIP_YUVFMT_YUV420P)
+		return false;
+	AVPixelFormat pformat = AV_PIX_FMT_YUV420P;
+	int32_t dataSize = videoFrame.width * videoFrame.height * 3 / 2;
+	if (videoFrame.fmt == OEIP_YUVFMT_YUY2P) {
+		pformat = AV_PIX_FMT_YUV422P;
+		dataSize = videoFrame.width * videoFrame.height * 2;
+	}
+	int ret = av_image_copy_to_buffer(data, dataSize, videoFrame.data, videoFrame.linesize,
+		pformat, videoFrame.width, videoFrame.height, 1);
+	return ret >= 0;
+}
+
+inline void make_dsi(int frequencyInHz, int channelCount, uint8_t* dsi) {
+	int sampling_frequency_index = get_sr_index(frequencyInHz);
+	unsigned int object_type = 2; // AAC LC by default
+	dsi[0] = (object_type << 3) | (sampling_frequency_index >> 1);
+	dsi[1] = ((sampling_frequency_index & 1) << 7) | (channelCount << 3);
+}
+
+
+
 //inline int enumVideoCodec() {
 //	AVCodec* codec = NULL;
 //	int ret = -1;	

@@ -41,5 +41,11 @@
     <ClInclude Include="testliveroom.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="testffmpeg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testoeipffmpeg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

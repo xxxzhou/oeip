@@ -89,18 +89,18 @@ void AOeipCameraActor::onReviceHandle(uint8 * data, int width, int height) {
 
 void AOeipCameraActor::onPipeDataHandle(int32_t layerIndex, uint8_t * data, int32_t width, int32_t height, int32_t outputIndex) {
 	if (layerIndex == videoPipe->getDarknetId()) {
-		//AsyncTask(ENamedThreads::GameThread, [=]()
-		//{
-		//	FString personMsg = "Person:" + FString::FromInt(width) + " ";
-		//	personBoxs.SetNum(width);
-		//	if (width > 0) {
-		//		memcpy(personBoxs.GetData(), data, sizeof(PersonBox)*width);
-		//		for (auto& person : personBoxs) {
-		//			personMsg += FString::SanitizeFloat(person.prob, 2) + " ";
-		//		}
-		//	}
-		//	OnPeronChange.Broadcast(personMsg);
-		//});
+		AsyncTask(ENamedThreads::GameThread, [=]()
+		{
+			FString personMsg = "Person:" + FString::FromInt(width) + " ";
+			personBoxs.SetNum(width);
+			if (width > 0) {
+				memcpy(personBoxs.GetData(), data, sizeof(PersonBox)*width);
+				for (auto& person : personBoxs) {
+					personMsg += FString::SanitizeFloat(person.prob, 2) + " ";
+				}
+			}
+			OnPeronChange.Broadcast(personMsg);
+		});
 	}
 }
 
@@ -110,11 +110,11 @@ void AOeipCameraActor::BeginPlay() {
 	oeipCamera = new OeipCamera();
 	//这个绑定会自动没有?
 	//cameraReviceHandle = oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
-	cameraReviceHandle = oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
+	oeipCamera->OnDeviceDataEvent.AddUObject(this, &AOeipCameraActor::onReviceHandle);
 	//设备处理类
 	gpuPipe = OeipManager::Get().CreatePipe(OeipGpgpuType::OEIP_CUDA);
 	videoPipe = new VideoPipe(gpuPipe);
-	pipeDataHandle = gpuPipe->OnOeipDataEvent.AddUObject(this, &AOeipCameraActor::onPipeDataHandle);
+	gpuPipe->OnOeipDataEvent.AddUObject(this, &AOeipCameraActor::onPipeDataHandle);
 	OeipManager::Get().OnLogEvent.AddUObject(this, &AOeipCameraActor::onLogMessage);
 	Super::BeginPlay();
 }
@@ -122,10 +122,10 @@ void AOeipCameraActor::BeginPlay() {
 void AOeipCameraActor::EndPlay(const EEndPlayReason::Type EndPlayReason) {
 	Super::EndPlay(EndPlayReason);
 	OeipManager::Get().OnLogEvent.RemoveAll(this);
-	if (gpuPipe)
-		gpuPipe->OnOeipDataEvent.Remove(pipeDataHandle);
-	if (oeipCamera)
-		oeipCamera->OnDeviceDataEvent.Remove(cameraReviceHandle);
+	if (gpuPipe && gpuPipe->OnOeipDataEvent.IsBoundToObject(this))
+		gpuPipe->OnOeipDataEvent.RemoveAll(this);
+	if (oeipCamera && oeipCamera->OnDeviceDataEvent.IsBoundToObject(this))
+		oeipCamera->OnDeviceDataEvent.RemoveAll(this);
 	safeDelete(videoPipe);
 	safeDelete(oeipCamera);
 }

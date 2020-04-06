@@ -69,7 +69,15 @@ namespace OeipControl
                         }
                         this.label3.Text = $"人数:{width} {msg}";
                     };
-                    this.BeginInvoke(action);
+                    this.TryBeginInvoke(action);
+                }
+                else
+                {
+                    Action action = () =>
+                    {
+                        this.label3.Text = $"无人";
+                    };
+                    this.TryBeginInvoke(action);
                 }
             }
         }

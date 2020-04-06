@@ -4,6 +4,8 @@
 #include "VideoDevice.h"
 #include "ImageProcess.h"
 #include "AudioOutput.h"
+#include "MediaOutput.h"
+#include "MediaPlay.h"
 #include <memory>
 #include <mutex>
 
@@ -21,6 +23,8 @@ private:
 	static OeipManager* instance;
 	std::vector<VideoDevice*> videoList;
 	std::vector<ImageProcess*> imagePipeList;
+	std::vector<MediaPlay*> mediaPlayList;
+	std::vector<MediaOutput*> mediaOutputList;
 	AudioOutput* audioOutput = nullptr;
 	std::mutex mtx;
 private:
@@ -49,7 +53,26 @@ public:
 	};
 	AudioOutput* getAudioOutput() {
 		return audioOutput;
-	}
+	};
+	int32_t initReadMedia();
+
+	int32_t initWriteMedia();
+
+	MediaPlay* getMediaPlay(const int32_t index) {
+		if (index < 0 || index >= mediaPlayList.size()) {
+			logMessage(OEIP_ERROR, "getMediaPlay incorrect index");
+			return nullptr;
+		}
+		return mediaPlayList[index];
+	};
+
+	MediaOutput* getMediaOutput(const int32_t index) {
+		if (index < 0 || index >= mediaOutputList.size()) {
+			logMessage(OEIP_ERROR, "getMediaOutput incorrect index");
+			return nullptr;
+		}
+		return mediaOutputList[index];
+	};
 };
 
 template<typename T>

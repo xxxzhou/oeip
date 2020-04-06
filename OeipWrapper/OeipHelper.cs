@@ -91,6 +91,18 @@ namespace OeipWrapper
         OEIP_Audio_WavHeader,
     }
 
+    public enum OeipFFmpegMode
+    {
+        OEIP_CODER = 300,
+        OEIP_CODER_OPEN = OEIP_CODER + 1,
+        OEIP_CODER_READ = OEIP_CODER + 2,
+        OEIP_CODER_CLOSE = OEIP_CODER + 3,
+        OEIP_DECODER = 500,
+        OEIP_DECODER_OPEN = OEIP_DECODER + 1,
+        OEIP_DECODER_READ = OEIP_DECODER + 2,
+        OEIP_DECODER_CLOSE = OEIP_DECODER + 3,
+    }
+
     public struct OeipRect
     {
         public float centerX;
@@ -210,6 +222,46 @@ namespace OeipWrapper
         }
     };
 
+    public struct OeipVideoEncoder
+    {
+        public int width;//1920
+        public int height;//1080
+        public int fps;//30
+        public OeipYUVFMT yuvType;//OEIP_YUVFMT_YUY2P
+        public int bitrate;//4000000        
+    };
+
+    public struct OeipAudioEncoder
+    {
+        public int frequency;//8000
+        public int channel;//1
+        public int bitrate;//48000        
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct OeipVideoFrame
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public IntPtr[] data;
+        public int dataSize;
+        public long timestamp;
+        public int width;
+        public int height;
+        public OeipYUVFMT fmt;//OEIP_YUVFMT_YUY2P
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
+        public int[] linesize;
+    };
+
+    public struct OeipAudioFrame
+    {
+        public IntPtr data;
+        public int dataSize;
+        public long timestamp;
+        public int sampleRate;// = 8000;
+        public int channels;// = 1;
+        public int bitDepth;// = 16;
+    };
+
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct Parametr
@@ -324,6 +376,18 @@ namespace OeipWrapper
     /// <param name="outputIndex"></param>
     [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
     public delegate void OnProcessDelegate(int layerIndex, IntPtr data, int width, int height, int outputIndex);
+
+    [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
+    public delegate void OnAudioOutputDelegate(bool bMic, IntPtr data, int size, OeipAudioDataType type);
+    [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
+    public delegate void OnAudioDataDelegate(IntPtr data, int size);
+
+    [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
+    public delegate void OnOperateDelegate(int type, int code);
+    [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
+    public delegate void OnVideoFrameDelegate(OeipVideoFrame videoFrame);
+    [UnmanagedFunctionPointer(PInvokeHelper.funcall)]
+    public delegate void OnAudioFrameDelegate(OeipAudioFrame videoFrame);
     #endregion
 
     public static class OeipHelper
@@ -355,6 +419,13 @@ namespace OeipWrapper
         /// </summary>
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern OeipYUVFMT getVideoYUV(OeipVideoType videoType);
+        /// <summary>
+        /// 根据YUV类型返回对应视频类型
+        /// </summary>
+        /// <param name="videoType"></param>
+        /// <returns></returns>
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern OeipVideoType getVideoType(OeipYUVFMT videoType);
 
         /// <summary>
         /// 相应颜色参数一般用uint来表示，用来给用户根据各个通道分量生成uint颜色，通道分量范围0.f-1.f
@@ -364,6 +435,36 @@ namespace OeipWrapper
 
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern bool bCuda();
+
+        /// <summary>
+        /// 根据data,width,height,fmt组合一个OeipVideoFrame
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="fmt"></param>
+        /// <param name="videoFrame"></param>
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setVideoFrame(IntPtr data, int width, int height, OeipYUVFMT fmt, ref OeipVideoFrame videoFrame);
+        /// <summary>
+        /// 根据data,填充OeipVideoFrame
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="fmt"></param>
+        /// <param name="videoFrame"></param>
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void fillVideoFrame(IntPtr data, ref OeipVideoFrame videoFrame);
+        /// <summary>
+        /// 复制OeipVideoFrame里数据到IntPtr
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="videoFrame"></param>
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void getVideoFrameData(IntPtr data, ref OeipVideoFrame videoFrame);
+
+
         #endregion
 
         #region camera device
@@ -486,6 +587,58 @@ namespace OeipWrapper
         [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
         public static extern void setDeviceEventAction(int deviceIndex, OnEventDelegate onDeviceEvent);
 
+        #endregion
+
+        #region audio
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setAudioOutputAction(OnAudioDataDelegate destDataHandle, OnAudioOutputDelegate srcDatahandle);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void startAudioOutput(bool bMic, bool bLoopback, OeipAudioDesc desc);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void closeAudioOutput();
+        #endregion
+
+        #region madia
+        /// <summary>
+        /// 生成一个读取媒体文件的管线
+        /// </summary>
+        /// <returns></returns>
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern int initReadMedia();
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setVideoDataAction(int mediaId, OnVideoFrameDelegate onHandle);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setAudioDataAction(int mediaId, OnAudioFrameDelegate onHandle);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setReadOperateAction(int mediaId, OnOperateDelegate onHandle);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall, CharSet = CharSet.Ansi)]
+        public static extern int openReadMedia(int mediaId, string url, bool bPlayAudio);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern bool getMediaVideoInfo(int mediaId, ref OeipVideoEncoder videoInfo);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern bool getMediaAudioInfo(int mediaId, ref OeipAudioEncoder audioInfo);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void closeReadMedia(int mediaId);
+        /// <summary>
+        /// 生成一个写入媒体文件的管线
+        /// </summary>
+        /// <returns></returns>
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern int initWriteMedia();
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setWriteOperateAction(int mediaId, OnOperateDelegate onHandle);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setVideoEncoder(int mediaId, OeipVideoEncoder videoInfo);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void setAudioEncoder(int mediaId, OeipAudioEncoder videoInfo);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall, CharSet = CharSet.Ansi)]
+        public static extern int openWriteMedia(int mediaId, string url, bool bVideo, bool bAudio);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern int pushVideo(int mediaId, ref OeipVideoFrame videoFrame);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern int pushAudio(int mediaId, ref OeipAudioFrame audioFrame);
+        [DllImport(OeipDll, CallingConvention = PInvokeHelper.funcall)]
+        public static extern void closeWriteMedia(int mediaId);
         #endregion
 
         #region gpgpu pipe

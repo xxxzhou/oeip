@@ -10,7 +10,7 @@ VideoPipe::VideoPipe(OeipGpgpuType gpuType) {
 
 	int32_t t1 = addPiepLayer(pipeId, "rgba2yuv test", OEIP_RGBA2YUV_LAYER);
 	int32_t t2 = addPiepLayer(pipeId, "yuv2rgba test", OEIP_YUV2RGBA_LAYER);
-	resizeIndex = addPiepLayer(pipeId, "resize", OEIP_RESIZE_LAYER);
+	//resizeIndex = addPiepLayer(pipeId, "resize", OEIP_RESIZE_LAYER);	
 	//auto x = addPiepLayer(pipeId, "blend", OEIP_BLEND_LAYER);
 	outMap = addPiepLayer(pipeId, "out map channel", OEIP_MAPCHANNEL_LAYER);
 	outIndex = addPiepLayer(pipeId, "output", OEIP_OUTPUT_LAYER);
@@ -29,6 +29,7 @@ VideoPipe::VideoPipe(OeipGpgpuType gpuType) {
 	mp.red = 0;
 	mp.blue = 2;
 	updatePipeParamet(pipeId, outMap, &mp);
+
 }
 
 

@@ -43,11 +43,10 @@ public:
 	int32_t videoIO(uint8_t* buffer, int32_t size);
 public:
 	// 通过 FNetOutput 继承
-	virtual int32_t openURL(const char* url, bool bVideo, bool bAudio) override;
+	virtual int32_t open(const char* url, bool bVideo, bool bAudio) override;
 	virtual void close() override;
 	//输入H264的流数据进来
 	virtual int32_t pushVideo(uint8_t* data, int32_t size, uint64_t timestamp) override;
 	//输入AAC音频数据进来
 	virtual int32_t pushAudio(uint8_t* data, int32_t size, uint64_t timestamp) override;
 };
-

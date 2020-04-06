@@ -1,20 +1,17 @@
 # oeip
 多媒体与游戏引擎(主要支持Unity3D/UE4)
-相关介绍 https://zhuanlan.zhihu.com/p/104027165
 
-第三方库：
-CUDA 10.1安裝:https://developer.nvidia.com/cuda-downloads
+编译项目:
+CUDA 10.1安裝:
+https://developer.nvidia.com/cuda-downloads
+CUDNN 10.1安裝:
+https://developer.nvidia.com/cudnn
 
-CUDNN 10.1安裝:https://developer.nvidia.com/cudnn
-
-下载https://github.com/xxxzhou/oeip-thridparty在Oeip项目下，新建一个ThirdParty文件夹，把oeip-thridparty里的文件全部复制到这。 二种引用DLL方式。 一是把相应的DLL复制到对应oeip dll目录下。 二是在环境变量里把上面的几个文件夹的BIN目录写入，推荐第二种。(1 ThirdParty\cuda 2 ThirdParty\FFmpeg\dll 3 ThirdParty\opencv4\bin 4 ThirdParty\pthread\dll).
-
-直播SDK环境配置：
-
-1 先启动直播服务器 OeipLiveServer
-2 启动媒体服务器 OeipLiveMedia
-3 本机注册OeipLiveCom这个COM组件，然后就可以用了。
-相应UE4/Unity3D里神经网络加载用的的绝对路径，请自己修改相应路径。
+下载 https://github.com/xxxzhou/oeip-thridparty
+在Oeip项目下，新建一个ThirdParty文件夹，把oeip-thridparty里的文件全部复制到这。
+二种引用DLL方式。
+一是把相应的DLL复制到对应OEIP dll目录下。
+二是在环境变量里把上面的几个文件夹的BIN目录写入
 
 为什么想做这个，主要因为如下几点:
 一是现有插件很多都是在插件层拿到CPU数据提交到显存，然后使用游戏引擎本身的上下文处理，这是一个浪费，游戏如在90FPS，而常见多媒体播放只有30FPS。

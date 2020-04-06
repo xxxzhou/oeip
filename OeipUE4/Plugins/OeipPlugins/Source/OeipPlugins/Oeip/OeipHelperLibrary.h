@@ -17,5 +17,7 @@ class OEIPPLUGINS_API UOeipHelperLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure, Category = Oeip)
 		static FString FStreamQualityToFString(const FCameraInfo& cameraInfo);
+	UFUNCTION(BlueprintPure, Category = Oeip)
+		static FDateTime GetDateNow();
 
 };

@@ -28,8 +28,4 @@ extern "C"
 	OEIPLIVEDLL_EXPORT bool stopPullStream(int32_t userId, int32_t index);
 	//登出房间
 	OEIPLIVEDLL_EXPORT bool logoutRoom();
-	//根据data/width/heigh填充videoFrame,一般用在推流把数据收集成OeipVideoFrame
-	OEIPLIVEDLL_EXPORT void getVideoFrame(uint8_t* data, int32_t width, int32_t height, OeipYUVFMT fmt, OeipVideoFrame& videoFrame);
-	//根据videoFrame填充data(data的空间要先申明)，一般用在拉流把OeipVideoFrame转化成桢内连续内存块uint8_t
-	OEIPLIVEDLL_EXPORT void getVideoFrameData(uint8_t* data, const OeipVideoFrame& videoFrame);
 }

@@ -18,8 +18,9 @@ private:
 	OAVCodecContext cdeCtx = nullptr;
 	OeipVideoEncoder encoderDesc = {};
 	OAVFrame frame = nullptr;
-	AVPacket packet = {};	
+	AVPacket packet = {};
 public:
+	virtual AVCodecContext* getCodecCtx() override;
 	virtual int encoder(uint8_t** indata, int length, uint64_t timestamp) override;
 	virtual int readPacket(uint8_t* outData, int& outLength, uint64_t& timestamp) override;
 };

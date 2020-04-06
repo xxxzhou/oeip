@@ -21,7 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <UseVSHostingProcess>true</UseVSHostingProcess>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -116,6 +116,7 @@
     <Compile Include="DisplayWF.Designer.cs">
       <DependentUpon>DisplayWF.cs</DependentUpon>
     </Compile>
+    <Compile Include="ControlHelper.cs" />
     <Compile Include="LiveControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

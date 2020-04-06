@@ -28,6 +28,9 @@
     <Filter Include="video">
       <UniqueIdentifier>{92c1d758-ce0c-4e9c-af3f-f460da28cb22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="media">
+      <UniqueIdentifier>{b1914620-04fd-4612-8835-5fab9dcfce7b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OeipCommon.h">
@@ -74,6 +77,12 @@
     </ClInclude>
     <ClInclude Include="RingBuffer.h">
       <Filter>audio</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaPlay.h">
+      <Filter>media</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaOutput.h">
+      <Filter>media</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

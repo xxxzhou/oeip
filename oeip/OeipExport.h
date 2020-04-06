@@ -22,11 +22,18 @@ extern "C"
 	OEIPDLL_EXPORT void shutdownOeip();
 	//根据设备的视频类型返回对应YUV类型，如果非YUV类型，返回OEIP_YUVFMT_OTHER
 	OEIPDLL_EXPORT OeipYUVFMT getVideoYUV(OeipVideoType videoType);
+	//根据OeipYUVFMT返回OeipVideoType
+	OEIPDLL_EXPORT OeipVideoType getVideoType(OeipYUVFMT videoType);
 	//相应颜色参数一般用uint32_t来表示，用来给用户根据各个通道分量生成uint32_t颜色，通道分量范围0.f-1.f
 	OEIPDLL_EXPORT uint32_t getColor(float r, float g, float b, float a);
 	//CUDA是否加载
 	OEIPDLL_EXPORT bool bCuda();
-
+	//根据data/width/heigh填充videoFrame(注意width/heigh并不是图片长宽，而是data数据排列二维的长宽),一般用在推流把数据收集成OeipVideoFrame
+	OEIPDLL_EXPORT void setVideoFrame(uint8_t* data, int32_t width, int32_t height, OeipYUVFMT fmt, OeipVideoFrame& videoFrame);
+	//根据data直接填充videoFrame里的数据块
+	OEIPDLL_EXPORT void fillVideoFrame(uint8_t* data, OeipVideoFrame& videoFrame);
+	//根据videoFrame填充data(data的空间要先申明)，一般用在拉流把OeipVideoFrame转化成桢内连续内存块uint8_t
+	OEIPDLL_EXPORT void getVideoFrameData(uint8_t* data, const OeipVideoFrame& videoFrame);
 #pragma region camera device 
 	//得到支持的捕获视频设备数量(主要包含webCamera)
 	OEIPDLL_EXPORT int32_t getDeviceCount();
@@ -40,9 +47,9 @@ extern "C"
 	OEIPDLL_EXPORT int32_t getFormat(int32_t deviceIndex);
 	//捕获视频设备设置对应格式
 	OEIPDLL_EXPORT void setFormat(int32_t deviceIndex, int32_t formatIndex);
-	//运行设备
+	//运行视频设备
 	OEIPDLL_EXPORT bool openDevice(int32_t deviceIndex);
-	//关闭设备
+	//关闭视频设备
 	OEIPDLL_EXPORT void closeDevice(int32_t deviceIndex);
 	//设备是否打开状态中
 	OEIPDLL_EXPORT bool bOpen(int32_t deviceIndex);
@@ -63,12 +70,54 @@ extern "C"
 #pragma endregion
 
 #pragma region audio
-	//返回麦或声卡的原始数据
-	OEIPDLL_EXPORT void setAudioOutputHandle(onAudioOutputHandle outDatahandle);
+	//返回麦或声卡混合后的数据以及原始数据	
+	OEIPDLL_EXPORT void setAudioOutputAction(onAudioDataAction destDataHandle, onAudioOutputAction srcDatahandle);
+	OEIPDLL_EXPORT void setAudioOutputHandle(onAudioDataHandle destDataHandle, onAudioOutputHandle srcDatahandle);
 	//开始采集麦与声卡，并返回麦与声卡的经给定格式的重采样输出,如果麦与声卡都为true,则混合输出
-	OEIPDLL_EXPORT void startAudioOutput(bool bMic, bool bLoopback, OeipAudioDesc desc, onAudioDataHandle dataHandle);
+	//OEIPDLL_EXPORT void startAudioOutput(bool bMic, bool bLoopback, OeipAudioDesc desc, onAudioDataHandle dataHandle);
+	OEIPDLL_EXPORT void startAudioOutput(bool bMic, bool bLoopback, OeipAudioDesc desc);
 	//关闭采集麦与声卡
 	OEIPDLL_EXPORT void closeAudioOutput();
+#pragma endregion
+
+#pragma region madia
+	//初始化一个读取媒体协议或是文件的对象,返回值小于0则初始化失败
+	OEIPDLL_EXPORT int32_t initReadMedia();
+	//每桢视频数据处理完后回调
+	OEIPDLL_EXPORT void setVideoDataAction(int32_t mediaId, onVideoFrameAction onHandle);
+	OEIPDLL_EXPORT void setVideoDataEvent(int32_t mediaId, onVideoFrameHandle onHandle);
+	//每桢音频数据处理完后回调
+	OEIPDLL_EXPORT void setAudioDataAction(int32_t mediaId, onAudioFrameAction onHandle);
+	OEIPDLL_EXPORT void setAudioDataEvent(int32_t mediaId, onAudioFrameHandle onHandle);
+	//打开/关闭/读取 结果回调
+	OEIPDLL_EXPORT void setReadOperateAction(int32_t mediaId, onOperateAction onHandle);
+	OEIPDLL_EXPORT void setReadOperateEvent(int32_t mediaId, onOperateHandle onHandle);
+	//打开一个媒体协议或是文件,是否自动播放音频,返回对应处理索引,返回值小于0则没有打开成功
+	OEIPDLL_EXPORT int32_t openReadMedia(int32_t mediaId, const char* url, bool bPlayAudio);
+	//得到对应视频基本信息
+	OEIPDLL_EXPORT bool getMediaVideoInfo(int32_t mediaId, OeipVideoEncoder& videoInfo);
+	//得到对应音频基本信息
+	OEIPDLL_EXPORT bool getMediaAudioInfo(int32_t mediaId, OeipAudioEncoder& audioInfo);
+	//关闭一个媒体协议
+	OEIPDLL_EXPORT void closeReadMedia(int32_t mediaId);
+
+	//初始化一个写入媒体协议或是文件的对象,返回值小于0则初始化失败
+	OEIPDLL_EXPORT int32_t initWriteMedia();
+	//设定各种操作回调
+	OEIPDLL_EXPORT void setWriteOperateAction(int32_t mediaId, onOperateAction onHandle);
+	OEIPDLL_EXPORT void setWriteOperateEvent(int32_t mediaId, onOperateHandle onHandle);
+	//打开写入媒体文件之前，如果有视频信息,请设定相应的基本信息
+	OEIPDLL_EXPORT void setVideoEncoder(int32_t mediaId, OeipVideoEncoder vEncoder);
+	//打开写入媒体文件之前，如果有音频信息,请设定相应的音频信息
+	OEIPDLL_EXPORT void setAudioEncoder(int32_t mediaId, OeipAudioEncoder aEncoder);
+	//写入媒体文件或协议,确定是否保护音视频,返回值小于0则打开失败
+	OEIPDLL_EXPORT int32_t openWriteMedia(int32_t mediaId, const char* url, bool bVideo, bool bAudio);
+	//写入相应的音频数据
+	OEIPDLL_EXPORT int32_t pushVideo(int32_t mediaId, const OeipVideoFrame& videoFrame);
+	//定稿相应的视频数据
+	OEIPDLL_EXPORT int32_t pushAudio(int32_t mediaId, const OeipAudioFrame& audioFrame);
+	//关闭一个媒体协议
+	OEIPDLL_EXPORT void closeWriteMedia(int32_t mediaId);
 #pragma endregion
 
 #pragma region gpgpu pipe

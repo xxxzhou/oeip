@@ -1,35 +1,11 @@
 #include "FAACEncoder.h"
 #include <memory>
 
-inline static bool check_sample_fmt(AVCodec* codec, enum AVSampleFormat sample_fmt) {
-	const enum AVSampleFormat* p = codec->sample_fmts;
-	int i = 0;
-	while (p[i] != AV_SAMPLE_FMT_NONE) {
-		if (p[i] == sample_fmt) {
-			return true;
-		}
-		i++;
+FAACEncoder::FAACEncoder(const OeipAudioEncoder& audioDesc) {
+	encoderDesc = audioDesc;
+	if (encoderDesc.bitrate == 0) {
+		encoderDesc.bitrate = 48000;
 	}
-	return false;
-}
-
-inline static void buildAdts(int size, uint8_t* buffer, int samplerate, int channels) {
-	char* padts = (char*)buffer;
-	int profile = 2;                                            //AAC LC
-	int freqIdx = get_sr_index(samplerate);                     //44.1KHz
-	int chanCfg = channels;            //MPEG-4 Audio Channel Configuration. 1 Channel front-center
-	padts[0] = (char)0xFF;      // 11111111     = syncword
-	padts[1] = (char)0xF1;      // 1111 1 00 1  = syncword MPEG-2 Layer CRC
-	padts[2] = (char)(((profile - 1) << 6) + (freqIdx << 2) + (chanCfg >> 2));
-	padts[6] = (char)0xFC;
-	padts[3] = (char)(((chanCfg & 3) << 6) + ((7 + size) >> 11));
-	padts[4] = (char)(((7 + size) & 0x7FF) >> 3);
-	padts[5] = (char)((((7 + size) & 7) << 5) + 0x1F);
-}
-
-
-FAACEncoder::FAACEncoder(const OeipAudioEncoder& encoderDesc) {
-	this->encoderDesc = encoderDesc;
 	openEncode();
 }
 
@@ -106,14 +82,18 @@ int32_t FAACEncoder::openEncode() {
 	bInit = true;
 }
 
+AVCodecContext* FAACEncoder::getCodecCtx() {
+	return cdeCtx.get();
+}
+
 int FAACEncoder::encoder(uint8_t** indata, int length, uint64_t timestamp) {
 	if (!bInit)
 		return -1;
 	int ret = 0;
 	memcpy(pcmBuffer.data() + pcmBufferSize, *indata, length);
 	pcmBufferSize += length;
-	//传入需要的数据，单位是byte(2表示AV_SAMPLE_FMT_S16)
-	int frameSize = cdeCtx->frame_size * cdeCtx->channels * 2;
+	//传入一桢需要的数据，单位是byte(2表示AV_SAMPLE_FMT_S16)
+	int frameSize = cdeCtx->frame_size * cdeCtx->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);// 2 av_get_bytes_per_sample
 	while (pcmBufferSize >= frameSize) {
 		pcmBufferSize -= frameSize;
 		frame->data[0] = const_cast<uint8_t*>(pcmBuffer.data());
