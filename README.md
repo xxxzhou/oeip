@@ -1,5 +1,6 @@
 # oeip
 多媒体与游戏引擎(主要支持Unity3D/UE4)
+详细介绍 https://zhuanlan.zhihu.com/p/104027165
 
 编译项目:
 CUDA 10.1安裝:
