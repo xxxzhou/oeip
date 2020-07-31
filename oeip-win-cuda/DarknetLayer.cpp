@@ -2,6 +2,12 @@
 #include <filesystem>
 #include <fstream>
 
+#if MSVC_PLATFORM_TOOLSET > 140
+namespace stdfs = std::filesystem;
+#else
+namespace stdfs = std::tr2::sys;
+#endif
+
 template <typename T>
 void resize_gpu(PtrStepSz<T> source, PtrStepSz<T> dest, bool bLinear, cudaStream_t stream);
 void image2netData_gpu(PtrStepSz<uchar4> source, float* outData, cudaStream_t stream = nullptr);
@@ -17,8 +23,8 @@ DarknetLayerCuda::~DarknetLayerCuda() {
 
 void DarknetLayerCuda::onParametChange(DarknetParamet oldT) {
 	if (layerParamet.bLoad && !oldT.bLoad) {
-		bool bInCfg = std::tr2::sys::exists(layerParamet.confile);
-		bool bInWgt = std::tr2::sys::exists(layerParamet.weightfile);
+		bool bInCfg = stdfs::exists(layerParamet.confile);
+		bool bInWgt = stdfs::exists(layerParamet.weightfile);
 		if (!bInCfg || !bInWgt) {
 			logMessage(OEIP_ERROR, "cfg or weights not find.");
 			layerParamet.bLoad = false;

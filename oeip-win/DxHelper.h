@@ -9,7 +9,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <atlcomcli.h>
-#include <cstdint>
+//#include <cstdint>
 #include "../oeip/OeipCommon.h"
 
 OEIPWINDLL_EXPORT int sizeDxFormatElement(DXGI_FORMAT format);

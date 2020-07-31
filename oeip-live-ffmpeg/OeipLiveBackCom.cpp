@@ -1,5 +1,5 @@
 #include "OeipLiveBackCom.h"
-#include <string>
+
 #include "../oeip/OeipCommon.h"
 
 OeipLiveBackCom::~OeipLiveBackCom() {

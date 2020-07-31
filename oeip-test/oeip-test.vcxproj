@@ -23,7 +23,7 @@
     <ProjectGuid>{9FC86192-B1DE-4ABA-AE98-6E89C14F6870}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>oeiptest</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

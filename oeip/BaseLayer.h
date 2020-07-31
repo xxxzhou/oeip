@@ -177,7 +177,7 @@ inline void BaseLayerTemplate<T>::updateParamet(const void* paramet) {
 
 template<OeipLayerType layerType>
 void updateParametTemplate(BaseLayer* layer, const void* paramet) {
-	using ParametType = LayerParamet<layerType, AllLayerParamet>::ParametType;
+	using ParametType = typename LayerParamet<layerType, AllLayerParamet>::ParametType;
 	auto xlayer = dynamic_cast<BaseLayerTemplate<ParametType>*>(layer);
 	xlayer->updateParamet(paramet);
 }

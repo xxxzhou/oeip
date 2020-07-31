@@ -7,6 +7,12 @@
 #include <iomanip>
 #include <iostream>
 
+#if MSVC_PLATFORM_TOOLSET > 140
+namespace stdfs = std::filesystem;
+#else
+namespace stdfs = std::tr2::sys;
+#endif
+
 static logEventHandle logHandle = nullptr;
 
 void logMessage(int32_t level, const char* message) {
@@ -115,7 +121,7 @@ void copycharstr(char* dest, const char* source, int32_t maxlength) {
 }
 
 bool loadFile(std::wstring path, std::vector<uint8_t>& data, int32_t length) {
-	bool bIn = std::tr2::sys::exists(path);
+	bool bIn = stdfs::exists(path);
 	if (!bIn) {
 		std::string message = "path not exist:" + wstring2string(path);
 		logMessage(OEIP_WARN, message.c_str());

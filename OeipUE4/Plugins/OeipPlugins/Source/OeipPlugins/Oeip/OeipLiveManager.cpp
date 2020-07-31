@@ -49,7 +49,7 @@ bool OeipLiveManager::PushVideoFrame(int index, uint8_t * data, int width, int h
 	if (!bLogin)
 		return false;
 	OeipVideoFrame& videoFrame = index == 0 ? mainVideoFrame : auxVideoFrame;
-	getVideoFrame(data, width, height, fmt, videoFrame);
+	setVideoFrame(data, width, height, fmt, videoFrame);
 	return pushVideoFrame(index, videoFrame);
 }
 

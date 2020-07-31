@@ -1,6 +1,7 @@
 #pragma once
 #import "OeipLiveCom.tlb" named_guids raw_interface_only
 #include "../oeip-live/OeipLiveBack.h"
+#include <string>
 using namespace OeipLiveCom;
 
 typedef std::function<void(std::string server, int32_t port, int32_t userId)> onServeBack;

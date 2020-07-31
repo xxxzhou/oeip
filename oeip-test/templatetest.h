@@ -38,7 +38,7 @@ namespace Templatetest
 		void update(void* index) {
 			Fruit<0> xxx;
 			//auto xx = xxx.t;
-			using xxxx = At<LayerType, int, double, char>::ptype;
+			using xxxx = typename At<LayerType, int, double, char>::ptype;
 			//std::cout << typeid(*index) << std::endl;
 			xxxx* x = (xxxx*)index;
 			std::cout << *x << std::endl;
