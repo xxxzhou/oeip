@@ -2,6 +2,10 @@
 多媒体与游戏引擎(主要支持Unity3D/UE4)
 详细介绍 https://zhuanlan.zhihu.com/p/104027165
 
+请注意:
+直接使用Download zip下载的文件编译不过，可以通过git clone --depth 1来解决，这个大小应该在6M左右。
+然后第三方库直接使用Download zip下载就行,git clone国内可能不下来。
+
 编译项目:
 CUDA 10.1安裝:
 https://developer.nvidia.com/cuda-downloads
