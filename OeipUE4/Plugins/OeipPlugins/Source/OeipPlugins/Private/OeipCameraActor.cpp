@@ -18,6 +18,7 @@ void AOeipCameraActor::SettingChange(const EOeipSettingType & settingType, const
 		}
 		//如果更新了摄像机
 		if ((name == L"cameraIndex" || name == L"formatIndex") && deviceSetting.cameraIndex >= 0) {
+                        if(oeipCamera){
 			//先把原来摄像机关闭
 			oeipCamera->Close();
 			//重新设置
@@ -26,6 +27,7 @@ void AOeipCameraActor::SettingChange(const EOeipSettingType & settingType, const
 			oeipCamera->SetFormat(deviceSetting.formatIndex);
 			changeFormat();
 			oeipCamera->Open();
+			}
 		}
 	}
 	else if (settingType == EOeipSettingType::GrabCut) {
